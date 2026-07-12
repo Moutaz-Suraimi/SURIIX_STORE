@@ -90,6 +90,17 @@ const StoreDashboard = () => {
     fetchPlans();
   }, []);
 
+  // Listen for tab-switch events from child components (e.g. DomainTab upgrade button)
+  React.useEffect(() => {
+    const handler = (e: Event) => {
+      const tab = (e as CustomEvent).detail;
+      if (tab) setActiveTab(tab);
+    };
+    window.addEventListener('suriix_switch_tab', handler);
+    return () => window.removeEventListener('suriix_switch_tab', handler);
+  }, []);
+
+
   // Theme Toggle State
   const [isDark, setIsDark] = useState(document.documentElement.classList.contains('dark'));
   const toggleTheme = () => {
@@ -931,7 +942,7 @@ const StoreDashboard = () => {
 
 
             {/* FALLBACK TABS */}
-            {['overview', 'settings', 'products', 'categories', 'orders', 'customers', 'offers', 'coupons', 'banners', 'pages', 'wallet', 'subscription', 'support', 'payment'].indexOf(activeTab) === -1 && (
+            {['overview', 'settings', 'products', 'categories', 'orders', 'customers', 'offers', 'coupons', 'banners', 'pages', 'wallet', 'subscription', 'support', 'payment', 'domain'].indexOf(activeTab) === -1 && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="min-h-[500px] flex flex-col items-center justify-center text-center opacity-40">
                 <Settings className="w-16 h-16 animate-spin-slow mb-4" />
                 <h2 className="text-2xl font-bold mb-2">هذه الصفحة قيد التطوير</h2>
@@ -3106,7 +3117,14 @@ const DomainTab = React.memo(({ storeData, onUpdateField }: { storeData: any, on
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [domainData, setDomainData] = useState<any>(null);
   const [errorStr, setErrorStr] = useState('');
-  
+
+  // Check if user has Pro or Business plan (domain feature requires upgrade)
+  const pkg: string = storeData?.package || storeData?.tier || storeData?.subscription_name || '';
+  // Also read from localStorage for cases where the full plan name is stored there
+  const localTier = (() => { try { const ls = localStorage.getItem('suriix_added_stores'); if (ls) { const list = JSON.parse(ls); return list[0]?.tier || list[0]?.subscription_name || ''; } } catch { } return ''; })();
+  const effectivePkg = pkg || localTier;
+  const hasDomainAccess = effectivePkg.includes('احترافي') || effectivePkg.includes('بيزنس') || effectivePkg.includes('Business') || effectivePkg.includes('Professional') || effectivePkg.includes('VIP');
+
   const handleLinkDomain = async () => {
     const cleanDomain = domain.replace(/^https?:\/\//, '').replace(/\/$/, '').trim();
     if (!cleanDomain || cleanDomain.includes('/')) {
@@ -3137,7 +3155,9 @@ const DomainTab = React.memo(({ storeData, onUpdateField }: { storeData: any, on
       // Save domain locally / in supabase
       toast.success('تم إضافة النطاق بنجاح! قد تحتاج الآن إلى إعداد الـ DNS الخاص بك.');
       setDomainData(result);
+      // Update both custom_domain AND the visible store URL
       onUpdateField('custom_domain', cleanDomain);
+      onUpdateField('url', cleanDomain);
       
       if (storeData.id && !String(storeData.id).startsWith("local-")) {
           const { error: dbError } = await supabase.from('stores').update({ custom_domain: cleanDomain }).eq('id', storeData.id);
@@ -3152,6 +3172,27 @@ const DomainTab = React.memo(({ storeData, onUpdateField }: { storeData: any, on
       setIsSubmitting(false);
     }
   };
+
+  // Show upgrade gate if user doesn't have access
+  if (!hasDomainAccess) {
+    return (
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 max-w-4xl mx-auto pt-6 pb-20 text-right" dir="rtl">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl p-8 border border-border/40 shadow-sm dark:border-slate-800 text-right flex flex-col items-center justify-center text-center py-16">
+          <div className="w-20 h-20 bg-amber-50 dark:bg-amber-900/30 rounded-full flex items-center justify-center mb-6 border-4 border-amber-100 dark:border-amber-800/40">
+            <Crown className="w-10 h-10 text-amber-500" />
+          </div>
+          <h2 className="text-2xl font-black text-slate-800 dark:text-white mb-3">ترقية مطلوبة</h2>
+          <p className="text-slate-500 dark:text-slate-300 text-sm max-w-sm leading-relaxed mb-8">ميزة ربط النطاق المخصص متاحة فقط لمشتركي الباقة الاحترافية وما فوق. قم بالترقية الآن للحصول على نطاقك الخاص.</p>
+          <button
+            onClick={() => { /* Navigate to subscription tab is handled outside */ window.dispatchEvent(new CustomEvent('suriix_switch_tab', { detail: 'subscription' })); }}
+            className="bg-amber-500 hover:bg-amber-600 text-white font-bold px-8 py-4 rounded-2xl transition shadow-lg shadow-amber-200 dark:shadow-amber-900/40 flex items-center gap-2"
+          >
+            <Crown className="w-5 h-5" /> الترقية للباقة الاحترافية
+          </button>
+        </div>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 max-w-4xl mx-auto pt-6 pb-20 text-right" dir="rtl">
