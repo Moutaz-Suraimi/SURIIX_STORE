@@ -5,7 +5,7 @@ import {
   ImageIcon, Star, BarChart3, Palette, Settings, CreditCard,
   HelpCircle, Bell, Search, Plus, ExternalLink, Copy, Edit3, Share2,
   PackageCheck, Eye, BadgeCheck, TrendingUp, User, Clock, CheckCircle2, XCircle, Trash2, MessageSquare, Lock, Moon, Sun, Save, Mail,
-  ArrowLeftRight, FileText, Activity, ShieldCheck, Calendar, ArrowDownToLine, ArrowUpFromLine, Zap, Headset, Facebook, Wallet, LogOut, Rocket, Crown
+  ArrowLeftRight, FileText, Activity, ShieldCheck, Calendar, ArrowDownToLine, ArrowUpFromLine, Zap, Headset, Facebook, Wallet, LogOut, Rocket, Crown, Globe
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { supabase } from "@/lib/supabase";
@@ -40,6 +40,7 @@ const SidebarMenu = [
   { id: 'analytics', label: 'التحليلات', icon: BarChart3 },
   { id: 'appearance', label: 'المظهر', icon: Palette },
   { id: 'settings', label: 'إعدادات المتجر', icon: Settings },
+  { id: 'domain', label: 'ربط نطاق خاص', icon: Globe },
   { id: 'payment', label: 'وسائل الدفع', icon: CreditCard },
   { id: 'subscription', label: 'الاشتراك', icon: BadgeCheck },
   { id: 'wallet', label: 'المحفظة الإلكترونية', icon: Wallet },
@@ -925,6 +926,7 @@ const StoreDashboard = () => {
               }} />
             }
             {activeTab === 'support' && <SupportTab storeData={storeData} />}
+            {activeTab === 'domain' && <DomainTab storeData={storeData} onUpdateField={updateGlobalStoreField} />}
             {activeTab === 'payment' && <PaymentTab storeData={storeData} onUpdateField={updateGlobalStoreField} />}
 
 
@@ -3098,5 +3100,164 @@ const CustomersTab = ({ storeData }: { storeData: any }) => {
     </motion.div>
   );
 };
+
+const DomainTab = React.memo(({ storeData, onUpdateField }: { storeData: any, onUpdateField: (field: string, val: any) => void }) => {
+  const [domain, setDomain] = useState(() => storeData?.custom_domain || '');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [domainData, setDomainData] = useState<any>(null);
+  const [errorStr, setErrorStr] = useState('');
+  
+  const handleLinkDomain = async () => {
+    const cleanDomain = domain.replace(/^https?:\/\//, '').replace(/\/$/, '').trim();
+    if (!cleanDomain || cleanDomain.includes('/')) {
+      setErrorStr('الرجاء إدخال نطاق صالح ومسموح به (مثال: mystore.com)');
+      return;
+    }
+    
+    setIsSubmitting(true);
+    setErrorStr('');
+    setDomainData(null);
+    
+    try {
+      // call Vercel via backend API
+      const response = await fetch('/api/domain', { 
+         method: 'POST', 
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify({ domain: cleanDomain }) 
+      });
+      
+      const result = await response.json();
+      
+      if (!response.ok) {
+         setErrorStr(result.error?.message || result.error || 'فشل في ربط النطاق. تأكد من أن النطاق غير مرتبط مسبقاً.');
+         setIsSubmitting(false);
+         return;
+      }
+      
+      // Save domain locally / in supabase
+      toast.success('تم إضافة النطاق بنجاح! قد تحتاج الآن إلى إعداد الـ DNS الخاص بك.');
+      setDomainData(result);
+      onUpdateField('custom_domain', cleanDomain);
+      
+      if (storeData.id && !String(storeData.id).startsWith("local-")) {
+          const { error: dbError } = await supabase.from('stores').update({ custom_domain: cleanDomain }).eq('id', storeData.id);
+          if (dbError) {
+              console.error('Failed to sync domain to DB:', dbError);
+              toast.error('لم يتم مزامنة النطاق مع قاعدة البيانات بشكل صحيح');
+          }
+      }
+    } catch (err: any) {
+      setErrorStr(err.message || 'حدث خطأ مجهول أثناء محاولة ربط النطاق');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 max-w-4xl mx-auto pt-6 pb-20 text-right" dir="rtl">
+       <div className="bg-white dark:bg-slate-800 rounded-2xl p-8 border border-border/40 shadow-sm dark:border-slate-800 text-right">
+           <div className="flex items-center gap-4 mb-6">
+               <div className="w-14 h-14 bg-primary/10 text-primary rounded-2xl flex items-center justify-center shrink-0">
+                  <Globe className="w-7 h-7" />
+               </div>
+               <div>
+                  <h2 className="text-2xl font-black text-slate-800 dark:text-white">تخصيص نطاق المتجر</h2>
+                  <p className="text-sm text-slate-500 mt-1 font-medium max-w-md dark:text-slate-300">قم بربط النطاق الخاص بك (دومين) ليعكس هوية علامتك التجارية بشكل أكثر احترافية بدلاً من رابط المنصة الافتراضي.</p>
+               </div>
+           </div>
+           
+           <div className="space-y-4">
+              <div>
+                 <label className="block text-slate-600 dark:text-slate-300 mb-2 font-medium text-sm">اسم النطاق (Domain)</label>
+                 <div className="flex flex-col md:flex-row gap-3">
+                    <input 
+                       value={domain}
+                       onChange={e => { setDomain(e.target.value); setErrorStr(''); }}
+                       type="text" 
+                       dir="ltr"
+                       placeholder="مثال: www.mystore.com" 
+                       className="flex-1 bg-slate-50 dark:bg-[#0f172a] p-4 rounded-xl border border-slate-200 dark:border-slate-800 focus:border-primary outline-none transition text-left tracking-wider font-mono shadow-inner" 
+                    />
+                    <button 
+                       onClick={handleLinkDomain}
+                       disabled={isSubmitting || !domain.trim()}
+                       className="bg-primary text-white font-bold py-4 px-8 rounded-xl hover:bg-primary/90 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary/20 shrink-0"
+                    >
+                       {isSubmitting ? 'جاري التحقق...' : 'ربط النطاق'}
+                    </button>
+                 </div>
+                 {errorStr && <p className="text-rose-500 text-sm font-bold mt-2 bg-rose-50 dark:bg-rose-900/20 p-2.5 rounded-lg w-fit">{errorStr}</p>}
+                 {storeData?.custom_domain && storeData.custom_domain === domain && !domainData && (
+                     <div className="mt-2 text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 font-bold text-xs px-3 py-2 rounded-lg w-fit flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4" /> النطاق مرتبط ومحفوظ ({storeData.custom_domain})
+                     </div>
+                 )}
+              </div>
+              
+              {domainData && (
+                 <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mt-8 bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/40 p-6 rounded-2xl overflow-hidden">
+                    <h3 className="font-bold text-lg text-blue-800 dark:text-blue-300 mb-4 flex items-center gap-2">
+                       <Zap className="w-5 h-5" /> خطوة أخيرة! قم بإعداد الـ DNS
+                    </h3>
+                    <p className="text-sm font-medium leading-relaxed text-blue-700/80 dark:text-blue-200/80 mb-6">
+                       لقد تم إنشاء النطاق في جانبنا بنجاح. الآن لكي يبدأ النطاق بالعمل، يجب عليك الذهاب إلى لوحة تحكم مزود الخدمة الخاص بك (مثل GoDaddy، Namecheap) وإضافة السجلات التالية الموضحة أدناه ليتم توجيه المستخدمين لمتجرك:
+                    </p>
+                    
+                    <div className="space-y-4">
+                       <h4 className="font-bold text-blue-800 dark:text-blue-300 border-b border-blue-200/60 pb-2">سجلات A Record (للنطاقات الأساسية root domain)</h4>
+                       <div className="bg-white dark:bg-slate-900 border border-blue-100 dark:border-blue-800/50 p-4 rounded-xl flex items-center justify-between text-left font-mono">
+                          <div>
+                             <p className="text-xs text-slate-500 mb-1 font-sans">Type</p>
+                             <p className="font-bold">A</p>
+                          </div>
+                          <div>
+                             <p className="text-xs text-slate-500 mb-1 font-sans">Name</p>
+                             <p className="font-bold">@</p>
+                          </div>
+                          <div>
+                             <p className="text-xs text-slate-500 mb-1 font-sans">Value</p>
+                             <p className="font-bold">76.76.21.21</p>
+                          </div>
+                          <button onClick={() => { navigator.clipboard.writeText('76.76.21.21'); toast.success('تم نسخ الـ IP'); }} className="p-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition"><Copy className="w-4 h-4" /></button>
+                       </div>
+                       
+                       <h4 className="font-bold text-blue-800 dark:text-blue-300 border-b border-blue-200/60 pb-2 mt-4">سجل CNAME (للنطاقات الفرعية www أو غيره)</h4>
+                       <div className="bg-white dark:bg-slate-900 border border-blue-100 dark:border-blue-800/50 p-4 rounded-xl flex items-center justify-between text-left font-mono">
+                          <div>
+                             <p className="text-xs text-slate-500 mb-1 font-sans">Type</p>
+                             <p className="font-bold">CNAME</p>
+                          </div>
+                          <div>
+                             <p className="text-xs text-slate-500 mb-1 font-sans">Name</p>
+                             <p className="font-bold">www</p>
+                          </div>
+                          <div>
+                             <p className="text-xs text-slate-500 mb-1 font-sans">Value</p>
+                             <p className="font-bold">cname.vercel-dns.com</p>
+                          </div>
+                          <button onClick={() => { navigator.clipboard.writeText('cname.vercel-dns.com'); toast.success('تم النسخ'); }} className="p-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition"><Copy className="w-4 h-4" /></button>
+                       </div>
+                    </div>
+                    {domainData.verification && domainData.verification.length > 0 && (
+                       <div className="mt-6 pt-4 border-t border-blue-200/50">
+                          <p className="text-amber-600 dark:text-amber-400 font-bold text-sm">ملاحظة: لقد عثرنا على إعدادات تحقق إضافية (TXT Verification) من المحتمل أنك تحتاج لإضافتها أيضاً:</p>
+                          <div className="space-y-2 mt-3">
+                             {domainData.verification.map((vr: any, idx: number) => (
+                                <div key={idx} className="bg-amber-50 dark:bg-amber-900/20 p-3 rounded-lg border border-amber-100 dark:border-amber-800/30 flex justify-between font-mono text-xs items-center text-left">
+                                   <span><strong className="font-sans mr-2 text-amber-700">Type:</strong> {vr.type}</span>
+                                   <span><strong className="font-sans mr-2 text-amber-700">Name:</strong> {vr.domain}</span>
+                                   <span><strong className="font-sans mr-2 text-amber-700">Value:</strong> {vr.value}</span>
+                                </div>
+                             ))}
+                          </div>
+                       </div>
+                    )}
+                 </motion.div>
+              )}
+           </div>
+       </div>
+    </motion.div>
+  );
+});
 
 export default StoreDashboard;
