@@ -169,7 +169,7 @@ const StoreDashboard = () => {
               ...prev,
               id: latestStore.id || '',
               name: storeName,
-              url: latestStore.slug ? `${latestStore.slug}.suriix.com` : 'mubashyrah.com',
+              url: latestStore.slug ? `${latestStore.slug}.suriix.store` : 'mubashyrah.com',
               initial: storeName.charAt(0),
               wallet: latestStore.wallet || 0,
               wallet_yer: latestStore.wallet_yer || latestStore.wallet || 0,
@@ -200,7 +200,7 @@ const StoreDashboard = () => {
                     setStoreData(prev => ({
                       ...prev,
                       name: storeRow.store_name || prev.name,
-                      url: storeRow.custom_domain || (storeRow.store_url ? `${storeRow.store_url}.suriix.com` : prev.url),
+                      url: storeRow.custom_domain || (storeRow.store_url ? `${storeRow.store_url}.suriix.store` : prev.url),
                       slug: storeRow.store_url || '',
                       initial: (storeRow.store_name || prev.name).charAt(0),
                       custom_domain: storeRow.custom_domain || '',
@@ -2073,12 +2073,12 @@ const SettingsTab = React.memo(({ storeData, onUpdateField }: { storeData: any, 
                 <div className="flex items-center bg-muted/50 rounded-xl border border-border/50 overflow-hidden" dir="ltr">
                   <input
                     type="text"
-                    value={storeData.slug || storeData.url?.replace('.suriix.com', '') || ''}
+                    value={storeData.slug || storeData.url?.replace('.suriix.store', '') || ''}
                     readOnly
                     className="flex-1 bg-transparent p-3.5 text-right outline-none font-bold text-muted-foreground"
                     placeholder="soon"
                   />
-                  <span className="px-3 text-xs text-muted-foreground font-mono border-l border-border/50 py-3.5 shrink-0 bg-muted/80">.suriix.com</span>
+                  <span className="px-3 text-xs text-muted-foreground font-mono border-l border-border/50 py-3.5 shrink-0 bg-muted/80">.suriix.store</span>
                 </div>
                 
                 <div className="p-4 border border-border/50 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 mt-2">
@@ -2344,7 +2344,7 @@ const WalletTabV2 = React.memo(({ storeData }: { storeData: any }) => {
         <div className="lg:col-span-4">
           {(() => {
             const storeId = storeData?.id ? String(storeData.id).replace('local-', '') : 'local';
-            const slug = storeData?.url?.replace('.suriix.com', '') || storeId;
+            const slug = storeData?.url?.replace('.suriix.store', '') || storeId;
             let totalIn = 0, totalOut = 0, txCount = 0, lastTx = '-';
             try {
               const txList = JSON.parse(localStorage.getItem('suriix_local_transactions') || '[]');

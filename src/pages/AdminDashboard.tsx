@@ -1501,7 +1501,7 @@ const AdminDashboard = () => {
                             </div>
                           </td>
                           <td className="py-4 px-6 text-sm">
-                            <a href={`https://${store.slug}.suriix.com`} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline font-bold" dir="ltr">{store.slug}.suriix.com</a>
+                            <a href={`https://${store.slug}.suriix.store`} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline font-bold" dir="ltr">{store.slug}.suriix.store</a>
                           </td>
                           <td className="py-4 px-6 text-sm">
                             <div className="flex flex-col">
@@ -1863,7 +1863,7 @@ const AdminDashboard = () => {
             <h2 className="text-xl font-black mb-4">تفاصيل المتجر</h2>
             <div className="space-y-3 font-medium text-sm text-gray-700 dark:text-gray-300">
               <p><strong>اسم المتجر:</strong> {selectedStore.store_name || 'غير معروف'}</p>
-              <p><strong>رابط المتجر:</strong> <a href={`https://${selectedStore.slug}.suriix.com`} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline">{selectedStore.slug}.suriix.com</a></p>
+              <p><strong>رابط المتجر:</strong> <a href={`https://${selectedStore.slug}.suriix.store`} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline">{selectedStore.slug}.suriix.store</a></p>
               <p><strong>المالك:</strong> {selectedStore.users?.name || 'غير معروف'} ({selectedStore.users?.email})</p>
               <p><strong>حالة المتجر:</strong> <span className={selectedStore.is_active ? 'text-green-500' : 'text-red-500'}>{selectedStore.is_active ? 'نشط' : 'بانتظار الدفع أو موقوف'}</span></p>
               <p><strong>الباقة:</strong> {selectedStore.tier || 'غير محدد'}</p>
@@ -1889,7 +1889,7 @@ const AdminDashboard = () => {
                 <label className="text-xs font-bold text-gray-500 block mb-1 dark:text-slate-300">رابط المتجر (slug)</label>
                 <div className="flex bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-white/10 rounded-lg overflow-hidden h-11">
                   <input type="text" className="flex-1 bg-transparent px-3 outline-none focus:bg-white dark:focus:bg-[#1A1A24] text-sm font-medium transition-colors" value={selectedStore.slug} onChange={e => setSelectedStore({...selectedStore, slug: e.target.value})} dir="ltr" required/>
-                  <span className="flex items-center px-3 bg-gray-100 dark:bg-white/5 border-r border-gray-200 dark:border-white/10 text-xs font-bold text-gray-500" dir="ltr">.suriix.com</span>
+                  <span className="flex items-center px-3 bg-gray-100 dark:bg-white/5 border-r border-gray-200 dark:border-white/10 text-xs font-bold text-gray-500" dir="ltr">.suriix.store</span>
                 </div>
               </div>
               <div>
@@ -1953,7 +1953,7 @@ const AdminDashboard = () => {
                 <label className="text-xs font-bold text-gray-500 block mb-1 dark:text-slate-300">رابط المتجر (slug)</label>
                 <div className="flex bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-white/10 rounded-lg overflow-hidden h-11">
                   <input type="text" className="flex-1 bg-transparent px-3 outline-none focus:bg-white dark:focus:bg-[#1A1A24] text-sm font-medium transition-colors" value={selectedStore?.slug || ''} onChange={e => setSelectedStore({...selectedStore, slug: e.target.value})} dir="ltr" placeholder="my-store" required/>
-                  <span className="flex items-center px-3 bg-gray-100 dark:bg-white/5 border-r border-gray-200 dark:border-white/10 text-xs font-bold text-gray-500" dir="ltr">.suriix.com</span>
+                  <span className="flex items-center px-3 bg-gray-100 dark:bg-white/5 border-r border-gray-200 dark:border-white/10 text-xs font-bold text-gray-500" dir="ltr">.suriix.store</span>
                 </div>
               </div>
               

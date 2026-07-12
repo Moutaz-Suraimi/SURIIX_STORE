@@ -563,7 +563,7 @@ const CreateStore = () => {
                           <label className="text-xs font-bold text-slate-400 block mb-2 tracking-wide uppercase dark:text-slate-300">Store URL / رابط المتجر</label>
                           <div className="flex" dir="ltr">
                             <input type="text" value={storeLink} onChange={e => setStoreLink(e.target.value.replace(/[^a-zA-Z0-9-]/g, '').toLowerCase())} placeholder="my-store" className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-l-xl px-4 py-3.5 text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500 text-right pr-4" />
-                            <div className="bg-slate-100 dark:bg-white/5 border border-l-0 border-slate-200 dark:border-white/10 rounded-r-xl px-4 py-3.5 text-sm font-bold text-slate-500 whitespace-nowrap flex items-center dark:text-slate-300">.suriix.com</div>
+                            <div className="bg-slate-100 dark:bg-white/5 border border-l-0 border-slate-200 dark:border-white/10 rounded-r-xl px-4 py-3.5 text-sm font-bold text-slate-500 whitespace-nowrap flex items-center dark:text-slate-300">.suriix.store</div>
                           </div>
                           <p className="text-[10px] text-slate-500 mt-1.5 float-right w-full text-right dark:text-slate-300">باللغة الإنجليزية فقط ولا يقبل مسافات (مثال: my-store)</p>
                         </div>
