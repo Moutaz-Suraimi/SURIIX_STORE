@@ -1750,6 +1750,24 @@ const AdminDashboard = () => {
                 <label className="text-xs font-bold text-gray-500 block mb-1 dark:text-slate-300">رصيد المحفظة (ر.ي)</label>
                 <input type="number" className="w-full h-11 border border-gray-200 dark:border-white/10 dark:bg-black/20 rounded-lg px-3 outline-none focus:border-purple-500 text-sm font-bold" defaultValue={selectedUser.wallet_yer || 0} id="edit-user-wallet"/>
               </div>
+              {selectedUser.role === 'store_owner' && (() => {
+                const userStore = storesList.find(s => s.user_id === selectedUser.id);
+                return (
+                  <div>
+                    <label className="text-xs font-bold text-gray-500 block mb-1 dark:text-slate-300">اسم المتجر</label>
+                    <input
+                      type="text"
+                      className="w-full h-11 border border-indigo-200 dark:border-indigo-500/30 dark:bg-black/20 rounded-lg px-3 outline-none focus:border-indigo-500 text-sm font-medium bg-indigo-50/30"
+                      defaultValue={userStore?.store_name || ''}
+                      id="edit-user-store-name"
+                      placeholder="لا يوجد متجر مرتبط"
+                    />
+                    {!userStore && (
+                      <p className="text-xs text-amber-500 mt-1 font-bold">⚠ لا يوجد متجر مرتبط بهذا المستخدم بعد</p>
+                    )}
+                  </div>
+                );
+              })()}
             </div>
             <button onClick={async () => {
               const name = (document.getElementById('edit-user-name') as HTMLInputElement).value;
@@ -1758,8 +1776,25 @@ const AdminDashboard = () => {
               const wallet_yer = parseInt((document.getElementById('edit-user-wallet') as HTMLInputElement).value) || 0;
               
               const { error } = await supabase.from('users').update({ name, email, role, wallet_yer }).eq('id', selectedUser.id);
-              if (error) toast.error('وقع خطأ أثناء التحديث: ' + error.message);
-              else { toast.success('تم تحديث البيانات بنجاح!'); fetchUsers(); setIsUserEditOpen(false); }
+              if (error) { toast.error('وقع خطأ أثناء تحديث المستخدم: ' + error.message); return; }
+
+              // Update store name if the user is a store_owner
+              const storeNameInput = document.getElementById('edit-user-store-name') as HTMLInputElement | null;
+              if (storeNameInput && role === 'store_owner') {
+                const store_name = storeNameInput.value.trim();
+                if (store_name) {
+                  const userStore = storesList.find(s => s.user_id === selectedUser.id);
+                  if (userStore) {
+                    const { error: storeError } = await supabase.from('stores').update({ store_name }).eq('id', userStore.id);
+                    if (storeError) { toast.error('تم تحديث المستخدم لكن وقع خطأ في تحديث المتجر: ' + storeError.message); fetchUsers(); fetchStores(); setIsUserEditOpen(false); return; }
+                  }
+                }
+              }
+
+              toast.success('تم تحديث البيانات بنجاح!');
+              fetchUsers();
+              fetchStores();
+              setIsUserEditOpen(false);
             }} className="w-full mt-6 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-black transition-colors shadow-lg shadow-purple-600/20">حفظ التعديلات الشاملة</button>
           </div>
         </div>
