@@ -51,6 +51,13 @@ const AdminDashboard = () => {
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
   const [isPlanEditOpen, setIsPlanEditOpen] = useState(false);
 
+  // Stores Management States
+  const [selectedStore, setSelectedStore] = useState<any>(null);
+  const [isStoreViewOpen, setIsStoreViewOpen] = useState(false);
+  const [isStoreEditOpen, setIsStoreEditOpen] = useState(false);
+  const [isAddStoreOpen, setIsAddStoreOpen] = useState(false);
+  const [storeSearch, setStoreSearch] = useState('');
+
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -374,6 +381,71 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleDeleteStore = async (storeId: string) => {
+    if (window.confirm('هل أنت متأكد من حذف هذا المتجر نهائياً؟ لا يمكن التراجع عن هذا الإجراء.')) {
+      try {
+        const { error } = await supabase.from('stores').delete().eq('id', storeId);
+        if (error) throw error;
+        toast.success('تم حذف المتجر بنجاح');
+        fetchStores();
+      } catch (e: any) {
+        toast.error('حدث خطأ أثناء حذف المتجر: ' + e.message);
+      }
+    }
+  };
+
+  const handleSaveStore = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedStore) return;
+    try {
+      const { error } = await supabase
+        .from('stores')
+        .update({
+          store_name: selectedStore.store_name,
+          slug: selectedStore.slug,
+          is_active: selectedStore.is_active,
+          tier: selectedStore.tier
+        })
+        .eq('id', selectedStore.id);
+      
+      if (error) throw error;
+      toast.success('تم تحديث بيانات المتجر بنجاح');
+      setIsStoreEditOpen(false);
+      fetchStores();
+    } catch (e: any) {
+      toast.error('حدث خطأ أثناء تحديث المتجر: ' + e.message);
+    }
+  };
+
+  const handleAddStore = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedStore?.user_id || !selectedStore?.store_name || !selectedStore?.slug) {
+      toast.error('يرجى تعبئة جميع الحقول المطلوبة');
+      return;
+    }
+    try {
+      const { error } = await supabase.from('stores').insert({
+        user_id: selectedStore.user_id,
+        store_name: selectedStore.store_name,
+        slug: selectedStore.slug,
+        is_active: false,
+        tier: 'free'
+      });
+      if (error) throw error;
+      
+      // Update user role to store_owner
+      await supabase.from('users').update({ role: 'store_owner' }).eq('id', selectedStore.user_id);
+      
+      toast.success('تم إنشاء المتجر بنجاح');
+      setIsAddStoreOpen(false);
+      setSelectedStore(null);
+      fetchStores();
+      fetchUsers();
+    } catch (e: any) {
+      toast.error('حدث خطأ أثناء إنشاء المتجر: ' + e.message);
+    }
+  };
+
   const handleDeleteMarketer = async (marketerId: string) => {
     if (window.confirm('هل أنت متأكد من حذف هذا المسوق؟ سيتم إزالة جميع بياناته بشكل نهائي.')) {
       try {
@@ -458,6 +530,16 @@ const AdminDashboard = () => {
   const filteredRequests = rechargeRequests.filter(r => {
     if (statusFilter !== 'all' && r.status !== statusFilter) return false;
     return true;
+  });
+
+  const activeStoresCount = storesList.filter(s => s.is_active).length;
+  const pendingStoresCount = storesList.filter(s => !s.is_active).length;
+  const filteredStores = storesList.filter(s => {
+    if (!storeSearch) return true;
+    const term = storeSearch.toLowerCase();
+    return s.store_name?.toLowerCase().includes(term) || 
+           s.users?.name?.toLowerCase().includes(term) || 
+           s.slug?.toLowerCase().includes(term);
   });
 
   return (
@@ -1326,47 +1408,100 @@ const AdminDashboard = () => {
           {activeSection === 'stores' && (
             <div className="max-w-[1400px] mx-auto space-y-6">
 
+              {/* PAGE TITLE */}
               <div className="flex items-center justify-between">
                 <div>
                   <h1 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight mb-1">إدارة المتاجر</h1>
                   <p className="text-gray-500 text-sm font-medium dark:text-slate-300">مراقبة محتويات المتاجر والتحكم بحالاتها</p>
                 </div>
                 <div className="flex gap-3">
-                  <button className="h-10 px-5 bg-purple-600 hover:bg-purple-700 text-white font-bold text-sm rounded-xl transition-all flex items-center gap-2 shadow-lg shadow-purple-600/20">
+                  <button onClick={() => setIsAddStoreOpen(true)} className="h-10 px-5 bg-purple-600 hover:bg-purple-700 text-white font-bold text-sm rounded-xl transition-all flex items-center gap-2 shadow-lg shadow-purple-600/20">
                     <Plus className="w-4 h-4" /> متجر جديد
                   </button>
                 </div>
               </div>
 
+              {/* STATS CARDS */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <div className="bg-white dark:bg-[#1A1A24] border border-gray-100 dark:border-white/5 rounded-3xl p-6 shadow-sm flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-bold text-gray-500 dark:text-slate-400 mb-1">إجمالي المتاجر</p>
+                    <p className="text-3xl font-black text-gray-900 dark:text-white">{storesList.length}</p>
+                  </div>
+                  <div className="w-12 h-12 rounded-2xl bg-purple-50 dark:bg-purple-500/10 flex items-center justify-center text-purple-600 dark:text-purple-400">
+                    <Store className="w-6 h-6" />
+                  </div>
+                </div>
+                <div className="bg-white dark:bg-[#1A1A24] border border-gray-100 dark:border-white/5 rounded-3xl p-6 shadow-sm flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-bold text-gray-500 dark:text-slate-400 mb-1">المتاجر النشطة</p>
+                    <p className="text-3xl font-black text-green-600 dark:text-green-400">{activeStoresCount}</p>
+                  </div>
+                  <div className="w-12 h-12 rounded-2xl bg-green-50 dark:bg-green-500/10 flex items-center justify-center text-green-600 dark:text-green-400">
+                    <CheckCircle2 className="w-6 h-6" />
+                  </div>
+                </div>
+                <div className="bg-white dark:bg-[#1A1A24] border border-gray-100 dark:border-white/5 rounded-3xl p-6 shadow-sm flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-bold text-gray-500 dark:text-slate-400 mb-1">بانتظار الدفع أو موقوفة</p>
+                    <p className="text-3xl font-black text-red-600 dark:text-red-400">{pendingStoresCount}</p>
+                  </div>
+                  <div className="w-12 h-12 rounded-2xl bg-red-50 dark:bg-red-500/10 flex items-center justify-center text-red-600 dark:text-red-400">
+                    <AlertTriangle className="w-6 h-6" />
+                  </div>
+                </div>
+              </div>
+
+              {/* SEARCH & FILTERS */}
+              <div className="flex flex-col md:flex-row gap-4 mb-6">
+                <div className="relative flex-1">
+                  <Search className="w-5 h-5 text-gray-400 absolute right-4 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    value={storeSearch}
+                    onChange={(e) => setStoreSearch(e.target.value)}
+                    placeholder="ابحث عن متجر بالاسم، المالك، رابط المتجر..."
+                    className="w-full bg-white dark:bg-[#1A1A24] border border-gray-200 dark:border-white/10 rounded-xl h-12 pr-12 pl-4 text-sm font-bold focus:border-purple-600 dark:text-white outline-none transition-colors"
+                  />
+                </div>
+              </div>
+
+              {/* TABLE */}
               <div className="bg-white dark:bg-[#1A1A24] rounded-2xl border border-gray-100 dark:border-white/5 shadow-sm overflow-hidden flex flex-col min-h-[500px]">
                 <table className="w-full text-right border-collapse">
                   <thead>
                     <tr className="bg-gray-50/80 dark:bg-white/[0.02] border-b border-gray-100 dark:border-white/5 text-[11px] font-black text-gray-400 uppercase tracking-wider dark:text-slate-300">
                       <th className="py-4 px-6 rounded-tr-2xl">اسم المتجر</th>
                       <th className="py-4 px-6">الرابط</th>
+                      <th className="py-4 px-6">المالك</th>
                       <th className="py-4 px-6">المسوق (الإحالة)</th>
-                      <th className="py-4 px-6">الباقة</th>
                       <th className="py-4 px-6">التاريخ</th>
                       <th className="py-4 px-6">الحالة</th>
                       <th className="py-4 px-6 rounded-tl-2xl text-center">إجراءات</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-50 dark:divide-white/5">
-                    {storesList.length > 0 ? storesList.map((store) => {
+                    {filteredStores.length > 0 ? filteredStores.map((store) => {
                       return (
                         <tr key={store.id} className="hover:bg-gray-50/50 dark:hover:bg-white/[0.02] transition-colors dark:bg-[#0f172a]">
                           <td className="py-4 px-6">
                             <div className="flex items-center gap-3">
                               <div className="w-9 h-9 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center font-black text-sm shrink-0">
-                                {store.name?.charAt(0) || 'م'}
+                                {store.store_name?.charAt(0) || 'م'}
                               </div>
                               <div>
-                                <p className="font-bold text-gray-900 text-sm dark:text-white">{store.name || 'متجر'}</p>
+                                <p className="font-bold text-gray-900 text-sm dark:text-white">{store.store_name || 'متجر'}</p>
                               </div>
                             </div>
                           </td>
                           <td className="py-4 px-6 text-sm">
                             <a href={`https://${store.slug}.suriix.com`} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline font-bold" dir="ltr">{store.slug}.suriix.com</a>
+                          </td>
+                          <td className="py-4 px-6 text-sm">
+                            <div className="flex flex-col">
+                              <span className="font-bold text-gray-900 dark:text-white">{store.users?.name || 'غير معروف'}</span>
+                              <span className="text-xs text-gray-500 lg:hidden">{store.users?.phone || ''}</span>
+                            </div>
                           </td>
                           <td className="py-4 px-6 text-sm">
                             {store.marketer_name ? (
@@ -1377,9 +1512,6 @@ const AdminDashboard = () => {
                               <span className="text-gray-400 dark:text-gray-600 text-xs font-bold">—</span>
                             )}
                           </td>
-                          <td className="py-4 px-6">
-                            <span className="font-bold text-gray-900 text-sm dark:text-white">{store.tier || 'غير محدد'}</span>
-                          </td>
                           <td className="py-4 px-6 text-sm text-gray-500 font-medium dark:text-slate-300">
                             {new Date(store.created_at).toLocaleDateString('ar-EG')}
                           </td>
@@ -1389,8 +1521,10 @@ const AdminDashboard = () => {
                             </span>
                           </td>
                           <td className="py-4 px-6 flex items-center justify-center gap-2">
-                            <button onClick={() => window.open(`https://${store.slug}.suriix.com`, '_blank')} className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors dark:bg-[#0f172a] dark:border-slate-800 dark:text-slate-300" title="دخول المتجر"><Eye className="w-4 h-4" /></button>
-                            <button onClick={() => handleToggleStoreStatus(store.id, store.is_active)} className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-red-500 hover:bg-red-50 transition-colors dark:border-slate-800" title={store.is_active ? 'إيقاف المتجر' : 'تفعيل المتجر'}>
+                            <button onClick={() => { setSelectedStore(store); setIsStoreViewOpen(true); }} className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors dark:bg-[#0f172a] dark:border-slate-800 dark:text-slate-300" title="تفاصيل المتجر"><Eye className="w-4 h-4" /></button>
+                            <button onClick={() => { setSelectedStore(store); setIsStoreEditOpen(true); }} className="w-8 h-8 rounded-full border border-blue-200 flex items-center justify-center text-blue-500 hover:bg-blue-50 transition-colors dark:border-blue-900/40" title="تعديل بيانات المتجر"><Edit className="w-4 h-4" /></button>
+                            <button onClick={() => handleDeleteStore(store.id)} className="w-8 h-8 rounded-full border border-red-200 flex items-center justify-center text-red-500 hover:bg-red-50 transition-colors dark:border-red-900/40" title="حذف المتجر"><Trash2 className="w-4 h-4" /></button>
+                            <button onClick={() => handleToggleStoreStatus(store.id, store.is_active)} className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-orange-500 hover:bg-orange-50 transition-colors dark:border-slate-800" title={store.is_active ? 'إيقاف المتجر' : 'تفعيل المتجر'}>
                               {store.is_active ? <XCircle className="w-4 h-4" /> : <CheckCircle2 className="w-4 h-4" />}
                             </button>
                           </td>
@@ -1398,7 +1532,7 @@ const AdminDashboard = () => {
                       );
                     }) : (
                       <tr>
-                        <td colSpan={6} className="py-12 text-center text-gray-400 text-sm font-bold dark:text-slate-300">لا يوجد متاجر لعرضها</td>
+                        <td colSpan={7} className="py-12 text-center text-gray-400 text-sm font-bold dark:text-slate-300">لا يوجد متاجر لعرضها</td>
                       </tr>
                     )}
                   </tbody>
@@ -1706,6 +1840,118 @@ const AdminDashboard = () => {
       </main>
 
       {/* ALL MODALS */}
+
+      {/* Stores Modals */}
+      {isStoreViewOpen && selectedStore && (
+        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white dark:bg-[#1A1A24] w-full max-w-md rounded-2xl p-6 shadow-2xl relative text-right">
+            <button onClick={() => setIsStoreViewOpen(false)} className="absolute top-4 left-4 text-gray-500 hover:text-gray-900 dark:text-white"><XCircle className="w-6 h-6"/></button>
+            <h2 className="text-xl font-black mb-4">تفاصيل المتجر</h2>
+            <div className="space-y-3 font-medium text-sm text-gray-700 dark:text-gray-300">
+              <p><strong>اسم المتجر:</strong> {selectedStore.store_name || 'غير معروف'}</p>
+              <p><strong>رابط المتجر:</strong> <a href={`https://${selectedStore.slug}.suriix.com`} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline">{selectedStore.slug}.suriix.com</a></p>
+              <p><strong>المالك:</strong> {selectedStore.users?.name || 'غير معروف'} ({selectedStore.users?.email})</p>
+              <p><strong>حالة المتجر:</strong> <span className={selectedStore.is_active ? 'text-green-500' : 'text-red-500'}>{selectedStore.is_active ? 'نشط' : 'بانتظار الدفع أو موقوف'}</span></p>
+              <p><strong>الباقة:</strong> {selectedStore.tier || 'غير محدد'}</p>
+              <p><strong>المسوق:</strong> {selectedStore.marketer_name || 'لا يوجد'}</p>
+              <p><strong>تاريخ الإنشاء:</strong> <span dir="ltr">{new Date(selectedStore.created_at).toLocaleDateString('ar-EG')}</span></p>
+            </div>
+            <button onClick={() => setIsStoreViewOpen(false)} className="w-full mt-6 py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 rounded-xl font-black transition-colors text-gray-700 dark:text-gray-300">إغلاق</button>
+          </div>
+        </div>
+      )}
+
+      {isStoreEditOpen && selectedStore && (
+        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 p-4 overflow-y-auto">
+          <div className="bg-white dark:bg-[#1A1A24] w-full max-w-md rounded-2xl p-6 shadow-2xl relative text-right mt-12 mb-12">
+            <button onClick={() => setIsStoreEditOpen(false)} className="absolute top-4 left-4 text-gray-500 hover:text-gray-900 dark:text-white"><XCircle className="w-6 h-6"/></button>
+            <h2 className="text-xl font-black mb-6">تعديل بيانات المتجر</h2>
+            <form onSubmit={handleSaveStore} className="space-y-4">
+              <div>
+                <label className="text-xs font-bold text-gray-500 block mb-1 dark:text-slate-300">اسم المتجر</label>
+                <input type="text" className="w-full h-11 border border-gray-200 dark:border-white/10 dark:bg-black/20 rounded-lg px-3 outline-none focus:border-purple-500 text-sm font-medium" value={selectedStore.store_name} onChange={e => setSelectedStore({...selectedStore, store_name: e.target.value})} required/>
+              </div>
+              <div>
+                <label className="text-xs font-bold text-gray-500 block mb-1 dark:text-slate-300">رابط المتجر (slug)</label>
+                <div className="flex bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-white/10 rounded-lg overflow-hidden h-11">
+                  <input type="text" className="flex-1 bg-transparent px-3 outline-none focus:bg-white dark:focus:bg-[#1A1A24] text-sm font-medium transition-colors" value={selectedStore.slug} onChange={e => setSelectedStore({...selectedStore, slug: e.target.value})} dir="ltr" required/>
+                  <span className="flex items-center px-3 bg-gray-100 dark:bg-white/5 border-r border-gray-200 dark:border-white/10 text-xs font-bold text-gray-500" dir="ltr">.suriix.com</span>
+                </div>
+              </div>
+              <div>
+                <label className="text-xs font-bold text-gray-500 block mb-1 dark:text-slate-300">الباقة</label>
+                <select className="w-full h-11 border border-gray-200 dark:border-white/10 dark:bg-black/20 rounded-lg px-3 outline-none focus:border-purple-500 text-sm font-medium" value={selectedStore.tier} onChange={e => setSelectedStore({...selectedStore, tier: e.target.value})}>
+                  <option value="free">مجانية (تأسيس)</option>
+                  <option value="basic">الأساسية</option>
+                  <option value="pro">الاحترافية</option>
+                  <option value="business">للأعمال</option>
+                </select>
+              </div>
+              <div className="flex items-center gap-3">
+                <input type="checkbox" id="store-active" checked={selectedStore.is_active} onChange={e => setSelectedStore({...selectedStore, is_active: e.target.checked})} className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500"/>
+                <label htmlFor="store-active" className="text-sm font-bold text-gray-700 dark:text-slate-300">متجر نشط (تم الدفع)</label>
+              </div>
+              <div className="flex gap-3 pt-4">
+                <button type="submit" className="flex-1 h-11 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-black transition-colors flex items-center justify-center gap-2">حفظ التغييرات</button>
+                <button type="button" onClick={() => setIsStoreEditOpen(false)} className="flex-1 h-11 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 text-gray-700 dark:text-white rounded-xl font-black transition-colors">إلغاء</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {isAddStoreOpen && (
+        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 p-4 overflow-y-auto">
+          <div className="bg-white dark:bg-[#1A1A24] w-full max-w-md rounded-2xl p-6 shadow-2xl relative text-right mt-12 mb-12">
+            <button onClick={() => { setIsAddStoreOpen(false); setSelectedStore(null); }} className="absolute top-4 left-4 text-gray-500 hover:text-gray-900 dark:text-white"><XCircle className="w-6 h-6"/></button>
+            <h2 className="text-xl font-black mb-6">إضافة متجر جديد</h2>
+            <form onSubmit={handleAddStore} className="space-y-4">
+              <div>
+                <label className="text-xs font-bold text-gray-500 block mb-1 dark:text-slate-300">مالك المتجر (مستخدم موجود)</label>
+                <select 
+                  className="w-full h-11 border border-gray-200 dark:border-white/10 dark:bg-black/20 rounded-lg px-3 outline-none focus:border-purple-500 text-sm font-medium" 
+                  value={selectedStore?.user_id || ''} 
+                  onChange={e => setSelectedStore({...selectedStore, user_id: e.target.value})}
+                  required
+                >
+                  <option value="">اختر المستخدم...</option>
+                  {usersList.map((u: any) => (
+                    <option key={u.id} value={u.id}>{u.name || u.email}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="text-xs font-bold text-gray-500 block mb-1 dark:text-slate-300">اسم المتجر</label>
+                <input 
+                  type="text" 
+                  className="w-full h-11 border border-gray-200 dark:border-white/10 dark:bg-black/20 rounded-lg px-3 outline-none focus:border-purple-500 text-sm font-medium" 
+                  value={selectedStore?.store_name || ''} 
+                  onChange={e => {
+                    const val = e.target.value;
+                    const autoSlug = val.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
+                    setSelectedStore({...selectedStore, store_name: val, slug: selectedStore?.slug ? selectedStore.slug : autoSlug});
+                  }} 
+                  placeholder="مثال: متجر الأناقة"
+                  required
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-gray-500 block mb-1 dark:text-slate-300">رابط المتجر (slug)</label>
+                <div className="flex bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-white/10 rounded-lg overflow-hidden h-11">
+                  <input type="text" className="flex-1 bg-transparent px-3 outline-none focus:bg-white dark:focus:bg-[#1A1A24] text-sm font-medium transition-colors" value={selectedStore?.slug || ''} onChange={e => setSelectedStore({...selectedStore, slug: e.target.value})} dir="ltr" placeholder="my-store" required/>
+                  <span className="flex items-center px-3 bg-gray-100 dark:bg-white/5 border-r border-gray-200 dark:border-white/10 text-xs font-bold text-gray-500" dir="ltr">.suriix.com</span>
+                </div>
+              </div>
+              
+              <div className="flex gap-3 pt-4">
+                <button type="submit" className="flex-1 h-11 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-black transition-colors flex items-center justify-center gap-2">إنشاء المتجر</button>
+                <button type="button" onClick={() => { setIsAddStoreOpen(false); setSelectedStore(null); }} className="flex-1 h-11 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 text-gray-700 dark:text-white rounded-xl font-black transition-colors">إلغاء</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {isUserViewOpen && selectedUser && (
         <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 p-4">
           <div className="bg-white dark:bg-[#1A1A24] w-full max-w-md rounded-2xl p-6 shadow-2xl relative text-right">
