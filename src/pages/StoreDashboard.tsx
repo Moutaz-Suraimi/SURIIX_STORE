@@ -1940,6 +1940,27 @@ const SettingsTab = React.memo(({ storeData, onUpdateField }: { storeData: any, 
     titleFeatured: storeData.sectionTitles?.featured || 'المنتجات المميزة'
   });
 
+  React.useEffect(() => {
+    if (storeData.name && !formData.name) {
+      setFormData({
+        name: storeData.name || '',
+        desc: storeData.desc || '',
+        whatsapp: storeData.whatsapp || '',
+        email: storeData.email || '',
+        instagram: storeData.instagram || '',
+        facebook: storeData.facebook || '',
+        maintenance: storeData.maintenance || false,
+        taxIncluded: storeData.taxIncluded || false,
+        customDomain: storeData.custom_domain || '',
+        logo: storeData.logo || '',
+        titleNewArrivals: storeData.sectionTitles?.newArrivals || 'وصل حديثاً',
+        titleBestSellers: storeData.sectionTitles?.bestSellers || 'الأكثر طلباً',
+        titleOffers: storeData.sectionTitles?.offers || 'عروض لا تفوت',
+        titleFeatured: storeData.sectionTitles?.featured || 'المنتجات المميزة'
+      });
+    }
+  }, [storeData]);
+
   const [isSubmittingDomain, setIsSubmittingDomain] = useState(false);
   const [domainData, setDomainData] = useState<any>(null);
   const [domainError, setDomainError] = useState('');
@@ -2049,16 +2070,15 @@ const SettingsTab = React.memo(({ storeData, onUpdateField }: { storeData: any, 
             <div>
               <label className="block font-bold text-sm mb-2 text-foreground">رابط المتجر (Slug)</label>
               <div className="flex flex-col gap-3">
-                <div className="flex items-center bg-muted/50 rounded-xl border border-border/50 overflow-hidden">
-                  <span className="px-3 text-xs text-muted-foreground font-mono border-l border-border/50 py-3.5 shrink-0 bg-muted/80">.suriix.com</span>
+                <div className="flex items-center bg-muted/50 rounded-xl border border-border/50 overflow-hidden" dir="ltr">
                   <input
                     type="text"
                     value={storeData.slug || storeData.url?.replace('.suriix.com', '') || ''}
                     readOnly
-                    className="flex-1 bg-transparent p-3.5 text-left outline-none font-bold text-muted-foreground"
-                    dir="ltr"
-                    placeholder="لم يُحدَّد بعد"
+                    className="flex-1 bg-transparent p-3.5 text-right outline-none font-bold text-muted-foreground"
+                    placeholder="soon"
                   />
+                  <span className="px-3 text-xs text-muted-foreground font-mono border-l border-border/50 py-3.5 shrink-0 bg-muted/80">.suriix.com</span>
                 </div>
                 
                 <div className="p-4 border border-border/50 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 mt-2">

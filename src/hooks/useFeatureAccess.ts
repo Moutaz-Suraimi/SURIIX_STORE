@@ -51,8 +51,17 @@ const PLAN_LIMITS: Record<string, PlanLimits> = {
 };
 
 export const useFeatureAccess = (userPackage: PlanPackage = 'Basic') => {
+  const lowerPackage = (userPackage || '').toLowerCase();
+  
+  let mappedPackage = 'Basic';
+  if (lowerPackage.includes('احترافي') || lowerPackage.includes('professional')) {
+    mappedPackage = 'Professional';
+  } else if (lowerPackage.includes('بيزنس') || lowerPackage.includes('business') || lowerPackage.includes('أعمال') || lowerPackage.includes('اعمال')) {
+    mappedPackage = 'Business';
+  }
+
   // Gracefully fallback to basic if the package is not recognized
-  const limits = PLAN_LIMITS[userPackage] || PLAN_LIMITS['Basic'];
+  const limits = PLAN_LIMITS[mappedPackage] || PLAN_LIMITS['Basic'];
 
   return {
     package: userPackage,
