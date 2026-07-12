@@ -125,7 +125,7 @@ const Index = () => {
         <div className="absolute left-0 top-0 h-full w-1/3 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+PHBhdGggZD0iTTEgMWgxOGQxIDEgMCAwIiBmaWxsPSJub25lIiBzdHJva2U9IiNlN2U1ZTQiIHN0cm9rZS13aWR0aD0iMSIvPjwvc3ZnPg==')] opacity-30 -z-20 pointer-events-none fade-out-right"></div>
         <div className="absolute right-0 top-0 h-full w-1/3 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+PHBhdGggZD0iTTEgMWgxOGQxIDEgMCAwIiBmaWxsPSJub25lIiBzdHJva2U9IiNlN2U1ZTQiIHN0cm9rZS13aWR0aD0iMSIvPjwvc3ZnPg==')] opacity-30 -z-20 pointer-events-none fade-out-left"></div>
 
-        <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8 relative w-full pt-32 pb-12">
+        <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8 relative w-full pt-24 sm:pt-32 pb-12">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
             
             {/* ===== LEFT SIDE: Hero Image ===== */}
@@ -193,20 +193,11 @@ const Index = () => {
 
               {/* Heading */}
               <div className="w-full text-right">
-                <h1 className="text-[44px] md:text-5xl lg:text-[70px] font-extrabold text-slate-900 leading-[1.2] md:leading-[1.2] tracking-tight dark:text-white pb-3">
+                <h1 className="text-[32px] sm:text-[44px] md:text-5xl lg:text-[70px] font-extrabold text-slate-900 leading-[1.25] tracking-tight dark:text-white pb-3">
                   أنشئ متجرك الذكي
                   <br />
-                  <span className="text-[#a855f7]">
-                    في دقائق، وابدأ
-                  </span>
-                  <br />
-                  <span className="text-[#a855f7]">
-                    البيع
-                  </span>
-                  <br />
-                  <span className="text-[#a855f7]">
-                    باحترافية.
-                  </span>
+                  <span className="text-[#a855f7]">في دقائق، وابدأ</span>
+                  {" "}<span className="text-[#a855f7]">البيع باحترافية.</span>
                 </h1>
               </div>
 
@@ -236,12 +227,12 @@ const Index = () => {
             </motion.div>
           </div>
 
-          {/* ===== DASHBOARD MOCKUP ===== */}
+          {/* ===== DASHBOARD MOCKUP - Desktop Only ===== */}
           <motion.div 
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, delay: 0.2, ease: "easeOut" }}
-            className="w-full max-w-[1200px] mx-auto h-[550px] mt-16 bg-white rounded-3xl border border-gray-100 flex flex-row overflow-hidden z-20 shadow-[0_40px_100px_rgba(139,92,246,0.15)] relative dark:bg-[#0f172a] dark:border-slate-800"
+            className="hidden md:flex w-full max-w-[1200px] mx-auto h-[550px] mt-16 bg-white rounded-3xl border border-gray-100 flex-row overflow-hidden z-20 shadow-[0_40px_100px_rgba(139,92,246,0.15)] relative dark:bg-[#0f172a] dark:border-slate-800"
           >
             {/* Sidebar (Left edge) */}
             <div className="w-[180px] border-r-0 border-l border-gray-100 bg-white flex flex-col py-6 gap-2 z-10 shrink-0 relative dark:bg-[#0f172a] dark:border-slate-800">
@@ -528,6 +519,33 @@ const Index = () => {
             </p>
           </div>
 
+          {/* ====== MOBILE: Feature Cards Grid ====== */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:hidden mt-8 mb-8">
+            {[
+              { icon: <Zap className="w-6 h-6" />, color: "purple", title: "سرعة فائقة", desc: "متجرك يعمل بأعلى سرعة تحميل لضمان تجربة رائعة" },
+              { icon: <Palette className="w-6 h-6" />, color: "pink", title: "تصاميم احترافية", desc: "قوالب جاهزة بتصاميم عصرية وقابلة للتخصيص" },
+              { icon: <BarChart4 className="w-6 h-6" />, color: "violet", title: "تحليلات ذكية", desc: "تقارير مفصّلة عن أداء متجرك ومبيعاتك" },
+              { icon: <ShieldCheck className="w-6 h-6" />, color: "emerald", title: "أمان تام", desc: "حماية كاملة لبيانات متجرك وعملائك" },
+              { icon: <Smartphone className="w-6 h-6" />, color: "blue", title: "متوافق مع الجوال", desc: "متجرك يبدو رائعاً على جميع الأجهزة" },
+              { icon: <Headphones className="w-6 h-6" />, color: "orange", title: "دعم 24/7", desc: "فريق دعم متخصص لمساعدتك في أي وقت" },
+            ].map((f, i) => (
+              <div key={i} className="bg-white dark:bg-[#1a1a24] rounded-2xl p-5 border border-gray-100 dark:border-white/5 shadow-sm flex items-start gap-4 text-right">
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
+                  f.color === 'purple' ? 'bg-purple-50 text-purple-600 dark:bg-purple-900/30' :
+                  f.color === 'pink' ? 'bg-pink-50 text-pink-600 dark:bg-pink-900/30' :
+                  f.color === 'violet' ? 'bg-violet-50 text-violet-600 dark:bg-violet-900/30' :
+                  f.color === 'emerald' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30' :
+                  f.color === 'blue' ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30' :
+                  'bg-orange-50 text-orange-600 dark:bg-orange-900/30'
+                }`}>{f.icon}</div>
+                <div>
+                  <h3 className="font-extrabold text-gray-900 dark:text-white text-[15px] mb-1">{f.title}</h3>
+                  <p className="text-[13px] text-gray-500 dark:text-gray-400 font-medium leading-relaxed">{f.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
           {/* ====== DESKTOP: Circular wheel ====== */}
           <div className="relative hidden lg:block mx-auto mt-8 mb-24" style={{ width: 900, height: 720 }}>
 
@@ -653,7 +671,7 @@ const Index = () => {
       {/* ===== STATISTICS SECTION ===== */}
       <section className="relative z-20 -mb-10 lg:-mb-16 mt-16 px-4">
         <div className="max-w-6xl mx-auto rounded-[2.5rem] p-[3px] bg-gradient-to-r from-purple-100 to-white dark:from-purple-900/40 dark:to-white/5 relative shadow-xl shadow-purple-500/10">
-          <div className="bg-gradient-to-l from-[#a855f7] via-[#c026d3] to-[#e879f9] rounded-[2.3rem] py-10 px-6 md:px-12 relative overflow-hidden h-full w-full shadow-inner">
+          <div className="bg-gradient-to-l from-[#a855f7] via-[#c026d3] to-[#e879f9] rounded-[2.3rem] py-8 sm:py-10 px-4 sm:px-6 md:px-12 relative overflow-hidden h-full w-full shadow-inner">
              {/* Background Decals */}
              <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" />
              <div className="absolute bottom-0 left-0 w-64 h-64 bg-black/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/3 pointer-events-none" />
@@ -834,7 +852,7 @@ const Index = () => {
             <p className="text-gray-500 dark:text-gray-400 font-bold text-lg">نفخر بثقة عملائنا وتجاربهم الناجحة مع منصتنا.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             
             {/* CARD 1 (Blue) - Fatima */}
             <div className="bg-white dark:bg-[#1a1a24] rounded-[2rem] p-8 shadow-[0_15px_40px_rgba(0,0,0,0.03)] dark:shadow-none border-[1.5px] border-transparent hover:border-blue-100 dark:border-white/5 relative flex flex-col justify-between overflow-hidden group transition-all duration-300">
@@ -1059,7 +1077,7 @@ const Index = () => {
               </svg>
 
               {/* Links and Logo Row */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16 relative z-10">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 mb-16 relative z-10">
                  
                  {/* COL 1: Logo & Socials */}
                  <div className="flex flex-col items-center md:items-end text-center md:text-right space-y-6">
