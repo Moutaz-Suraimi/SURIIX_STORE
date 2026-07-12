@@ -117,9 +117,9 @@ const StoreDashboard = () => {
 
   const [storeData, setStoreData] = React.useState<any>({
     id: '',
-    name: 'مباشرة',
-    url: 'mubashyrah.com',
-    initial: 'م',
+    name: '',
+    url: '',
+    initial: '',
     wallet: 0,
     wallet_yer: 0,
     wallet_sar: 0,
@@ -193,6 +193,33 @@ const StoreDashboard = () => {
               if (isSupabaseId || authData.session?.user) {
                 const uid = authData.session?.user?.id || latestStore.owner_id || latestStore.id;
                 setNotifUserId(uid);
+
+                // Fetch actual store data (name, URL) from Supabase stores table
+                supabase.from('stores').select('store_name, store_url, custom_domain').eq('owner_id', uid).maybeSingle().then(({ data: storeRow }) => {
+                  if (storeRow) {
+                    setStoreData(prev => ({
+                      ...prev,
+                      name: storeRow.store_name || prev.name,
+                      url: storeRow.custom_domain || (storeRow.store_url ? `${storeRow.store_url}.suriix.com` : prev.url),
+                      slug: storeRow.store_url || '',
+                      initial: (storeRow.store_name || prev.name).charAt(0),
+                      custom_domain: storeRow.custom_domain || '',
+                    }));
+                    // Also sync to localStorage
+                    try {
+                      const ls = localStorage.getItem('suriix_added_stores');
+                      if (ls) {
+                        const list = JSON.parse(ls);
+                        if (list.length > 0) {
+                          list[0].name = storeRow.store_name || list[0].name;
+                          list[0].slug = storeRow.store_url || list[0].slug;
+                          localStorage.setItem('suriix_added_stores', JSON.stringify(list));
+                        }
+                      }
+                    } catch { }
+                  }
+                });
+
                 supabase.from('users').select('wallet_yer, status, package_id').eq('id', uid).limit(1).then(({ data, error }) => {
                   if (error) {
                     console.error('Error fetching user for wallet:', error);
@@ -1970,8 +1997,16 @@ const SettingsTab = React.memo(({ storeData, onUpdateField }: { storeData: any, 
 
             <div>
               <label className="block font-bold text-sm mb-2 text-foreground">رابط المتجر (Slug)</label>
-              <div className="flex items-center">
-                <input type="text" value={storeData.url} disabled className="w-full bg-muted/50 p-3.5 rounded-xl text-left border border-border/50 outline-none font-bold text-muted-foreground cursor-not-allowed" dir="ltr" />
+              <div className="flex items-center bg-muted/50 rounded-xl border border-border/50 overflow-hidden">
+                <span className="px-3 text-xs text-muted-foreground font-mono border-l border-border/50 py-3.5 shrink-0 bg-muted/80">.suriix.com</span>
+                <input
+                  type="text"
+                  value={storeData.slug || storeData.url?.replace('.suriix.com', '') || ''}
+                  readOnly
+                  className="flex-1 bg-transparent p-3.5 text-left outline-none font-bold text-muted-foreground"
+                  dir="ltr"
+                  placeholder="لم يُحدَّد بعد"
+                />
               </div>
               <p className="text-xs text-muted-foreground mt-2">لا يمكنك تغيير رابط المتجر بعد إنشائه.</p>
             </div>
