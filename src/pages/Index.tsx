@@ -10,7 +10,8 @@ import {
   CheckCircle2,
   Home, Package, BarChart3, Users, Settings, LogOut, ArrowUpRight, 
   ChevronDown, Headphones, Watch, Briefcase, Sparkles, Clock, Code2, Headset,
-  Mail, Moon, Sun, Menu, X, ShieldCheck, CreditCard, ShoppingCart, ShoppingBag
+  Mail, Moon, Sun, Menu, X, ShieldCheck, CreditCard, ShoppingCart, ShoppingBag,
+  Smile, FileText, Store, PenTool, Smartphone, RefreshCcw, LayoutGrid, Star, MessageCircle, Quote, Rocket
 } from "lucide-react";
 
 const fadeUp = {
@@ -506,329 +507,702 @@ const Index = () => {
 
 
       {/* ===== FEATURES SECTION ===== */}
-      <section id="features" className="py-24 bg-white dark:bg-[#15151c] relative transition-colors">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 overflow-x-hidden lg:overflow-x-visible">
-          
-          <div className="text-center max-w-2xl mx-auto mb-12 lg:mb-24 relative z-10">
-            <span className="text-purple-600 font-bold bg-purple-50 dark:bg-purple-900/20 px-5 py-2 rounded-full text-sm inline-block mb-6 border border-purple-100 dark:border-purple-800/40">لماذا Suriix ؟؟</span>
-            <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-6 leading-tight tracking-tight">
-               كل ما تحتاجه لبناء <br className="hidden md:block" />
-               <span className="text-purple-600">متجر ناجح</span>
+      <section id="features" className="py-20 bg-[#f4f0ff] dark:bg-[#15151c] relative transition-colors overflow-hidden">
+        {/* Background blobs */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute top-0 left-0 w-[400px] h-[400px] bg-purple-200/50 dark:bg-purple-900/10 rounded-full blur-3xl -translate-x-1/3 -translate-y-1/3" />
+          <div className="absolute bottom-0 right-0 w-[350px] h-[350px] bg-purple-200/40 dark:bg-purple-900/10 rounded-full blur-3xl translate-x-1/3 translate-y-1/3" />
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+
+          {/* Heading */}
+          <div className="text-center mb-8">
+            <span className="text-purple-600 font-bold bg-white/80 dark:bg-purple-900/30 px-5 py-2 rounded-full text-sm inline-block mb-5 border border-purple-200 dark:border-purple-800/40 shadow-sm">لماذا Suriix ؟؟</span>
+            <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-4 leading-tight">
+              كل ما تحتاجه لبناء<br />
+              <span className="text-purple-600">متجر ناجح</span>
             </h2>
-            <p className="text-lg text-gray-500 dark:text-gray-400 font-medium pb-4">
+            <p className="text-base text-gray-500 dark:text-gray-400 font-medium max-w-lg mx-auto leading-relaxed">
               من الأدوات الذكية إلى التصاميم الاحترافية، نوفر لك كل ما تحتاجه للتركيز على ما يهم حقاً: نمو متجرك.
             </p>
           </div>
 
-          {/* Desktop Circular Layout (hidden on mobile, visible lg) */}
-          <div className="relative hidden lg:flex h-[760px] mx-auto items-center justify-center mt-8 mb-16 pointer-events-none" style={{ width: '100%' }}>
-             
-             {/* Abstract Origin Point at absolute center */}
-             <div className="absolute left-1/2 top-1/2 w-0 h-0 flex items-center justify-center">
-             
-                 {/* 1. The Dashed Ring (r = 180px -> w=360px) */}
-                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[360px] h-[360px] rounded-full border-[1.5px] border-dashed border-purple-200 dark:border-white/10 -z-10" />
+          {/* ====== DESKTOP: Circular wheel ====== */}
+          <div className="relative hidden lg:block mx-auto mt-8 mb-24" style={{ width: 900, height: 720 }}>
 
-                 {/* 2. The Center Graphic */}
-                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[11rem] h-[11rem] bg-gradient-to-br from-[#aa48f8] to-[#7f34f8] rounded-[3rem] shadow-[0_30px_60px_-15px_rgba(155,77,255,0.6)] flex items-center justify-center text-white z-10 transform hover:scale-105 transition-transform duration-700 ease-out group pointer-events-auto">
-                     <span className="font-display font-extrabold text-[5.5rem] opacity-95 drop-shadow-xl select-none" style={{ textShadow: "0 10px 30px rgba(0,0,0,0.2)" }}>S</span>
-                     <div className="absolute inset-0 bg-gradient-to-tr from-white/0 to-white/20 rounded-[3rem] opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-                     <div className="absolute -top-3 -right-3 w-9 h-9 bg-gray-900 rounded-full border-4 border-white dark:border-[#15151c] shadow-lg flex items-center justify-center -z-10 group-hover:-translate-y-2 transition-transform duration-500">
-                        <ShoppingBag className="w-4 h-4 text-white" />
-                     </div>
-                 </div>
+              {/* Outer dashed ring */}
+              <div className="absolute rounded-full border-[2.5px] border-dashed border-purple-200 dark:border-purple-800/60"
+                style={{ width: 440, height: 440, left: 230, top: 140 }} />
 
-                 {/* ========== CARD 01: TOP ========== */}
-                 {/* Dot at y=-180px */}
-                 <div className="absolute left-1/2 bottom-[180px] -translate-x-1/2 translate-y-1/2 w-3.5 h-3.5 rounded-full bg-purple-500 ring-[6px] ring-white dark:ring-[#15151c] z-10" />
-                 {/* Connecting line UP to card (Length: 50px) */}
-                 <div className="absolute left-1/2 bottom-[180px] -translate-x-1/2 w-[1.5px] h-[50px] border-l-[1.5px] border-dashed border-purple-200 dark:border-white/10" />
-                 {/* The Card (Bottom edge touching y=-230px) */}
-                 <div className="absolute bottom-[230px] left-1/2 -translate-x-1/2 z-20 pointer-events-auto">
-                     <div className="w-[310px] bg-white dark:bg-[#1a1a24] rounded-[2rem] p-4 flex flex-row items-center shadow-[0_20px_50px_-12px_rgba(0,0,0,0.08)] dark:shadow-purple-900/10 border border-gray-50 dark:border-white/5 relative group hover:-translate-y-2 transition-transform duration-500 ease-out text-right cursor-default">
-                        <div className="absolute -top-3 right-8 bg-purple-100 dark:bg-purple-900/60 text-purple-700 dark:text-purple-300 px-3.5 py-1.5 rounded-full font-extrabold text-[11px] ring-4 ring-white dark:ring-[#1a1a24]">01</div>
-                        <div className="flex-1 pr-4 pl-0">
-                           <h3 className="font-extrabold text-[15px] text-gray-900 dark:text-white mb-2 group-hover:text-purple-600 transition-colors">إنشاء سريع وسهل</h3>
-                           <p className="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed font-bold block">أنشئ متجرك في دقائق بدون أي تعقيد أو خبرة برمجية سابقة.</p>
-                        </div>
-                        <div className="w-[60px] h-[60px] rounded-[1.5rem] bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0 ml-2">
-                           <Zap className="w-7 h-7 fill-purple-600 dark:fill-purple-400" />
-                        </div>
-                     </div>
-                 </div>
+              {/* Inner soft ring */}
+              <div className="absolute rounded-full border border-purple-200/40 dark:border-purple-800/30"
+                style={{ width: 280, height: 280, left: 310, top: 220 }} />
 
-                 {/* ========== CARD 03: BOTTOM ========== */}
-                 {/* Dot at y=180px */}
-                 <div className="absolute left-1/2 top-[180px] -translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full bg-blue-500 ring-[6px] ring-white dark:ring-[#15151c] z-10" />
-                 {/* Connecting line DOWN to card (Length: 50px) */}
-                 <div className="absolute left-1/2 top-[180px] -translate-x-1/2 w-[1.5px] h-[50px] border-l-[1.5px] border-dashed border-blue-200 dark:border-white/10" />
-                 {/* The Card (Top edge touching y=230px) */}
-                 <div className="absolute top-[230px] left-1/2 -translate-x-1/2 z-20 pointer-events-auto">
-                     <div className="w-[310px] bg-white dark:bg-[#1a1a24] rounded-[2rem] p-4 flex flex-row items-center shadow-[0_20px_50px_-12px_rgba(0,0,0,0.08)] dark:shadow-blue-900/10 border border-gray-50 dark:border-white/5 relative group hover:translate-y-2 transition-transform duration-500 ease-out text-right cursor-default">
-                        <div className="absolute -top-3 right-8 bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 px-3.5 py-1.5 rounded-full font-extrabold text-[11px] ring-4 ring-white dark:ring-[#1a1a24]">03</div>
-                        <div className="flex-1 pr-4 pl-0">
-                           <h3 className="font-extrabold text-[15px] text-gray-900 dark:text-white mb-2 group-hover:text-blue-600 transition-colors">إدارة ذكية</h3>
-                           <p className="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed font-bold block">لوحة تحكم متكاملة لإدارة المنتجات، الطلبات والعملاء بسهولة تامة.</p>
-                        </div>
-                        <div className="w-[60px] h-[60px] rounded-[1.5rem] bg-blue-50 dark:bg-blue-900/30 text-blue-500 dark:text-blue-400 flex items-center justify-center shrink-0 ml-2">
-                           <LayoutDashboard className="w-7 h-7 fill-blue-500 dark:fill-blue-400" />
-                        </div>
-                     </div>
-                 </div>
+              {/* Connecting dots on the ring: Top, Right, Bottom, Left */}
+              <div className="absolute w-[16px] h-[16px] rounded-full bg-purple-500 ring-4 ring-white dark:ring-[#111118] shadow-sm z-10"
+                style={{ left: 442, top: 132 }} />
+              <div className="absolute w-[16px] h-[16px] rounded-full bg-pink-500 ring-4 ring-white dark:ring-[#111118] shadow-sm z-10"
+                style={{ left: 662, top: 352 }} />
+              <div className="absolute w-[16px] h-[16px] rounded-full bg-violet-500 ring-4 ring-white dark:ring-[#111118] shadow-sm z-10"
+                style={{ left: 442, top: 572 }} />
+              <div className="absolute w-[16px] h-[16px] rounded-full bg-emerald-500 ring-4 ring-white dark:ring-[#111118] shadow-sm z-10"
+                style={{ left: 222, top: 352 }} />
 
-                 {/* ========== CARD 02: RIGHT ========== */}
-                 <div className="absolute top-1/2 right-[-180px] -translate-y-1/2 translate-x-1/2 w-3.5 h-3.5 rounded-full bg-pink-500 ring-[6px] ring-white dark:ring-[#15151c] z-10" />
-                 <div className="absolute top-1/2 right-[-180px] -translate-y-1/2 w-[60px] h-[1.5px] border-t-[1.5px] border-dashed border-pink-200 dark:border-white/10" />
-                 <div className="absolute top-1/2 left-[240px] -translate-y-1/2 z-20 pointer-events-auto">
-                     <div className="w-[310px] bg-white dark:bg-[#1a1a24] rounded-[2rem] p-4 flex flex-row items-center shadow-[0_20px_50px_-12px_rgba(0,0,0,0.08)] dark:shadow-pink-900/10 border border-gray-50 dark:border-white/5 relative group hover:translate-x-2 transition-transform duration-500 ease-out text-right cursor-default">
-                        <div className="absolute -top-3 right-8 bg-pink-100 dark:bg-pink-900/60 text-pink-700 dark:text-pink-300 px-3.5 py-1.5 rounded-full font-extrabold text-[11px] ring-4 ring-white dark:ring-[#1a1a24]">02</div>
-                        <div className="flex-1 pr-4 pl-0">
-                           <h3 className="font-extrabold text-[15px] text-gray-900 dark:text-white mb-2 group-hover:text-pink-600 transition-colors">تصاميم احترافية</h3>
-                           <p className="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed font-bold block">قوالب حديثة ومتجاوبة تعكس هوية علامتك التجارية بشكل مميز.</p>
-                        </div>
-                        <div className="w-[60px] h-[60px] rounded-[1.5rem] bg-pink-50 dark:bg-pink-900/30 text-pink-500 dark:text-pink-400 flex items-center justify-center shrink-0 ml-2">
-                           <Palette className="w-7 h-7 fill-pink-500 dark:fill-pink-400" />
-                        </div>
-                     </div>
-                 </div>
+              {/* CENTER: Suriix Logo */}
+              <div className="absolute flex items-center justify-center z-20 group cursor-pointer"
+                style={{ width: 140, height: 140, left: 380, top: 290 }}>
+                {/* Glowing Aura */}
+                <div className="absolute inset-0 rounded-full bg-purple-500/20 dark:bg-purple-900/40 blur-2xl group-hover:bg-purple-500/30 transition-all duration-500" />
+                {/* Center Circle */}
+                <div className="w-[110px] h-[110px] bg-white dark:bg-[#1a1a24] rounded-full shadow-[0_15px_30px_rgba(147,51,234,0.15)] dark:shadow-[0_15px_30px_rgba(0,0,0,0.5)] border border-purple-100 dark:border-purple-800/40 flex items-center justify-center relative group-hover:scale-105 transition-transform duration-500">
+                    <img src="/favicon.png" alt="Suriix Logo" className="w-[55px] h-[55px] object-contain drop-shadow-md group-hover:drop-shadow-lg transition-all duration-500" />
+                </div>
+              </div>
 
-                 {/* ========== CARD 04: LEFT ========== */}
-                 <div className="absolute top-1/2 left-[-180px] -translate-y-1/2 -translate-x-1/2 w-3.5 h-3.5 rounded-full bg-emerald-500 ring-[6px] ring-white dark:ring-[#15151c] z-10" />
-                 <div className="absolute top-1/2 left-[-180px] -translate-y-1/2 w-[60px] h-[1.5px] border-t-[1.5px] border-dashed border-emerald-200 dark:border-white/10 -translate-x-[100%]" />
-                 <div className="absolute top-1/2 right-[240px] -translate-y-1/2 z-20 pointer-events-auto">
-                     <div className="w-[310px] bg-white dark:bg-[#1a1a24] rounded-[2rem] p-4 flex flex-row items-center shadow-[0_20px_50px_-12px_rgba(0,0,0,0.08)] dark:shadow-emerald-900/10 border border-gray-50 dark:border-white/5 relative group hover:-translate-x-2 transition-transform duration-500 ease-out text-right cursor-default">
-                        <div className="absolute -top-3 right-8 bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 px-3.5 py-1.5 rounded-full font-extrabold text-[11px] ring-4 ring-white dark:ring-[#1a1a24]">04</div>
-                        <div className="flex-1 pr-4 pl-0">
-                           <h3 className="font-extrabold text-[15px] text-gray-900 dark:text-white mb-2 group-hover:text-emerald-600 transition-colors">تحليلات وتقارير</h3>
-                           <p className="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed font-bold block">تقارير دقيقة تساعدك على اتخاذ قرارات ذكية وتطوير متجرك.</p>
-                        </div>
-                        <div className="w-[60px] h-[60px] rounded-[1.5rem] bg-emerald-50 dark:bg-emerald-900/30 text-emerald-500 dark:text-emerald-400 flex items-center justify-center shrink-0 ml-2">
-                           <BarChart4 className="w-7 h-7 fill-emerald-500 dark:fill-emerald-400" />
-                        </div>
-                     </div>
-                 </div>
+              {/* FEATURE 01: TOP */}
+              <div className="absolute z-30 flex flex-col items-center text-center"
+                style={{ width: 240, left: 330, top: -10 }}>
+                <div className="w-14 h-14 rounded-[1.2rem] bg-purple-50 flex items-center justify-center mb-3">
+                  <Zap className="w-7 h-7 text-purple-600" fill="currentColor" />
+                </div>
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <span className="text-purple-600 font-extrabold text-[11px] font-mono bg-purple-100 px-2.5 py-0.5 rounded-full ring-2 ring-white dark:ring-[#111118]">01</span>
+                  <h3 className="font-extrabold text-gray-900 dark:text-white text-[16px]">إنشاء سريع وسهل</h3>
+                </div>
+                <p className="text-[13px] text-gray-500 dark:text-gray-400 font-bold block" style={{ maxWidth: 200 }}>
+                  أنشئ متجرك في دقائق بدون أي تعقيد أو خبرة برمجية سابقة.
+                </p>
+              </div>
 
-             </div>
+              {/* FEATURE 02: RIGHT */}
+              <div className="absolute z-30 flex flex-col items-end text-right"
+                style={{ width: 240, left: 690, top: 285 }}>
+                <div className="w-14 h-14 rounded-[1.2rem] bg-pink-50 flex items-center justify-center mb-3">
+                  <Palette className="w-7 h-7 text-pink-500" fill="currentColor" />
+                </div>
+                <div className="flex items-center justify-end gap-2 mb-2 w-full">
+                  <h3 className="font-extrabold text-gray-900 dark:text-white text-[16px]">تصاميم احترافية</h3>
+                  <span className="text-pink-600 font-extrabold text-[11px] font-mono bg-pink-100 px-2.5 py-0.5 rounded-full ring-2 ring-white dark:ring-[#111118]">02</span>
+                </div>
+                <p className="text-[13px] text-gray-500 dark:text-gray-400 font-bold block" style={{ maxWidth: 220 }}>
+                  قوالب حديثة ومتجاوبة تعكس هوية علامتك التجارية بشكل مميز.
+                </p>
+              </div>
+
+              {/* FEATURE 03: BOTTOM */}
+              <div className="absolute z-30 flex flex-col items-center text-center"
+                style={{ width: 240, left: 330, top: 600 }}>
+                <div className="w-14 h-14 rounded-[1.2rem] bg-violet-50 flex items-center justify-center mb-3">
+                  <LayoutDashboard className="w-7 h-7 text-violet-600" fill="currentColor" />
+                </div>
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <span className="text-violet-600 font-extrabold text-[11px] font-mono bg-violet-100 px-2.5 py-0.5 rounded-full ring-2 ring-white dark:ring-[#111118]">03</span>
+                  <h3 className="font-extrabold text-gray-900 dark:text-white text-[16px]">إدارة ذكية</h3>
+                </div>
+                <p className="text-[13px] text-gray-500 dark:text-gray-400 font-bold block" style={{ maxWidth: 220 }}>
+                  لوحة تحكم متكاملة لإدارة المنتجات، الطلبات والعملاء بسهولة تامة.
+                </p>
+              </div>
+
+              {/* FEATURE 04: LEFT */}
+              <div className="absolute z-30 flex flex-col items-start text-right"
+                style={{ width: 210, left: 0, top: 285 }}>
+                <div className="w-14 h-14 rounded-[1.2rem] bg-emerald-50 flex items-center justify-center mb-3">
+                  <BarChart4 className="w-7 h-7 text-emerald-500" fill="currentColor" />
+                </div>
+                <div className="flex items-center gap-2 mb-2 w-full justify-start">
+                  <h3 className="font-extrabold text-gray-900 dark:text-white text-[16px] text-right">تحليلات وتقارير</h3>
+                  <span className="text-emerald-600 font-extrabold text-[11px] font-mono bg-emerald-100 px-2.5 py-0.5 rounded-full ring-2 ring-white dark:ring-[#111118]">04</span>
+                </div>
+                <p className="text-[13px] text-gray-500 dark:text-gray-400 font-bold block text-right" style={{ maxWidth: 210 }}>
+                  تقارير دقيقة تساعدك على اتخاذ قرارات ذكية وتطوير متجرك.
+                </p>
+              </div>
+
           </div>
 
-          {/* Mobile Linear Layout (visible only on mobile/tablet) */}
-          <div className="lg:hidden flex flex-col gap-6 w-full max-w-md mx-auto z-20 relative px-4 mt-8">
-             {/* Card 01 */}
-             <div className="w-full bg-white dark:bg-[#1a1a24] rounded-[2rem] p-5 flex flex-row items-center shadow-[0_20px_50px_-12px_rgba(0,0,0,0.08)] dark:shadow-purple-900/10 border border-gray-50 dark:border-white/5 relative group transition-transform duration-300 text-right cursor-default">
-                <div className="absolute -top-3 right-8 bg-purple-100 dark:bg-purple-900/60 text-purple-700 dark:text-purple-300 px-4 py-1.5 rounded-full font-extrabold text-[11px] ring-4 ring-white dark:ring-[#1a1a24]">01</div>
-                <div className="flex-1 pr-4 pl-2">
-                   <h3 className="font-extrabold text-[16px] text-gray-900 dark:text-white mb-2">إنشاء سريع وسهل</h3>
-                   <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed font-bold block">أنشئ متجرك في دقائق بدون أي تعقيد أو خبرة برمجية سابقة.</p>
-                </div>
-                <div className="w-[65px] h-[65px] rounded-[1.5rem] bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0 ml-2">
-                   <Zap className="w-8 h-8 fill-purple-600 dark:fill-purple-400" />
-                </div>
-             </div>
-
-             {/* Card 02 */}
-             <div className="w-full bg-white dark:bg-[#1a1a24] rounded-[2rem] p-5 flex flex-row items-center shadow-[0_20px_50px_-12px_rgba(0,0,0,0.08)] dark:shadow-pink-900/10 border border-gray-50 dark:border-white/5 relative group transition-transform duration-300 text-right cursor-default">
-                <div className="absolute -top-3 right-8 bg-pink-100 dark:bg-pink-900/60 text-pink-700 dark:text-pink-300 px-4 py-1.5 rounded-full font-extrabold text-[11px] ring-4 ring-white dark:ring-[#1a1a24]">02</div>
-                <div className="flex-1 pr-4 pl-2">
-                   <h3 className="font-extrabold text-[16px] text-gray-900 dark:text-white mb-2">تصاميم احترافية</h3>
-                   <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed font-bold block">قوالب حديثة ومتجاوبة تعكس هوية علامتك التجارية بشكل مميز.</p>
-                </div>
-                <div className="w-[65px] h-[65px] rounded-[1.5rem] bg-pink-50 dark:bg-pink-900/30 text-pink-500 dark:text-pink-400 flex items-center justify-center shrink-0 ml-2">
-                   <Palette className="w-8 h-8 fill-pink-500 dark:fill-pink-400" />
-                </div>
-             </div>
-
-             {/* Card 03 */}
-             <div className="w-full bg-white dark:bg-[#1a1a24] rounded-[2rem] p-5 flex flex-row items-center shadow-[0_20px_50px_-12px_rgba(0,0,0,0.08)] dark:shadow-blue-900/10 border border-gray-50 dark:border-white/5 relative group transition-transform duration-300 text-right cursor-default">
-                <div className="absolute -top-3 right-8 bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 px-4 py-1.5 rounded-full font-extrabold text-[11px] ring-4 ring-white dark:ring-[#1a1a24]">03</div>
-                <div className="flex-1 pr-4 pl-2">
-                   <h3 className="font-extrabold text-[16px] text-gray-900 dark:text-white mb-2">إدارة ذكية</h3>
-                   <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed font-bold block">لوحة تحكم متكاملة لإدارة المنتجات، الطلبات والعملاء بسهولة تامة.</p>
-                </div>
-                <div className="w-[65px] h-[65px] rounded-[1.5rem] bg-blue-50 dark:bg-blue-900/30 text-blue-500 dark:text-blue-400 flex items-center justify-center shrink-0 ml-2">
-                   <LayoutDashboard className="w-8 h-8 fill-blue-500 dark:fill-blue-400" />
-                </div>
-             </div>
-
-             {/* Card 04 */}
-             <div className="w-full bg-white dark:bg-[#1a1a24] rounded-[2rem] p-5 flex flex-row items-center shadow-[0_20px_50px_-12px_rgba(0,0,0,0.08)] dark:shadow-emerald-900/10 border border-gray-50 dark:border-white/5 relative group transition-transform duration-300 text-right cursor-default">
-                <div className="absolute -top-3 right-8 bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 px-4 py-1.5 rounded-full font-extrabold text-[11px] ring-4 ring-white dark:ring-[#1a1a24]">04</div>
-                <div className="flex-1 pr-4 pl-2">
-                   <h3 className="font-extrabold text-[16px] text-gray-900 dark:text-white mb-2">تحليلات وتقارير</h3>
-                   <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed font-bold block">تقارير دقيقة تساعدك على اتخاذ قرارات ذكية وتطوير متجرك.</p>
-                </div>
-                <div className="w-[65px] h-[65px] rounded-[1.5rem] bg-emerald-50 dark:bg-emerald-900/30 text-emerald-500 dark:text-emerald-400 flex items-center justify-center shrink-0 ml-2">
-                   <BarChart4 className="w-8 h-8 fill-emerald-500 dark:fill-emerald-400" />
-                </div>
-             </div>
-          </div>
-
-        </div>
-      </section>
-
-
-      {/* ===== STATISTICS SECTION ===== */}
-      <section className="py-16 bg-gradient-to-r from-purple-700 via-purple-600 to-fuchsia-600">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 divide-x divide-x-reverse divide-white/20">
+          {/* ====== MOBILE ====== */}
+          <div className="lg:hidden flex flex-col gap-8 max-w-md mx-auto pt-8 pb-4 px-2">
             {[
-              { num: "99.9%", label: "وقت التشغيل" },
-              { num: "+27", label: "عميل سعيد" },
-              { num: "+480", label: "طلب تم تنفيذه" },
-              { num: "+35", label: "متجر نشط" },
-            ].map((stat, i) => (
-              <div key={i} className="text-center px-4">
-                <p className="text-4xl md:text-5xl font-extrabold text-white mb-2">{stat.num}</p>
-                <p className="text-purple-100 font-medium text-sm md:text-base">{stat.label}</p>
+              { num: '01', icon: <Zap className="w-6 h-6 text-purple-600" style={{ fill: 'currentColor' }} />, border: 'border-purple-100 dark:border-purple-900', title: 'إنشاء سريع وسهل', desc: 'أنشئ متجرك في دقائق بدون أي تعقيد أو خبرة برمجية سابقة.' },
+              { num: '02', icon: <Palette className="w-6 h-6 text-pink-500" style={{ fill: 'currentColor' }} />, border: 'border-pink-100 dark:border-pink-900', title: 'تصاميم احترافية', desc: 'قوالب حديثة ومتجاوبة تعكس هوية علامتك التجارية بشكل مميز.' },
+              { num: '03', icon: <LayoutDashboard className="w-6 h-6 text-violet-600" style={{ fill: 'currentColor' }} />, border: 'border-violet-100 dark:border-violet-900', title: 'إدارة ذكية', desc: 'لوحة تحكم متكاملة لإدارة المنتجات، الطلبات والعملاء بسهولة تامة.' },
+              { num: '04', icon: <BarChart4 className="w-6 h-6 text-emerald-500" style={{ fill: 'currentColor' }} />, border: 'border-emerald-100 dark:border-emerald-900', title: 'تحليلات وتقارير', desc: 'تقارير دقيقة تساعدك على اتخاذ قرارات ذكية وتطوير متجرك.' },
+            ].map((f, i) => (
+              <div key={i} className="flex flex-row-reverse items-center gap-4 text-right">
+                <div className={`w-14 h-14 rounded-full bg-white dark:bg-[#1d1d2a] border-2 ${f.border} shadow-md flex items-center justify-center shrink-0`}>
+                  {f.icon}
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-end gap-2 mb-1">
+                    <h3 className="font-extrabold text-sm text-gray-900 dark:text-white">{f.title}</h3>
+                    <span className="text-gray-400 font-bold text-xs font-mono">{f.num}</span>
+                  </div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed font-medium">{f.desc}</p>
+                </div>
               </div>
             ))}
           </div>
+
         </div>
       </section>
 
 
+
+      {/* ===== STATISTICS SECTION ===== */}
+      <section className="relative z-20 -mb-10 lg:-mb-16 mt-16 px-4">
+        <div className="max-w-6xl mx-auto rounded-[2.5rem] p-[3px] bg-gradient-to-r from-purple-100 to-white dark:from-purple-900/40 dark:to-white/5 relative shadow-xl shadow-purple-500/10">
+          <div className="bg-gradient-to-l from-[#a855f7] via-[#c026d3] to-[#e879f9] rounded-[2.3rem] py-10 px-6 md:px-12 relative overflow-hidden h-full w-full shadow-inner">
+             {/* Background Decals */}
+             <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" />
+             <div className="absolute bottom-0 left-0 w-64 h-64 bg-black/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/3 pointer-events-none" />
+             
+             {/* Dotted pattern overlay */}
+             <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle, white 1.5px, transparent 1.5px)', backgroundSize: '24px 24px' }}></div>
+             
+             <div className="grid grid-cols-2 lg:grid-cols-4 gap-y-10 lg:gap-8 items-center relative z-10 w-full" dir="rtl">
+                 
+                 {/* Stat 1: Uptime */}
+                 <div className="flex flex-col items-center justify-center text-center text-white space-y-3 relative lg:after:content-[''] lg:after:absolute lg:after:left-0 lg:after:top-1/2 lg:after:-translate-y-1/2 lg:after:w-px lg:after:h-16 lg:after:bg-white/20">
+                   <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center mb-1 shadow-lg border border-white/20 hover:scale-110 transition-transform duration-300">
+                      <Zap className="w-7 h-7 text-white" />
+                   </div>
+                   <div className="flex items-center justify-center gap-1 font-mono">
+                      <div className="text-4xl md:text-5xl font-extrabold tracking-tight drop-shadow-md">99.9</div>
+                      <span className="text-2xl md:text-3xl font-extrabold">%</span>
+                   </div>
+                   <div className="text-white/90 font-bold text-sm md:text-base opacity-95 tracking-wide">وقت التشغيل</div>
+                 </div>
+
+                 {/* Stat 2: Happy Clients */}
+                 <div className="flex flex-col items-center justify-center text-center text-white space-y-3 relative lg:after:content-[''] lg:after:absolute lg:after:left-0 lg:after:top-1/2 lg:after:-translate-y-1/2 lg:after:w-px lg:after:h-16 lg:after:bg-white/20">
+                   <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center mb-1 shadow-lg border border-white/20 hover:scale-110 transition-transform duration-300">
+                      <Smile className="w-7 h-7 text-white" />
+                   </div>
+                   <div className="flex items-center justify-center gap-1 font-mono">
+                      <div className="text-4xl md:text-5xl font-extrabold tracking-tight drop-shadow-md">27</div>
+                      <span className="text-3xl md:text-4xl font-extrabold">+</span>
+                   </div>
+                   <div className="text-white/90 font-bold text-sm md:text-base opacity-95 tracking-wide">عميل سعيد</div>
+                 </div>
+
+                 {/* Stat 3: Orders Completed */}
+                 <div className="flex flex-col items-center justify-center text-center text-white space-y-3 relative lg:after:content-[''] lg:after:absolute lg:after:left-0 lg:after:top-1/2 lg:after:-translate-y-1/2 lg:after:w-px lg:after:h-16 lg:after:bg-white/20">
+                   <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center mb-1 shadow-lg border border-white/20 hover:scale-110 transition-transform duration-300">
+                      <FileText className="w-7 h-7 text-white" />
+                   </div>
+                   <div className="flex items-center justify-center gap-1 font-mono">
+                      <div className="text-4xl md:text-5xl font-extrabold tracking-tight drop-shadow-md">480</div>
+                      <span className="text-3xl md:text-4xl font-extrabold">+</span>
+                   </div>
+                   <div className="text-white/90 font-bold text-sm md:text-base opacity-95 tracking-wide">طلب تم تنفيذه</div>
+                 </div>
+
+                 {/* Stat 4: Active Stores */}
+                 <div className="flex flex-col items-center justify-center text-center text-white space-y-3 relative">
+                   <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center mb-1 shadow-lg border border-white/20 hover:scale-110 transition-transform duration-300">
+                      <Store className="w-7 h-7 text-white" />
+                   </div>
+                   <div className="flex items-center justify-center gap-1 font-mono">
+                      <div className="text-4xl md:text-5xl font-extrabold tracking-tight drop-shadow-md">35</div>
+                      <span className="text-3xl md:text-4xl font-extrabold">+</span>
+                   </div>
+                   <div className="text-white/90 font-bold text-sm md:text-base opacity-95 tracking-wide">متجر نشط</div>
+                 </div>
+
+             </div>
+          </div>
+        </div>
+      </section>
+
       {/* ===== TEMPLATES SECTION ===== */}
-      <section id="templates" className="py-24 bg-[#fafafc] dark:bg-[#0f0f13] transition-colors">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <span className="text-purple-600 font-bold bg-purple-50 dark:bg-purple-900/20 px-4 py-1.5 rounded-full text-sm inline-block mb-4 border border-purple-100 dark:border-purple-800/40">قوالب احترافية</span>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white mb-4">تصاميم جاهزة تناسب كل مجال</h2>
-            <p className="text-lg text-gray-600 dark:text-gray-400">اختر من مجموعة واسعة من القوالب الاحترافية، وخصصها بهويتك.</p>
+      <section id="templates" className="pt-32 pb-24 bg-[#f8f9fc] dark:bg-[#0f0f13] transition-colors relative overflow-hidden text-center z-10 w-full">
+        
+        {/* Background Decorative Graphic Elements */}
+        {/* 1. Dotted grid on top left */}
+        <div className="absolute top-[20%] left-[-2%] opacity-[0.03] dark:opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #5b21b6 2px, transparent 2px)', backgroundSize: '16px 16px', width: '300px', height: '200px' }}></div>
+        
+        {/* 2. Concentric circle pattern on right */}
+        <div className="absolute right-[5%] top-1/3 -translate-y-1/2 flex items-center justify-center pointer-events-none opacity-40 dark:opacity-20">
+           <div className="w-[400px] h-[400px] border border-purple-200 dark:border-white/5 rounded-full absolute" />
+           <div className="w-[300px] h-[300px] border border-purple-200 dark:border-white/5 rounded-full absolute" />
+           <div className="w-[200px] h-[200px] border border-purple-200 dark:border-white/5 rounded-full absolute" />
+           {/* Pink dot center */}
+           <div className="w-4 h-4 bg-fuchsia-400 rounded-full shadow-[0_0_15px_rgba(232,121,249,0.8)] absolute z-10" />
+        </div>
+        
+        {/* 3. Floating 3D Palette left side */}
+        <div className="hidden lg:flex absolute left-[12%] top-[15%] transform -rotate-12 pointer-events-none animate-bounce" style={{ animationDuration: '4s' }}>
+           <div className="w-[84px] h-[84px] bg-gradient-to-tr from-purple-500 to-purple-400 rounded-[1.5rem] shadow-[0_20px_35px_-10px_rgba(168,85,247,0.5)] border-b-4 border-r-4 border-purple-700 flex items-center justify-center hover:-rotate-6 transition-transform">
+              <Palette className="w-10 h-10 text-white drop-shadow-sm" />
+           </div>
+        </div>
+
+        {/* 4. Bottom-right soft purple blob overlay */}
+        <div className="absolute -bottom-1/4 -right-1/4 w-[1000px] h-[600px] bg-gradient-to-tl from-purple-100/50 to-transparent dark:from-purple-900/20 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20">
+          
+          <div className="mb-12">
+            <span className="text-purple-700 dark:text-purple-300 font-extrabold bg-white dark:bg-purple-900/30 px-5 py-2 rounded-full text-sm inline-flex items-center justify-center gap-2 mb-6 border border-purple-100 dark:border-purple-800/40 shadow-sm relative">
+               قوالب احترافية
+               <Palette className="w-4 h-4 fill-purple-600" />
+               <div className="absolute inset-0 bg-purple-600 opacity-5 rounded-full" />
+            </span>
+            <h2 className="text-4xl md:text-5xl font-extrabold text-[#111] dark:text-white mb-6 tracking-tight relative z-10">
+              تصاميم جاهزة <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-700 to-purple-500 relative inline-block z-10">تناسب<div className="absolute -bottom-1 right-0 w-full h-[15px] bg-gradient-to-r from-purple-200 to-transparent rounded-full opacity-60 dark:opacity-30 -z-10"></div></span> كل مجال
+            </h2>
+            <p className="text-base font-bold md:text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">
+              اختر من مجموعة واسعة من القوالب الاحترافية، وخصصها بهويتك،<br className="hidden md:block"/> وانطلق بمشروعك بثقة وسرعة.
+            </p>
           </div>
 
-          <div className="flex flex-col items-center justify-center bg-white dark:bg-[#1a1a24] rounded-3xl border border-dashed border-gray-300 dark:border-white/10 p-16 shadow-sm">
-            <div className="w-20 h-20 bg-purple-50 dark:bg-purple-900/20 rounded-full flex items-center justify-center mb-6">
-              <Palette className="w-10 h-10 text-purple-600" />
-            </div>
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">قوالب سوريكس قريباً!</h3>
-            <p className="text-gray-500 dark:text-gray-400 max-w-md mx-auto text-center">نعمل حالياً على تجهيز مكتبة ضخمة من القوالب الاحترافية التي ستساعدك على إطلاق متجرك بأبهى حُلة، انتظرونا قريباً.</p>
+          {/* Features Bar */}
+          <div className="max-w-5xl mx-auto bg-white/90 dark:bg-[#1a1a24]/90 backdrop-blur-xl rounded-3xl md:rounded-full p-2 lg:p-3 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.06)] dark:shadow-[0_20px_50px_-15px_rgba(168,85,247,0.1)] border border-gray-100 dark:border-white/5 mb-16 relative overflow-hidden" dir="rtl">
+             
+             <div className="flex flex-col md:flex-row items-center justify-between divide-y md:divide-y-0 md:divide-x md:divide-x-reverse divide-gray-100 dark:divide-white/10 w-full">
+                
+                {/* Item 1 */}
+                <div className="flex items-center justify-center md:justify-start gap-4 px-4 py-4 w-full group">
+                   <div className="w-12 h-12 rounded-2xl bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center shrink-0 border border-purple-100 dark:border-purple-800/20 group-hover:bg-purple-100 transition-colors">
+                      <LayoutGrid className="w-5 h-5 text-purple-600" />
+                   </div>
+                   <span className="font-extrabold text-[#333] dark:text-white text-[15px]">تصاميم حديثة وجذابة</span>
+                </div>
+                
+                {/* Item 2 */}
+                <div className="flex items-center justify-center md:justify-start gap-4 px-4 py-4 w-full group">
+                   <div className="w-12 h-12 rounded-2xl bg-green-50 dark:bg-green-900/30 flex items-center justify-center shrink-0 border border-green-100 dark:border-green-800/20 group-hover:bg-green-100 transition-colors">
+                      <PenTool className="w-5 h-5 text-green-600" />
+                   </div>
+                   <span className="font-extrabold text-[#333] dark:text-white text-[15px]">قابلة للتخصيص بسهولة</span>
+                </div>
+
+                {/* Item 3 */}
+                <div className="flex items-center justify-center md:justify-start gap-4 px-4 py-4 w-full group">
+                   <div className="w-12 h-12 rounded-2xl bg-orange-50 dark:bg-orange-900/30 flex items-center justify-center shrink-0 border border-orange-100 dark:border-orange-800/20 group-hover:bg-orange-100 transition-colors">
+                      <Smartphone className="w-5 h-5 text-orange-500" />
+                   </div>
+                   <span className="font-extrabold text-[#333] dark:text-white text-[15px]">متجاوبة مع جميع الأجهزة</span>
+                </div>
+
+                {/* Item 4 */}
+                <div className="flex items-center justify-center md:justify-start gap-4 px-4 py-4 w-full group">
+                   <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center shrink-0 border border-blue-100 dark:border-blue-800/20 group-hover:bg-blue-100 transition-colors">
+                      <RefreshCcw className="w-5 h-5 text-blue-500" />
+                   </div>
+                   <span className="font-extrabold text-[#333] dark:text-white text-[15px]">تحديثات مستمرة</span>
+                </div>
+
+             </div>
           </div>
+
+          {/* Templates Section - Coming Soon Minimal Decoration */}
+          <div className="flex items-center justify-center gap-4 mt-20 mb-8 max-w-sm mx-auto">
+             <div className="flex-1 h-px border-t border-dashed border-gray-300 dark:border-white/20 relative">
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-2.5 h-2.5 rotate-45 bg-purple-600" />
+             </div>
+             <h3 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white mt-1 px-2 whitespace-nowrap">قوالب قريباً</h3>
+             <div className="flex-1 h-px border-t border-dashed border-gray-300 dark:border-white/20 relative">
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2.5 h-2.5 rotate-45 bg-purple-600" />
+             </div>
+          </div>
+
         </div>
       </section>
 
 
       {/* ===== TESTIMONIALS SECTION ===== */}
-      <section className="py-24 bg-white dark:bg-[#15151c] relative overflow-hidden transition-colors">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <span className="text-purple-600 font-bold bg-purple-50 dark:bg-purple-900/20 px-4 py-1.5 rounded-full text-sm inline-block mb-4 border border-purple-100 dark:border-purple-800/40">آراء عملائنا</span>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white">ماذا يقول عملاؤنا عن Suriix؟</h2>
+      <section className="py-24 bg-[#fafafc] dark:bg-[#15151c] relative overflow-hidden transition-colors">
+        {/* Background Decorative Blur Orbs */}
+        <div className="absolute left-[-10%] bottom-[-10%] w-[500px] h-[500px] bg-purple-200/50 dark:bg-purple-900/20 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute right-[-5%] top-[10%] w-[300px] h-[300px] bg-blue-100/50 dark:bg-blue-900/10 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute right-[5%] top-[5%] grid grid-cols-4 gap-2 opacity-[0.15] dark:opacity-10 pointer-events-none">
+          {[...Array(16)].map((_, i) => <div key={i} className="w-[5px] h-[5px] rounded-full bg-purple-600" />)}
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center mb-16 flex flex-col items-center">
+            <div className="inline-flex items-center gap-2 text-purple-600 font-extrabold bg-purple-100 dark:bg-purple-900/40 px-4 py-1.5 rounded-full text-sm mb-4">
+              <span>آراء عملائنا</span>
+              <MessageCircle className="w-4 h-4" fill="currentColor" />
+            </div>
+            <h2 className="text-3xl md:text-5xl font-extrabold text-[#1a1a24] dark:text-white mb-4">
+              ماذا يقول عملاؤنا عن <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-fuchsia-500">Suriix</span>؟
+            </h2>
+            <p className="text-gray-500 dark:text-gray-400 font-bold text-lg">نفخر بثقة عملائنا وتجاربهم الناجحة مع منصتنا.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                text: "أفضل منصة لإنشاء المتاجر الإلكترونية. سهلة الاستخدام والدعم سريع جداً.",
-                name: "فاطمة العتيبي",
-                store: "متجر عطور",
-                img: "https://i.pravatar.cc/100?img=5"
-              },
-              {
-                text: "تصميم المتجر احترافي، والمبيعات زادت بشكل ملحوظ بعد الانتقال إلى المنصة.",
-                name: "أحمد السبيعي",
-                store: "متجر إلكترونيات",
-                img: "https://i.pravatar.cc/100?img=12"
-              },
-              {
-                text: "كل الأدوات التي أحتاجها في مكان واحد. أنصح بها بشدة لأي صاحب متجر.",
-                name: "سارة محمد",
-                store: "متجر أزياء",
-                img: "https://i.pravatar.cc/100?img=9"
-              }
-            ].map((t, i) => (
-              <div key={i} className="bg-[#fafafc] dark:bg-[#1a1a24] p-8 rounded-2xl border border-gray-100 dark:border-white/5 flex flex-col justify-between">
-                <div>
-                  <div className="text-purple-400 text-6xl font-serif leading-none mb-4">"</div>
-                  <p className="text-gray-700 dark:text-gray-300 text-lg leading-relaxed mb-8">{t.text}</p>
-                </div>
-                <div className="flex items-center space-x-4 space-x-reverse">
-                  <img src={t.img} alt={t.name} className="w-12 h-12 rounded-full border-2 border-white dark:border-white/10 shadow-sm" />
-                  <div>
-                    <h4 className="font-bold text-gray-900 dark:text-white">{t.name}</h4>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{t.store}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+            
+            {/* CARD 1 (Blue) - Fatima */}
+            <div className="bg-white dark:bg-[#1a1a24] rounded-[2rem] p-8 shadow-[0_15px_40px_rgba(0,0,0,0.03)] dark:shadow-none border-[1.5px] border-transparent hover:border-blue-100 dark:border-white/5 relative flex flex-col justify-between overflow-hidden group transition-all duration-300">
+               {/* Top subtle gradient */}
+               <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-blue-50 to-transparent dark:from-blue-900/20 dark:to-transparent rounded-br-[100px] z-0 transition-transform duration-500 group-hover:scale-110" />
+               {/* Bottom Border Gradient */}
+               <div className="absolute bottom-0 right-0 w-full h-[5px] bg-gradient-to-r from-blue-400 to-sky-400 opacity-90" />
+
+               <div className="relative z-10">
+                 <div className="flex justify-between items-start mb-8 flex-row-reverse">
+                   <div className="w-14 h-14 rounded-2xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-500 border border-blue-100 dark:border-blue-800/40">
+                      <Star className="w-7 h-7" />
+                   </div>
+                   <div className="text-blue-500/80 dark:text-blue-400/80">
+                      <Quote className="w-12 h-12 rotate-180" fill="currentColor" />
+                   </div>
+                 </div>
+                 
+                 <p className="text-[#3a3a4c] dark:text-gray-300 text-[15px] font-extrabold leading-[1.8] text-right mb-8">
+                   أفضل منصة لإنشاء المتاجر الإلكترونية. سهولة الاستخدام والدعم السريع جداً.
+                 </p>
+               </div>
+               
+               <div className="relative z-10 flex flex-col mt-auto">
+                 <div className="h-px w-16 bg-blue-200 dark:bg-blue-900/40 mx-auto mb-6" />
+                 
+                 <div className="flex items-center justify-center gap-4">
+                   <img src="https://i.pravatar.cc/150?img=5" alt="فاطمة العتيبي" className="w-14 h-14 rounded-full object-cover border-2 border-blue-100 dark:border-blue-900/30 shadow-sm" />
+                   <div className="text-right">
+                     <h4 className="font-extrabold text-[#1a1a24] dark:text-white mb-0.5 text-lg">فاطمة العتيبي</h4>
+                     <p className="text-[13px] text-gray-500 font-bold">متجر عطور</p>
+                   </div>
+                 </div>
+               </div>
+            </div>
+
+            {/* CARD 2 (Purple) - Ahmed */}
+            <div className="bg-white dark:bg-[#1a1a24] rounded-[2rem] p-8 shadow-[0_15px_40px_rgba(0,0,0,0.03)] dark:shadow-none border-[1.5px] border-transparent hover:border-purple-100 dark:border-white/5 relative flex flex-col justify-between overflow-hidden group transition-all duration-300">
+               <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-purple-50 to-transparent dark:from-purple-900/20 dark:to-transparent rounded-br-[100px] z-0 transition-transform duration-500 group-hover:scale-110" />
+               <div className="absolute bottom-0 right-0 w-full h-[5px] bg-gradient-to-r from-purple-500 to-fuchsia-400 opacity-90" />
+
+               <div className="relative z-10">
+                 <div className="flex justify-between items-start mb-8 flex-row-reverse">
+                   <div className="w-14 h-14 rounded-2xl bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center text-purple-500 border border-purple-100 dark:border-purple-800/40">
+                      <BarChart4 className="w-7 h-7" />
+                   </div>
+                   <div className="text-purple-500/80 dark:text-purple-400/80">
+                      <Quote className="w-12 h-12 rotate-180" fill="currentColor" />
+                   </div>
+                 </div>
+                 
+                 <p className="text-[#3a3a4c] dark:text-gray-300 text-[15px] font-extrabold leading-[1.8] text-right mb-8">
+                   تصميم المتجر احترافي، والمبيعات زادت بشكل ملحوظ بعد الانتقال إلى المنصة.
+                 </p>
+               </div>
+               
+               <div className="relative z-10 flex flex-col mt-auto">
+                 <div className="h-px w-16 bg-purple-200 dark:bg-purple-900/40 mx-auto mb-6" />
+                 
+                 <div className="flex items-center justify-center gap-4">
+                   <img src="https://i.pravatar.cc/150?img=12" alt="أحمد السبيعي" className="w-14 h-14 rounded-full object-cover border-2 border-purple-100 dark:border-purple-900/30 shadow-sm" />
+                   <div className="text-right">
+                     <h4 className="font-extrabold text-[#1a1a24] dark:text-white mb-0.5 text-lg">أحمد السبيعي</h4>
+                     <p className="text-[13px] text-gray-500 font-bold">متجر إلكترونيات</p>
+                   </div>
+                 </div>
+               </div>
+            </div>
+
+            {/* CARD 3 (Orange) - Sara */}
+            <div className="bg-white dark:bg-[#1a1a24] rounded-[2rem] p-8 shadow-[0_15px_40px_rgba(0,0,0,0.03)] dark:shadow-none border-[1.5px] border-transparent hover:border-orange-100 dark:border-white/5 relative flex flex-col justify-between overflow-hidden group transition-all duration-300">
+               <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-orange-50 to-transparent dark:from-orange-900/20 dark:to-transparent rounded-br-[100px] z-0 transition-transform duration-500 group-hover:scale-110" />
+               <div className="absolute bottom-0 right-0 w-full h-[5px] bg-gradient-to-r from-orange-400 to-pink-500 opacity-90" />
+
+               <div className="relative z-10">
+                 <div className="flex justify-between items-start mb-8 flex-row-reverse">
+                   <div className="w-14 h-14 rounded-2xl bg-orange-50 dark:bg-orange-900/20 flex items-center justify-center text-orange-500 border border-orange-100 dark:border-orange-800/40">
+                      <ShoppingBag className="w-7 h-7" />
+                   </div>
+                   <div className="text-orange-500/80 dark:text-orange-400/80">
+                      <Quote className="w-12 h-12 rotate-180" fill="currentColor" />
+                   </div>
+                 </div>
+                 
+                 <p className="text-[#3a3a4c] dark:text-gray-300 text-[15px] font-extrabold leading-[1.8] text-right mb-8">
+                   كل الأدوات التي أحتاجها في مكان واحد. أنصح بها بشدة لأي صاحب متجر.
+                 </p>
+               </div>
+               
+               <div className="relative z-10 flex flex-col mt-auto">
+                 <div className="h-px w-16 bg-orange-200 dark:bg-orange-900/40 mx-auto mb-6" />
+                 
+                 <div className="flex items-center justify-center gap-4">
+                   <img src="https://i.pravatar.cc/150?img=9" alt="سارة محمد" className="w-14 h-14 rounded-full object-cover border-2 border-orange-100 dark:border-orange-900/30 shadow-sm" />
+                   <div className="text-right">
+                     <h4 className="font-extrabold text-[#1a1a24] dark:text-white mb-0.5 text-lg">سارة محمد</h4>
+                     <p className="text-[13px] text-gray-500 font-bold">متجر أزياء</p>
+                   </div>
+                 </div>
+               </div>
+            </div>
+
           </div>
           
-          <div className="flex justify-center mt-10 space-x-2 space-x-reverse">
-             <div className="w-2.5 h-2.5 rounded-full bg-purple-600"></div>
-             <div className="w-2 h-2 rounded-full bg-gray-200 dark:bg-white/20"></div>
-             <div className="w-2 h-2 rounded-full bg-gray-200 dark:bg-white/20"></div>
+          {/* Pagination Dots */}
+          <div className="flex justify-center mt-12 gap-2">
+             <div className="w-3 h-3 rounded-full bg-gray-200 dark:bg-white/10 transition-colors hover:bg-gray-300 cursor-pointer" />
+             <div className="w-3 h-3 rounded-full bg-gray-200 dark:bg-white/10 transition-colors hover:bg-gray-300 cursor-pointer" />
+             <div className="w-3 h-3 rounded-full bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.5)] transition-colors cursor-pointer" />
           </div>
+          
         </div>
       </section>
 
       {/* ===== CTA SECTION ===== */}
-      <section className="py-20 bg-[#fafafc] dark:bg-[#0f0f13] border-t border-b border-gray-100 dark:border-white/5 transition-colors">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center bg-gray-50/50 dark:bg-[#1a1a24] border border-transparent dark:border-white/5 shadow-sm py-16 rounded-[2.5rem] relative overflow-hidden">
-           <div className="absolute top-0 left-1/4 w-[300px] h-[300px] bg-purple-500/10 rounded-full blur-[80px] pointer-events-none" />
-           <div className="absolute bottom-0 right-1/4 w-[300px] h-[300px] bg-fuchsia-500/10 rounded-full blur-[80px] pointer-events-none" />
+      <section className="py-24 bg-white dark:bg-[#15151c] relative overflow-hidden transition-colors">
+        
+        {/* Floating spheres in background outside the card */}
+        <div className="absolute top-10 left-[10%] w-12 h-12 rounded-full bg-gradient-to-br from-purple-400 to-fuchsia-600 blur-[2px] opacity-60 dark:opacity-40" style={{ filter: 'drop-shadow(0 10px 15px rgba(168,85,247,0.4))' }} />
+        <div className="absolute bottom-10 right-[15%] w-20 h-20 rounded-full bg-gradient-to-br from-purple-400 to-fuchsia-600 blur-[2px] opacity-60 dark:opacity-40" style={{ filter: 'drop-shadow(0 15px 25px rgba(168,85,247,0.5))' }} />
+
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
            
-           <h2 className="text-3xl lg:text-4xl font-extrabold text-gray-900 dark:text-white mb-6 relative z-10">جاهز لتبدأ رحلتك في التجارة الذكية؟</h2>
-           <p className="text-xl text-gray-600 dark:text-gray-400 mb-10 relative z-10">انضم إلى آلاف التجار وابدأ متجرك الآن مجاناً.</p>
-           <Link to="/create-store" className="relative z-10 inline-flex items-center justify-center space-x-2 space-x-reverse bg-gradient-to-r from-purple-600 to-fuchsia-500 text-white px-10 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-purple-500/30 transition-all hover:scale-105">
-              <span>ابدأ الآن</span>
-              <ArrowLeft className="w-5 h-5" />
-           </Link>
+           <div className="bg-[#fcfcff] dark:bg-[#1a1a24] rounded-[2.5rem] shadow-[0_15px_60px_rgba(168,85,247,0.06)] dark:shadow-none border-[1.5px] border-purple-50 dark:border-white/5 relative overflow-hidden h-auto min-h-[400px] flex flex-col items-center justify-center py-16 px-6">
+              
+              {/* === BACKGROUND DECORATIONS === */}
+              {/* Right decorative wave/blob */}
+              <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-gradient-to-tl from-purple-200/60 to-purple-50/0 dark:from-purple-900/40 dark:to-transparent rounded-tl-[200px] pointer-events-none" />
+              {/* Left decorative wave/blob */}
+              <div className="absolute top-0 left-0 w-[300px] h-[200px] bg-gradient-to-br from-purple-100/50 to-transparent dark:from-purple-900/30 rounded-br-[150px] pointer-events-none" />
+
+              {/* Top-left dot grid */}
+              <div className="absolute top-10 left-10 grid grid-cols-4 gap-2 opacity-20 pointer-events-none">
+                {[...Array(16)].map((_, i) => <div key={i} className="w-[4px] h-[4px] rounded-full bg-gray-500 dark:bg-gray-400" />)}
+              </div>
+              
+              {/* Bottom scattered dots left/right */}
+              <div className="absolute bottom-20 left-[30%] grid grid-cols-4 gap-2 opacity-20 pointer-events-none">
+                {[...Array(8)].map((_, i) => <div key={i} className="w-[3px] h-[3px] rounded-full bg-purple-500" />)}
+              </div>
+              <div className="absolute bottom-20 right-[30%] grid grid-cols-4 gap-2 opacity-20 pointer-events-none">
+                {[...Array(8)].map((_, i) => <div key={i} className="w-[3px] h-[3px] rounded-full bg-purple-500" />)}
+              </div>
+
+              {/* LEFT FLOATING ELEMENTS (Simulating the 3D icons) */}
+              <div className="absolute left-[5%] xl:left-[10%] top-1/2 -translate-y-1/2 w-[200px] h-[200px] pointer-events-none hidden md:block">
+                 {/* Floating Sparkle/Star */}
+                 <div className="absolute top-0 left-10 text-purple-400 rotate-12 drop-shadow-lg opacity-80">
+                    <Sparkles className="w-8 h-8" fill="currentColor" />
+                 </div>
+                 {/* Floating Chart Card */}
+                 <div className="absolute top-6 right-0 bg-white/80 dark:bg-[#252532]/80 backdrop-blur-md p-3 rounded-2xl shadow-xl border border-white dark:border-white/10 -rotate-12 transition-transform duration-500 hover:rotate-0">
+                    <BarChart4 className="w-8 h-8 text-purple-600 dark:text-purple-400" />
+                 </div>
+                 {/* Floating Cart Card */}
+                 <div className="absolute bottom-10 right-4 bg-white/80 dark:bg-[#252532]/80 backdrop-blur-md p-3 rounded-xl shadow-xl border border-white dark:border-white/10 rotate-12 transition-transform duration-500 hover:rotate-0">
+                    <ShoppingCart className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                 </div>
+                 
+                 {/* Fake 3D Brain/Pedestal (using concentric glowing ellipses) */}
+                 <div className="absolute bottom-0 left-4 w-32 h-10 bg-purple-200/50 dark:bg-purple-900/50 rounded-[100%] shadow-[inset_0_-5px_15px_rgba(168,85,247,0.2)] flex items-center justify-center">
+                    <div className="w-24 h-6 bg-purple-300/60 dark:bg-purple-800/60 rounded-[100%] shadow-[inset_0_-2px_5px_rgba(168,85,247,0.3)] flex items-center justify-center">
+                       <div className="w-16 h-4 bg-white/50 dark:bg-white/10 rounded-[100%]" />
+                    </div>
+                    {/* Placeholder for Brain */}
+                    <div className="absolute bottom-6 w-20 h-20 rounded-full bg-gradient-to-br from-purple-400 to-fuchsia-600 blur-[2px] opacity-40 mix-blend-multiply dark:mix-blend-screen" />
+                    <Star className="absolute bottom-10 w-16 h-16 text-purple-500/80 fill-current drop-shadow-2xl" />
+                 </div>
+              </div>
+
+
+              {/* === MAIN CONTENT === */}
+              <div className="relative z-20 flex flex-col items-center text-center max-w-2xl mx-auto">
+                 
+                 {/* Rocket Badge */}
+                 <div className="flex items-center justify-center gap-4 mb-8">
+                    <div className="w-8 h-px bg-gradient-to-r from-transparent to-purple-400" />
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-fuchsia-600 p-[2px] shadow-[0_10px_25px_rgba(168,85,247,0.4)]">
+                       <div className="w-full h-full rounded-full bg-white dark:bg-[#1a1a24] flex items-center justify-center overflow-hidden relative">
+                         <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-fuchsia-600/20" />
+                         <Rocket className="w-8 h-8 text-purple-600 dark:text-purple-400 fill-current -translate-y-0.5 translate-x-0.5" />
+                       </div>
+                    </div>
+                    <div className="w-8 h-px bg-gradient-to-l from-transparent to-purple-400" />
+                 </div>
+
+                 {/* Headings */}
+                 <h2 className="text-3xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-6 leading-tight">
+                    جاهز لتبدأ رحلتك في <span className="text-purple-600 dark:text-purple-400">التجارة الذكية؟</span>
+                 </h2>
+                 <p className="text-lg md:text-xl text-gray-600 dark:text-gray-400 mb-10 font-bold">
+                    انضم إلى آلاف التجار وابدأ متجرك الآن <span className="text-purple-600 dark:text-purple-400">مجاناً.</span>
+                 </p>
+                 
+                 {/* CTA Button */}
+                 <Link to="/create-store" className="relative z-10 inline-flex items-center justify-center space-x-3 space-x-reverse bg-gradient-to-r from-purple-600 to-fuchsia-500 text-white px-10 py-4 rounded-full font-bold text-[17px] shadow-[0_10px_30px_rgba(168,85,247,0.4)] hover:shadow-[0_15px_40px_rgba(168,85,247,0.6)] transition-all hover:scale-[1.03] group">
+                    <span>ابدأ الآن</span>
+                    <ArrowLeft className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
+                 </Link>
+
+              </div>
+           </div>
         </div>
       </section>
 
 
       {/* ===== FOOTER ===== */}
-      <footer className="bg-white dark:bg-[#15151c] pt-20 pb-10 border-t border-gray-100 dark:border-white/5 transition-colors">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-            
-            <div className="space-y-6">
-              <div className="flex items-center space-x-2 space-x-reverse">
-                <img src="/favicon.png" alt="Suriix Logo" className="w-8 h-8 object-contain" />
-                <span className="font-bold text-xl text-gray-900 dark:text-white">Suriix</span>
+      <footer className="py-24 bg-white dark:bg-[#15151c] relative overflow-hidden transition-colors">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+           <div className="bg-[#fcfcff] dark:bg-[#1a1a24] rounded-[3rem] shadow-[0_15px_60px_rgba(168,85,247,0.06)] dark:shadow-none border-[1.5px] border-purple-50 dark:border-white/5 relative overflow-hidden h-auto flex flex-col pt-20 px-6 lg:px-20 pb-8">
+              
+              {/* Background Decorations */}
+              <div className="absolute top-10 left-10 grid grid-cols-4 gap-2 opacity-20 pointer-events-none">
+                {[...Array(16)].map((_, i) => <div key={i} className="w-[4px] h-[4px] rounded-full bg-gray-400" />)}
               </div>
-              <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
-                منصة متكاملة لإنشاء وإدارة المتاجر الإلكترونية بسهولة واحترافية.
-              </p>
-              <div className="flex space-x-4 space-x-reverse text-gray-400 dark:text-slate-300">
-                <a href="#" className="hover:text-purple-600 transition"><svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg></a>
-                <a href="#" className="hover:text-purple-600 transition"><svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a>
+              <div className="absolute bottom-0 right-[-100px] w-[500px] h-[300px] bg-gradient-to-tl from-purple-200/40 to-transparent dark:from-purple-900/20 rounded-tl-[200px] pointer-events-none" />
+              {/* Overlay waves for right side */}
+              <svg className="absolute bottom-0 right-0 w-[500px] h-[300px] pointer-events-none opacity-[0.03] dark:opacity-[0.02]" viewBox="0 0 500 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+                 <path d="M500 300C350 300 200 250 100 150C0 50 0 0 0 0" stroke="currentColor" strokeWidth="2" />
+                 <path d="M500 250C380 250 250 200 150 100C50 0 0 0 0 0" stroke="currentColor" strokeWidth="2" />
+                 <path d="M500 200C400 200 280 150 180 50C80 -50 0 0 0 0" stroke="currentColor" strokeWidth="2" />
+              </svg>
+
+              {/* Links and Logo Row */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16 relative z-10">
+                 
+                 {/* COL 1: Logo & Socials */}
+                 <div className="flex flex-col items-center md:items-end text-center md:text-right space-y-6">
+                    <div className="flex items-center space-x-2 space-x-reverse justify-center md:justify-end cursor-pointer">
+                      <span className="font-extrabold text-3xl text-gray-900 dark:text-white mt-1 relative">
+                        Suriix
+                      </span>
+                      <img src="/favicon.png" alt="Suriix Logo" className="w-10 h-10 object-contain drop-shadow-md" />
+                    </div>
+                    <p className="text-[#3a3a4c] dark:text-gray-400 text-[15px] font-bold leading-[1.8] max-w-[220px]">
+                      منصة متكاملة لإدارة متجرك الإلكتروني بسهولة واحترافية
+                    </p>
+                    <div className="flex items-center justify-center md:justify-end gap-3 pt-2">
+                       {/* Facebook */}
+                       <a href="#" className="w-10 h-10 rounded-full bg-purple-50 dark:bg-purple-900/20 text-purple-600 flex items-center justify-center hover:bg-purple-600 hover:text-white transition-all hover:scale-110">
+                         <svg className="w-[18px] h-[18px]" fill="currentColor" viewBox="0 0 24 24"><path d="M22.675 0H1.325C.593 0 0 .593 0 1.325v21.351C0 23.407.593 24 1.325 24H12.82v-9.294H9.692v-3.622h3.128V8.413c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12V24h6.116c.73 0 1.323-.593 1.323-1.325V1.325C24 .593 23.407 0 22.675 0z"/></svg>
+                       </a>
+                       {/* Instagram */}
+                       <a href="#" className="w-10 h-10 rounded-full bg-purple-50 dark:bg-purple-900/20 text-purple-600 flex items-center justify-center hover:bg-purple-600 hover:text-white transition-all hover:scale-110">
+                         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+                       </a>
+                       {/* WhatsApp */}
+                       <a href="#" className="w-10 h-10 rounded-full bg-purple-50 dark:bg-purple-900/20 text-purple-600 flex items-center justify-center hover:bg-purple-600 hover:text-white transition-all hover:scale-110">
+                         <svg className="w-[22px] h-[22px]" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.888-.788-1.487-1.761-1.66-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" /></svg>
+                       </a>
+                    </div>
+                 </div>
+                 
+                 {/* COL 2: Company */}
+                 <div className="flex flex-col items-center md:items-end text-center md:text-right">
+                    <div className="inline-flex flex-col items-end mb-8 relative">
+                       <h4 className="font-extrabold text-[#1a1a24] dark:text-white text-xl">الشركة</h4>
+                       <div className="absolute -bottom-3 right-0 w-8 h-[2.5px] bg-purple-500 rounded-full" />
+                    </div>
+                    <ul className="space-y-4 text-[15px] text-gray-500 dark:text-gray-400 font-bold w-full flex flex-col items-center md:items-end">
+                      <li>
+                        <Link to="/about" className="hover:text-purple-600 transition-colors flex items-center justify-center md:justify-end gap-3 w-full group">
+                           <span>عن المنصة</span>
+                           <Smile className="w-[18px] h-[18px] text-purple-600 transition-transform group-hover:scale-110" />
+                        </Link>
+                      </li>
+                      <li>
+                        <Link to="/blog" className="hover:text-purple-600 transition-colors flex items-center justify-center md:justify-end gap-3 w-full group">
+                           <span>المدونة</span>
+                           <PenTool className="w-[18px] h-[18px] text-purple-600 transition-transform group-hover:scale-110" />
+                        </Link>
+                      </li>
+                      <li>
+                        <Link to="/careers" className="hover:text-purple-600 transition-colors flex items-center justify-center md:justify-end gap-3 w-full group">
+                           <span>وظائف</span>
+                           <Briefcase className="w-[18px] h-[18px] text-purple-600 transition-transform group-hover:scale-110" />
+                        </Link>
+                      </li>
+                      <li>
+                        <Link to="/contact" className="hover:text-purple-600 transition-colors flex items-center justify-center md:justify-end gap-3 w-full group">
+                           <span>تواصل معنا</span>
+                           <Mail className="w-[18px] h-[18px] text-purple-600 transition-transform group-hover:scale-110" />
+                        </Link>
+                      </li>
+                    </ul>
+                 </div>
+
+                 {/* COL 3: Support */}
+                 <div className="flex flex-col items-center md:items-end text-center md:text-right">
+                    <div className="inline-flex flex-col items-end mb-8 relative">
+                       <h4 className="font-extrabold text-[#1a1a24] dark:text-white text-xl">الدعم</h4>
+                       <div className="absolute -bottom-3 right-0 w-8 h-[2.5px] bg-purple-500 rounded-full" />
+                    </div>
+                    <ul className="space-y-4 text-[15px] text-gray-500 dark:text-gray-400 font-bold w-full flex flex-col items-center md:items-end">
+                      <li>
+                        <Link to="/help" className="hover:text-purple-600 transition-colors flex items-center justify-center md:justify-end gap-3 w-full group">
+                           <span>مركز المساعدة</span>
+                           <svg className="w-[18px] h-[18px] text-purple-600 transition-transform group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link to="/faq" className="hover:text-purple-600 transition-colors flex items-center justify-center md:justify-end gap-3 w-full group">
+                           <span>الأسئلة الشائعة</span>
+                           <MessageCircle className="w-[18px] h-[18px] text-purple-600 transition-transform group-hover:scale-110" />
+                        </Link>
+                      </li>
+                      <li>
+                        <Link to="/privacy" className="hover:text-purple-600 transition-colors flex items-center justify-center md:justify-end gap-3 w-full group">
+                           <span>سياسة الخصوصية</span>
+                           <ShieldCheck className="w-[18px] h-[18px] text-purple-600 transition-transform group-hover:scale-110" />
+                        </Link>
+                      </li>
+                      <li>
+                        <Link to="/terms" className="hover:text-purple-600 transition-colors flex items-center justify-center md:justify-end gap-3 w-full group">
+                           <span>الشروط والأحكام</span>
+                           <FileText className="w-[18px] h-[18px] text-purple-600 transition-transform group-hover:scale-110" />
+                        </Link>
+                      </li>
+                    </ul>
+                 </div>
+
+                 {/* COL 4: Resources */}
+                 <div className="flex flex-col items-center md:items-end text-center md:text-right">
+                    <div className="inline-flex flex-col items-end mb-8 relative">
+                       <h4 className="font-extrabold text-[#1a1a24] dark:text-white text-xl">الموارد</h4>
+                       <div className="absolute -bottom-3 right-0 w-8 h-[2.5px] bg-purple-500 rounded-full" />
+                    </div>
+                    <ul className="space-y-4 text-[15px] text-gray-500 dark:text-gray-400 font-bold w-full flex flex-col items-center md:items-end">
+                      <li>
+                        <Link to="/guide" className="hover:text-purple-600 transition-colors flex items-center justify-center md:justify-end gap-3 w-full group">
+                           <span>دليل البدء</span>
+                           <Rocket className="w-[18px] h-[18px] text-purple-600 transition-transform group-hover:scale-110" />
+                        </Link>
+                      </li>
+                      <li>
+                        <Link to="/videos" className="hover:text-purple-600 transition-colors flex items-center justify-center md:justify-end gap-3 w-full group">
+                           <span>فيديوهات تعليمية</span>
+                           <svg className="w-[18px] h-[18px] text-purple-600 transition-transform group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link to="/partners" className="hover:text-purple-600 transition-colors flex items-center justify-center md:justify-end gap-3 w-full group">
+                           <span>شركاء النجاح</span>
+                           <Users className="w-[18px] h-[18px] text-purple-600 transition-transform group-hover:scale-110" />
+                        </Link>
+                      </li>
+                      <li>
+                        <Link to="/community" className="hover:text-purple-600 transition-colors flex items-center justify-center md:justify-end gap-3 w-full group">
+                           <span>المجتمع</span>
+                           <Users className="w-[18px] h-[18px] text-purple-600 transition-transform group-hover:scale-110" />
+                        </Link>
+                      </li>
+                    </ul>
+                 </div>
+
               </div>
-            </div>
-            
-            <div>
-              <h4 className="font-bold text-gray-900 dark:text-white mb-6">الشركة</h4>
-              <ul className="space-y-3 text-sm text-gray-500 dark:text-gray-400 font-medium">
-                <li><Link to="/about" className="hover:text-purple-600 dark:hover:text-purple-400">من نحن</Link></li>
-                <li><Link to="/blog" className="hover:text-purple-600 dark:hover:text-purple-400">المدونة</Link></li>
-                <li><Link to="/careers" className="hover:text-purple-600 dark:hover:text-purple-400">وظائف</Link></li>
-                <li><Link to="/contact" className="hover:text-purple-600 dark:hover:text-purple-400">تواصل معنا</Link></li>
-              </ul>
-            </div>
+              
+              {/* Divider & Copyright */}
+              <div className="relative border-t border-purple-100 dark:border-purple-900/40 pt-8 mt-4 flex justify-center text-[13px] text-gray-500 dark:text-gray-400 font-bold w-full mx-auto max-w-4xl">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#fcfcff] dark:bg-[#1a1a24] p-3">
+                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-fuchsia-600 flex items-center justify-center shadow-[0_5px_15px_rgba(168,85,247,0.4)]">
+                      <ShieldCheck className="w-4 h-4 text-white" />
+                   </div>
+                </div>
+                <p>جميع الحقوق محفوظة. 2024 Suriix ©</p>
+              </div>
 
-            <div>
-              <h4 className="font-bold text-gray-900 dark:text-white mb-6">الدعم</h4>
-              <ul className="space-y-3 text-sm text-gray-500 dark:text-gray-400 font-medium">
-                <li><Link to="/help" className="hover:text-purple-600 dark:hover:text-purple-400">مركز المساعدة</Link></li>
-                <li><Link to="/terms" className="hover:text-purple-600 dark:hover:text-purple-400">الشروط والأحكام</Link></li>
-                <li><Link to="/privacy" className="hover:text-purple-600 dark:hover:text-purple-400">سياسة الخصوصية</Link></li>
-                <li><Link to="/faq" className="hover:text-purple-600 dark:hover:text-purple-400">الأسئلة الشائعة</Link></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-bold text-gray-900 dark:text-white mb-6">الموارد</h4>
-              <ul className="space-y-3 text-sm text-gray-500 dark:text-gray-400 font-medium">
-                <li><Link to="/guide" className="hover:text-purple-600 dark:hover:text-purple-400">دليل البدء</Link></li>
-                <li><Link to="/tools" className="hover:text-purple-600 dark:hover:text-purple-400">أدوات مجانية</Link></li>
-                <li><Link to="/partners" className="hover:text-purple-600 dark:hover:text-purple-400">شركاؤنا تقنياً</Link></li>
-                <li><Link to="/updates" className="hover:text-purple-600 dark:hover:text-purple-400">التحديثات</Link></li>
-              </ul>
-            </div>
-
-          </div>
-
-          <div className="pt-8 border-t border-gray-100 dark:border-white/5 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500 dark:text-gray-400">
-            <p>© 2024 Suriix جميع الحقوق محفوظة.</p>
-          </div>
+           </div>
         </div>
       </footer>
 
