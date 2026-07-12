@@ -775,7 +775,7 @@ const PublicStore = () => {
   };
 
   const handleRegister = async () => {
-    if (!authForm.name || !authForm.email || !authForm.password) { setAuthError('يرجى ملء جميع الحقول المطلوبة'); return; }
+    if (!authForm.name || !authForm.email || !authForm.password || !authForm.phone) { setAuthError('يرجى ملء جميع الحقول المطلوبة (الاسم، البريد الإلكتروني، رقم الهاتف، وكلمة المرور)'); return; }
     // Save locally and navigate immediately — never block on Supabase
     const newCustomer = { name: authForm.name, email: authForm.email, phone: authForm.phone, wallet: 0, joinDate: new Date().toLocaleDateString('ar-SA') };
     saveCustomer(newCustomer);
@@ -1761,7 +1761,7 @@ const PublicStore = () => {
               <div className="space-y-4">
                 {authMode === 'register' && <input type="text" placeholder="اسمك الكامل" value={authForm.name} onChange={e => setAuthForm(f => ({...f, name: e.target.value}))} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-[#5B5EE5] transition dark:bg-[#0f172a] dark:border-slate-800" />}
                 <input type="email" placeholder="البريد الإلكتروني" value={authForm.email} onChange={e => setAuthForm(f => ({...f, email: e.target.value}))} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-[#5B5EE5] transition dark:bg-[#0f172a] dark:border-slate-800" />
-                {authMode === 'register' && <input type="tel" placeholder="رقم الهاتف (اختياري)" value={authForm.phone} onChange={e => setAuthForm(f => ({...f, phone: e.target.value}))} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-[#5B5EE5] transition dark:bg-[#0f172a] dark:border-slate-800" />}
+                {authMode === 'register' && <input type="tel" placeholder="رقم الهاتف" value={authForm.phone} onChange={e => setAuthForm(f => ({...f, phone: e.target.value}))} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-[#5B5EE5] transition dark:bg-[#0f172a] dark:border-slate-800" />}
                 <PasswordField value={authForm.password} onChange={e => setAuthForm(f => ({...f, password: e.target.value}))} />
                 {authError && <p className="text-rose-500 text-sm font-bold bg-rose-50 p-3 rounded-xl">{authError}</p>}
                 <button onClick={authMode === 'login' ? handleLogin : handleRegister} className="w-full bg-[#5B5EE5] text-white py-4 rounded-xl font-black text-lg hover:bg-[#4a4ec4] transition shadow-lg shadow-[#5B5EE5]/30">

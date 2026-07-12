@@ -1940,6 +1940,57 @@ const SettingsTab = React.memo(({ storeData, onUpdateField }: { storeData: any, 
     titleFeatured: storeData.sectionTitles?.featured || 'المنتجات المميزة'
   });
 
+  const [isSubmittingDomain, setIsSubmittingDomain] = useState(false);
+  const [domainData, setDomainData] = useState<any>(null);
+  const [domainError, setDomainError] = useState('');
+  
+  const handleLinkDomain = async () => {
+    const cleanDomain = formData.customDomain.replace(/^https?:\/\//, '').replace(/\/$/, '').trim();
+    if (!cleanDomain || cleanDomain.includes('/')) {
+      setDomainError('الرجاء إدخال نطاق صالح ومسموح به (مثال: mystore.com)');
+      return;
+    }
+    
+    setIsSubmittingDomain(true);
+    setDomainError('');
+    setDomainData(null);
+    
+    try {
+      // call Vercel via backend API
+      const response = await fetch('/api/domain', { 
+         method: 'POST', 
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify({ domain: cleanDomain }) 
+      });
+      
+      const result = await response.json();
+      
+      if (!response.ok) {
+         setDomainError(result.error?.message || result.error || 'فشل في ربط النطاق. تأكد من أن النطاق غير مرتبط مسبقاً.');
+         setIsSubmittingDomain(false);
+         return;
+      }
+      
+      // Save domain locally / in supabase
+      toast.success('تم إضافة النطاق بنجاح! قد تحتاج الآن إلى إعداد الـ DNS الخاص بك.');
+      setDomainData(result);
+      
+      onUpdateField('custom_domain', cleanDomain);
+      onUpdateField('url', cleanDomain);
+      
+      if (storeData.id && !String(storeData.id).startsWith("local-")) {
+          const { error: dbError } = await supabase.from('stores').update({ custom_domain: cleanDomain }).eq('id', storeData.id);
+          if (dbError) {
+              console.error('Failed to sync domain to DB:', dbError);
+          }
+      }
+    } catch (err: any) {
+      setDomainError(err.message || 'حدث خطأ مجهول أثناء محاولة ربط النطاق');
+    } finally {
+      setIsSubmittingDomain(false);
+    }
+  };
+
   const handleChange = (e: any) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
@@ -1997,18 +2048,77 @@ const SettingsTab = React.memo(({ storeData, onUpdateField }: { storeData: any, 
 
             <div>
               <label className="block font-bold text-sm mb-2 text-foreground">رابط المتجر (Slug)</label>
-              <div className="flex items-center bg-muted/50 rounded-xl border border-border/50 overflow-hidden">
-                <span className="px-3 text-xs text-muted-foreground font-mono border-l border-border/50 py-3.5 shrink-0 bg-muted/80">.suriix.com</span>
-                <input
-                  type="text"
-                  value={storeData.slug || storeData.url?.replace('.suriix.com', '') || ''}
-                  readOnly
-                  className="flex-1 bg-transparent p-3.5 text-left outline-none font-bold text-muted-foreground"
-                  dir="ltr"
-                  placeholder="لم يُحدَّد بعد"
-                />
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center bg-muted/50 rounded-xl border border-border/50 overflow-hidden">
+                  <span className="px-3 text-xs text-muted-foreground font-mono border-l border-border/50 py-3.5 shrink-0 bg-muted/80">.suriix.com</span>
+                  <input
+                    type="text"
+                    value={storeData.slug || storeData.url?.replace('.suriix.com', '') || ''}
+                    readOnly
+                    className="flex-1 bg-transparent p-3.5 text-left outline-none font-bold text-muted-foreground"
+                    dir="ltr"
+                    placeholder="لم يُحدَّد بعد"
+                  />
+                </div>
+                
+                <div className="p-4 border border-border/50 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 mt-2">
+                  <label className="flex items-center justify-between font-bold text-sm mb-3 text-foreground">
+                    <span className="flex items-center gap-2">
+                      <Globe className="w-5 h-5 text-primary" /> إضافة دومين مخصص (Custom Domain)
+                    </span>
+                    {!featureAccess.hasFeature('customDomain') && (
+                      <span className="text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-md">ترقية الاحترافية مطلوبة</span>
+                    )}
+                  </label>
+                  
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <input
+                      type="text"
+                      name="customDomain"
+                      value={formData.customDomain}
+                      onChange={handleChange}
+                      disabled={!featureAccess.hasFeature('customDomain')}
+                      className="flex-1 bg-white dark:bg-slate-800 p-3.5 rounded-xl border border-border/50 outline-none focus:border-primary transition font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+                      placeholder="مثال: mystore.com"
+                      dir="ltr"
+                    />
+                    <button
+                      onClick={handleLinkDomain}
+                      disabled={!featureAccess.hasFeature('customDomain') || isSubmittingDomain || !formData.customDomain}
+                      className="bg-primary text-white font-bold py-3.5 px-6 rounded-xl hover:bg-primary/90 transition disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+                    >
+                      {isSubmittingDomain ? 'جاري التحقق...' : 'ربط النطاق'}
+                    </button>
+                  </div>
+                  
+                  {!featureAccess.hasFeature('customDomain') && (
+                    <p className="text-xs text-amber-600 mt-3 font-medium">الرجاء ترقية الباقة لربط الدومين المخصص الخاص بك.</p>
+                  )}
+                  {domainError && <p className="text-rose-500 text-sm font-bold mt-3 bg-rose-50 dark:bg-rose-900/20 p-2.5 rounded-lg w-fit">{domainError}</p>}
+                  
+                  {domainData && (
+                    <div className="mt-6 bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/40 p-5 rounded-xl">
+                      <h3 className="font-bold text-sm text-blue-800 dark:text-blue-300 mb-3 flex items-center gap-2">
+                        <Zap className="w-4 h-4" /> لإكمال الربط، أضف السجلات التالية (DNS):
+                      </h3>
+                      <div className="space-y-3">
+                        <div className="bg-white dark:bg-slate-900 border border-blue-100 dark:border-blue-800/50 p-3 rounded-lg flex items-center justify-between font-mono text-sm">
+                          <div><span className="text-xs text-slate-500 block font-sans">Type</span>A</div>
+                          <div><span className="text-xs text-slate-500 block font-sans">Name</span>@</div>
+                          <div><span className="text-xs text-slate-500 block font-sans">Value</span>76.76.21.21</div>
+                          <button onClick={() => { navigator.clipboard.writeText('76.76.21.21'); toast.success('تم النسخ'); }} className="text-blue-600"><Copy className="w-4 h-4"/></button>
+                        </div>
+                        <div className="bg-white dark:bg-slate-900 border border-blue-100 dark:border-blue-800/50 p-3 rounded-lg flex items-center justify-between font-mono text-sm">
+                          <div><span className="text-xs text-slate-500 block font-sans">Type</span>CNAME</div>
+                          <div><span className="text-xs text-slate-500 block font-sans">Name</span>www</div>
+                          <div><span className="text-xs text-slate-500 block font-sans">Value</span>cname.vercel-dns.com</div>
+                          <button onClick={() => { navigator.clipboard.writeText('cname.vercel-dns.com'); toast.success('تم النسخ'); }} className="text-blue-600"><Copy className="w-4 h-4"/></button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
-              <p className="text-xs text-muted-foreground mt-2">لا يمكنك تغيير رابط المتجر بعد إنشائه.</p>
             </div>
 
             <div>
@@ -2020,30 +2130,7 @@ const SettingsTab = React.memo(({ storeData, onUpdateField }: { storeData: any, 
           {/* Advanced Settings */}
           <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-border/40 shadow-sm space-y-5 dark:border-slate-800">
             <h3 className="font-bold text-lg mb-2">خيارات متقدمة</h3>
-
-            {/* Custom Domain Input */}
-            <div className="mb-6 p-4 border border-border/50 rounded-xl bg-slate-50/50 dark:bg-slate-900/50">
-              <label className="flex items-center gap-2 font-bold text-sm mb-2 text-foreground">
-                الدومين المخصص (Custom Domain)
-                {!featureAccess.hasFeature('customDomain') && (
-                  <span className="text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-md">ترقية مطلوبة</span>
-                )}
-              </label>
-              <input
-                type="text"
-                name="customDomain"
-                value={formData.customDomain}
-                onChange={handleChange}
-                disabled={!featureAccess.hasFeature('customDomain')}
-                className="w-full bg-muted/30 p-3.5 rounded-xl border border-border/50 outline-none focus:border-primary transition font-bold disabled:opacity-50 disabled:cursor-not-allowed"
-                placeholder="مثال: mystore.com"
-                dir="ltr"
-              />
-              {!featureAccess.hasFeature('customDomain') && (
-                <p className="text-xs text-amber-600 mt-2 font-medium">هذه الميزة متاحة فقط في باقة الاحترافي وباقة الأعمال.</p>
-              )}
-            </div>
-
+            
             <label className="flex flex-row-reverse items-center justify-between p-4 rounded-xl border border-border/50 hover:bg-muted/20 cursor-pointer transition">
               <input type="checkbox" name="maintenance" checked={formData.maintenance} onChange={handleChange} className="w-5 h-5 accent-primary cursor-pointer" />
               <div>
