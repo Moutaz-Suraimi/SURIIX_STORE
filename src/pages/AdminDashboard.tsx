@@ -363,8 +363,14 @@ const AdminDashboard = () => {
       const newStatus = currentStatus === 'active' ? 'banned' : 'active';
       const { error } = await supabase.from('users').update({ status: newStatus }).eq('id', userId);
       if (error) throw error;
+      
+      // Update store status if it's a store owner
+      const storeIsActive = newStatus === 'active';
+      await supabase.from('stores').update({ is_active: storeIsActive }).eq('user_id', userId);
+
       fetchUsers();
-      toast.success(newStatus === 'banned' ? 'تم حظر المستخدم بنجاح' : 'تم استرجاع المستخدم بنجاح');
+      fetchStores();
+      toast.success(newStatus === 'banned' ? 'تم حظر المستخدم وإيقاف متجره بنجاح' : 'تم استرجاع المستخدم وتفعيل متجره بنجاح');
     } catch (e: any) {
       toast.error('حدث خطأ: ' + e.message);
     }
@@ -1789,6 +1795,7 @@ const AdminDashboard = () => {
                       <th className="py-4 px-6">الحالة</th>
                       <th className="py-4 px-6">تاريخ الانضمام</th>
                       <th className="py-4 px-6">الصلاحية</th>
+                      <th className="py-4 px-6 text-center">إجراءات</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-50 dark:divide-white/5">
@@ -1815,6 +1822,13 @@ const AdminDashboard = () => {
                           <span className={`px-2 py-1 rounded text-xs font-bold ${user.role === 'admin' ? 'bg-purple-50 text-purple-600' : 'bg-gray-100 text-gray-600 dark:text-slate-300'}`}>
                             {user.role === 'admin' ? 'مدير' : 'مستخدم'}
                           </span>
+                        </td>
+                        <td className="py-4 px-6 flex items-center justify-center gap-2">
+                          <button onClick={() => { setSelectedUser(user); setIsUserViewOpen(true); }} className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors" title="تفاصيل"><Eye className="w-4 h-4" /></button>
+                          <button onClick={() => { setSelectedUser(user); setIsUserEditOpen(true); }} className="w-8 h-8 rounded-full border border-blue-200 flex items-center justify-center text-blue-500 hover:bg-blue-50 transition-colors" title="تعديل"><Edit className="w-4 h-4" /></button>
+                          <button onClick={() => handleToggleUserStatus(user.id, user.status)} className={`w-8 h-8 rounded-full border flex items-center justify-center transition-colors ${user.status === 'active' ? 'border-red-200 text-red-500 hover:bg-red-50' : 'border-green-200 text-green-500 hover:bg-green-50'}`} title={user.status === 'active' ? 'حظر المستخدم وتعليق المتجر' : 'تفعيل المستخدم والمتجر'}>
+                            {user.status === 'active' ? <XCircle className="w-4 h-4" /> : <CheckCircle2 className="w-4 h-4" />}
+                          </button>
                         </td>
                       </tr>
                     )) : (
