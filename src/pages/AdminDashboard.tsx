@@ -827,8 +827,8 @@ const AdminDashboard = () => {
               </div>
 
               {/* TABLE */}
-              <div className="bg-white dark:bg-[#1A1A24] border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm overflow-hidden">
-                <table className="w-full text-right">
+              <div className="bg-white dark:bg-[#1A1A24] border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm overflow-hidden overflow-x-auto">
+                <table className="w-full min-w-[900px] xl:min-w-full text-right">
                   <thead className="bg-[#FCFDFE] dark:bg-white/5 border-b border-gray-100 dark:border-white/5 text-gray-500 text-xs font-bold dark:text-slate-300">
                     <tr>
                       <th className="py-5 px-6">المستخدم</th>
@@ -974,8 +974,8 @@ const AdminDashboard = () => {
               </div>
 
               {/* Table */}
-              <div className="bg-white dark:bg-[#1A1A24] border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm overflow-hidden">
-                <table className="w-full text-right">
+              <div className="bg-white dark:bg-[#1A1A24] border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm overflow-hidden overflow-x-auto">
+                <table className="w-full min-w-[900px] xl:min-w-full text-right">
                   <thead className="bg-[#FCFDFE] dark:bg-white/5 border-b border-gray-100 dark:border-white/5 text-gray-500 text-xs font-bold dark:text-slate-300">
                     <tr>
                       <th className="py-5 px-6">المسوق</th>
@@ -1123,8 +1123,8 @@ const AdminDashboard = () => {
               </div>
 
               {/* USERS TABLE */}
-              <div className="bg-white dark:bg-[#1A1A24] rounded-2xl border border-gray-100 dark:border-white/5 shadow-sm overflow-hidden flex flex-col min-h-[500px]">
-                <table className="w-full text-right border-collapse">
+              <div className="bg-white dark:bg-[#1A1A24] rounded-2xl border border-gray-100 dark:border-white/5 shadow-sm overflow-hidden overflow-x-auto flex flex-col min-h-[500px]">
+                <table className="w-full min-w-[900px] xl:min-w-full text-right border-collapse">
                   <thead>
                     <tr className="bg-gray-50/80 dark:bg-white/[0.02] border-b border-gray-100 dark:border-white/5 text-[11px] font-black text-gray-400 uppercase tracking-wider dark:text-slate-300">
                       <th className="py-4 px-6 rounded-tr-2xl">المستخدم</th>
@@ -1384,8 +1384,8 @@ const AdminDashboard = () => {
                 ))}
               </div>
 
-              <div className="bg-white dark:bg-[#1A1A24] rounded-2xl border border-gray-100 dark:border-white/5 shadow-sm overflow-hidden min-h-[400px]">
-                <table className="w-full text-right border-collapse">
+              <div className="bg-white dark:bg-[#1A1A24] rounded-2xl border border-gray-100 dark:border-white/5 shadow-sm overflow-hidden overflow-x-auto min-h-[400px]">
+                <table className="w-full min-w-[900px] xl:min-w-full text-right border-collapse">
                   <thead>
                     <tr className="bg-gray-50/80 dark:bg-white/[0.02] border-b border-gray-100 dark:border-white/5 text-[11px] font-black text-gray-400 uppercase tracking-wider dark:text-slate-300">
                       <th className="py-4 px-6">رقم الطلب</th>
@@ -1494,8 +1494,8 @@ const AdminDashboard = () => {
               </div>
 
               {/* TABLE */}
-              <div className="bg-white dark:bg-[#1A1A24] rounded-2xl border border-gray-100 dark:border-white/5 shadow-sm overflow-hidden flex flex-col min-h-[500px]">
-                <table className="w-full text-right border-collapse">
+              <div className="bg-white dark:bg-[#1A1A24] rounded-2xl border border-gray-100 dark:border-white/5 shadow-sm overflow-hidden overflow-x-auto flex flex-col min-h-[500px]">
+                <table className="w-full min-w-[900px] xl:min-w-full text-right border-collapse">
                   <thead>
                     <tr className="bg-gray-50/80 dark:bg-white/[0.02] border-b border-gray-100 dark:border-white/5 text-[11px] font-black text-gray-400 uppercase tracking-wider dark:text-slate-300">
                       <th className="py-4 px-6 rounded-tr-2xl">اسم المتجر</th>
