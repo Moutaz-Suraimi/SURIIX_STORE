@@ -108,7 +108,9 @@ const App = () => {
                     <Route path="/privacy" element={<Privacy />} />
                     <Route path="/faq" element={<FAQ />} />
                     <Route path="/getting-started" element={<GettingStarted />} />
+                    <Route path="/guide" element={<GettingStarted />} />
                     <Route path="/free-tools" element={<FreeTools />} />
+                    <Route path="/tools" element={<FreeTools />} />
                     <Route path="/partners" element={<TechnicalPartners />} />
                     <Route path="/updates" element={<Updates />} />
                     <Route path="*" element={<NotFound />} />
