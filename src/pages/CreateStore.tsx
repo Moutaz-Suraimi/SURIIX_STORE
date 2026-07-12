@@ -539,7 +539,7 @@ const CreateStore = () => {
             })}
           </div>
           <AnimatePresence mode="wait">
-            <motion.div key={step} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="w-full flex gap-6 min-h-[500px]">
+            <motion.div key={step} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="w-full flex flex-col lg:flex-row gap-6 min-h-[500px]">
               {/* Wizard Step 1: الهوية والشعار */}
               {step === 2 && (
                 <>
@@ -997,8 +997,8 @@ const CreateStore = () => {
                         </div>
                       </div>
 
-                      <div className="flex w-full gap-4">
-                        <button onClick={() => setStep(4)} className="px-6 py-4 rounded-xl text-slate-500 bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 dark:text-slate-300 font-bold transition-colors cursor-pointer">
+                      <div className="flex flex-col md:flex-row w-full gap-4">
+                        <button onClick={() => setStep(4)} className="px-6 py-4 rounded-xl text-slate-500 bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 dark:text-slate-300 font-bold transition-colors cursor-pointer w-full md:w-auto">
                           تعديل البيانات
                         </button>
                         <button onClick={handleCompleteOnboarding} className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-500 text-white py-4 rounded-xl font-black text-lg flex items-center justify-center gap-2 shadow-xl shadow-emerald-500/20 hover:opacity-90 transition-opacity cursor-pointer">
