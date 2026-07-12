@@ -10,7 +10,7 @@ import {
   CheckCircle2,
   Home, Package, BarChart3, Users, Settings, LogOut, ArrowUpRight, 
   ChevronDown, Headphones, Watch, Briefcase, Sparkles, Clock, Code2, Headset,
-  Mail, Moon, Sun, Menu, X
+  Mail, Moon, Sun, Menu, X, ShieldCheck, CreditCard, ShoppingCart, ShoppingBag
 } from "lucide-react";
 
 const fadeUp = {
@@ -127,173 +127,20 @@ const Index = () => {
         <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8 relative w-full pt-32 pb-12">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
             
-            {/* ===== LEFT SIDE: Dashboard Mockup ===== */}
+            {/* ===== LEFT SIDE: Hero Image ===== */}
             <motion.div
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.9, ease: "easeOut" }}
-              className="relative hidden lg:flex items-center justify-center order-2 h-[650px] w-full mt-4"
+              className="relative hidden lg:flex items-center justify-center order-2 h-[600px] w-full"
             >
-              {/* Main Dashboard Card */}
-              <div 
-                className="absolute xl:-left-8 lg:-left-4 w-[650px] h-[550px] bg-white rounded-3xl border border-gray-100 flex flex-row-reverse overflow-hidden z-20 dark:bg-[#0f172a]"
-                style={{ boxShadow: '0 40px 100px rgba(139,92,246,0.1)' }}
-              >
-                {/* Sidebar */}
-                <div className="w-[80px] border-r border-gray-100 bg-white flex flex-col items-center py-6 gap-6 z-10 shrink-0 relative dark:bg-[#0f172a]">
-                  <div className="absolute inset-y-0 right-0 w-[4px] bg-purple-600 rounded-l-full top-[102px] h-[36px]" />
-                  
-                  <img src="/favicon.png" alt="Suriix" className="w-10 h-10 object-contain mb-4" />
-                  <div className="w-11 h-11 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center relative shadow-sm">
-                    <Home className="w-5 h-5 fill-purple-600" />
-                  </div>
-                  <Package className="w-5 h-5 text-gray-400 dark:text-slate-300" />
-                  <ShoppingCartIcon className="w-5 h-5 text-gray-400 dark:text-slate-300" />
-                  <BarChart3 className="w-5 h-5 text-gray-400 dark:text-slate-300" />
-                  <Mail className="w-5 h-5 text-gray-400 dark:text-slate-300" />
-                  <Users className="w-5 h-5 text-gray-400 dark:text-slate-300" />
-                  <Settings className="w-5 h-5 text-gray-400 dark:text-slate-300" />
-                  <div className="mt-auto">
-                    <LogOut className="w-5 h-5 text-gray-300" />
-                  </div>
-                </div>
-
-                {/* Main Content */}
-                <div className="flex-1 p-8 bg-[#fafafc] dark:bg-[#0f0f13] overflow-hidden flex flex-col">
-                  {/* Header */}
-                  <div className="flex justify-between items-center mb-8 border-b border-gray-100 dark:border-slate-800 pb-4">
-                    <div className="flex gap-3 items-center flex-row-reverse">
-                      <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white dark:border-slate-800 shadow-md">
-                        <img src="https://api.dicebear.com/7.x/notionists/svg?seed=Felix&backgroundColor=e2e8f0" alt="avatar" className="w-full h-full object-cover" />
-                      </div>
-                      <div className="text-right">
-                        <h3 className="font-extrabold text-gray-900 text-[17px] leading-tight w-full dark:text-white">أهلاً محمد</h3>
-                        <p className="text-[10px] text-gray-400 w-full text-right font-medium dark:text-slate-300">مرحباً بك في لوحة التحكم</p>
-                      </div>
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-extrabold text-gray-800 dark:text-white">إحصائيات المتجر</h4>
-                    </div>
-                  </div>
-
-                  {/* Stats Row */}
-                  <div className="grid grid-cols-3 gap-4 mb-6">
-                    <div className="bg-white rounded-[1.25rem] border border-gray-100/80 p-4 shadow-sm relative overflow-hidden flex flex-col justify-between h-[104px] dark:bg-[#0f172a]">
-                       <div className="flex justify-between items-start mb-2 w-full">
-                          <span className="text-[11px] font-bold text-gray-800 dark:text-white">إجمالي المبيعات</span>
-                          <div className="w-8 h-8 rounded-xl bg-purple-50 flex items-center justify-center shrink-0 shadow-sm border border-purple-100/50">
-                             <BagIcon className="w-4 h-4 text-purple-600" />
-                          </div>
-                       </div>
-                       <div className="flex justify-between items-end w-full">
-                          <p className="font-extrabold text-gray-900 text-[22px] leading-none tracking-tight font-sans dark:text-white">45,231</p>
-                          <span className="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-1 rounded-md flex items-center gap-0.5"><ArrowUpRight className="w-2.5 h-2.5"/> +13.3%</span>
-                       </div>
-                    </div>
-
-                    <div className="bg-white rounded-[1.25rem] border border-gray-100/80 p-4 shadow-sm relative overflow-hidden flex flex-col justify-between h-[104px] dark:bg-[#0f172a]">
-                       <div className="flex justify-between items-start mb-2 w-full">
-                          <span className="text-[11px] font-bold text-gray-800 dark:text-white">الطلبات</span>
-                          <div className="w-8 h-8 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0 shadow-sm border border-emerald-100/50">
-                             <ShoppingCartIcon className="w-4 h-4 text-emerald-600" />
-                          </div>
-                       </div>
-                       <div className="flex justify-between items-end w-full">
-                          <p className="font-extrabold text-gray-900 text-[22px] leading-none tracking-tight font-sans dark:text-white">320</p>
-                          <span className="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-1 rounded-md flex items-center gap-0.5"><ArrowUpRight className="w-2.5 h-2.5"/> +8.2%</span>
-                       </div>
-                    </div>
-
-                    <div className="bg-white rounded-[1.25rem] border border-gray-100/80 p-4 shadow-sm relative overflow-hidden flex flex-col justify-between h-[104px] dark:bg-[#0f172a]">
-                       <div className="flex justify-between items-start mb-2 w-full">
-                          <span className="text-[11px] font-bold text-gray-800 dark:text-white">العملاء</span>
-                          <div className="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center shrink-0 shadow-sm border border-blue-100/50">
-                             <Users className="w-4 h-4 text-blue-600" />
-                          </div>
-                       </div>
-                       <div className="flex justify-between items-end w-full">
-                          <p className="font-extrabold text-gray-900 text-[22px] leading-none tracking-tight font-sans dark:text-white">12,456</p>
-                          <span className="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-1 rounded-md flex items-center gap-0.5"><ArrowUpRight className="w-2.5 h-2.5"/> +15.3%</span>
-                       </div>
-                    </div>
-                  </div>
-
-                  {/* Chart Area */}
-                  <div className="bg-gray-50/50 rounded-2xl p-4 md:p-6 border border-gray-100 mb-6 flex-1 h-[150px] relative dark:bg-[#0f172a]">
-                    <div className="flex justify-between items-center mb-6">
-                       <span className="text-[10px] font-bold text-gray-500 bg-white border border-gray-200 px-2.5 py-1 rounded-md flex items-center gap-1 shadow-sm dark:bg-[#0f172a] dark:border-slate-800 dark:text-slate-300">آخر 30 يوم <ChevronDown className="w-3 h-3"/></span>
-                       <h5 className="text-sm font-extrabold text-gray-800 dark:text-white">أداء المبيعات</h5>
-                    </div>
-                    {/* SVG Line Chart */}
-                    <div className="w-full h-[70px] relative">
-                       {/* X Axis labels */}
-                       <div className="absolute -bottom-5 left-0 right-0 flex justify-between text-[8px] text-gray-400 px-3 dark:text-slate-300">
-                          <span>1 مايو</span>
-                          <span>8 مايو</span>
-                          <span>15 مايو</span>
-                          <span>22 مايو</span>
-                          <span>29 مايو</span>
-                       </div>
-                       {/* Y Axis labels */}
-                       <div className="absolute top-0 bottom-0 -left-6 flex flex-col justify-between text-[8px] text-gray-400 dark:text-slate-300">
-                          <span>20K</span>
-                          <span>15K</span>
-                          <span>10K</span>
-                          <span>5K</span>
-                          <span>0</span>
-                       </div>
-                       
-                       <svg viewBox="0 0 400 80" className="w-full h-full overflow-visible" preserveAspectRatio="none">
-                         <defs>
-                           <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
-                             <stop offset="0%" stopColor="#a855f7" stopOpacity="0.25"/>
-                             <stop offset="100%" stopColor="#a855f7" stopOpacity="0"/>
-                           </linearGradient>
-                         </defs>
-                         <path d="M0,60 L40,40 L80,50 L120,30 L160,40 L200,20 L240,25 L280,10 L320,40 L360,20 L400,0 L400,80 L0,80 Z" fill="url(#chartGrad)"/>
-                         <path d="M0,60 L40,40 L80,50 L120,30 L160,40 L200,20 L240,25 L280,10 L320,40 L360,20 L400,0" fill="none" stroke="#a855f7" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                         <circle cx="200" cy="20" r="4" fill="#a855f7" stroke="white" strokeWidth="2" />
-                         <g transform="translate(170,-15)">
-                            <rect width="50" height="20" rx="8" fill="#1e1b4b" />
-                            <text x="25" y="13" fill="white" fontSize="9" fontWeight="bold" textAnchor="middle" fontFamily="sans-serif">د.إ 965</text>
-                         </g>
-                         {/* Grid Lines */}
-                         <line x1="0" y1="0" x2="400" y2="0" stroke="#f3f4f6" strokeWidth="1" strokeDasharray="4 4" />
-                         <line x1="0" y1="40" x2="400" y2="40" stroke="#f3f4f6" strokeWidth="1" strokeDasharray="4 4" />
-                         <line x1="0" y1="80" x2="400" y2="80" stroke="#f3f4f6" strokeWidth="1" strokeDasharray="4 4" />
-                       </svg>
-                    </div>
-                  </div>
-
-                  {/* Products Area */}
-                  <div>
-                    <h5 className="text-sm font-extrabold text-gray-800 mb-4 text-right dark:text-white">أحدث المنتجات</h5>
-                    <div className="grid grid-cols-3 gap-4">
-                       <div className="bg-white border text-center border-gray-100/80 rounded-[1.25rem] pb-3 pt-4 px-3 flex flex-col items-center gap-3 shadow-sm dark:bg-[#0f172a]">
-                          <div className="w-16 h-16 bg-gray-100 dark:bg-[#0f172a] rounded-2xl flex items-center justify-center p-3 transform transition-transform hover:scale-105"><Headphones className="w-full h-full text-gray-700 dark:text-white"/></div>
-                          <div className="w-full">
-                             <p className="text-[11px] font-bold text-gray-800 mb-0.5 dark:text-white">سماعة لاسلكية</p>
-                             <p className="text-[11px] font-bold text-purple-600">199 رس</p>
-                          </div>
-                       </div>
-                       <div className="bg-white border text-center border-gray-100/80 rounded-[1.25rem] pb-3 pt-4 px-3 flex flex-col items-center gap-3 shadow-sm dark:bg-[#0f172a]">
-                          <div className="w-16 h-16 bg-gray-100 dark:bg-[#0f172a] rounded-2xl flex items-center justify-center p-3 transform transition-transform hover:scale-105"><Watch className="w-full h-full text-gray-700 dark:text-white"/></div>
-                          <div className="w-full">
-                             <p className="text-[11px] font-bold text-gray-800 mb-0.5 dark:text-white">ساعة ذكية</p>
-                             <p className="text-[11px] font-bold text-purple-600">299 رس</p>
-                          </div>
-                       </div>
-                       <div className="bg-white border text-center border-gray-100/80 rounded-[1.25rem] pb-3 pt-4 px-3 flex flex-col items-center gap-3 shadow-sm dark:bg-[#0f172a]">
-                          <div className="w-16 h-16 bg-gray-100 dark:bg-[#0f172a] rounded-2xl flex items-center justify-center p-3 transform transition-transform hover:scale-105"><Briefcase className="w-full h-full text-gray-700 dark:text-white"/></div>
-                          <div className="w-full">
-                             <p className="text-[11px] font-bold text-gray-800 mb-0.5 dark:text-white">حقيبة ظهر</p>
-                             <p className="text-[11px] font-bold text-purple-600">159 رس</p>
-                          </div>
-                       </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              {/* Hero Image */}
+              <img
+                src="/hero-image.png"
+                alt="Suriix Dashboard Preview"
+                className="w-full h-full object-contain drop-shadow-2xl"
+                style={{ maxHeight: 560 }}
+              />
             </motion.div>
 
             {/* ===== RIGHT SIDE: Text Content ===== */}
@@ -331,40 +178,264 @@ const Index = () => {
                 <span className="font-bold text-gray-800 dark:text-white">Suriix</span> تمنحك كل ما تحتاجه لإطلاق متجرك الإلكتروني بتصميم احترافي، وإدارة سهلة، وتجربة عملاء استثنائية.
               </p>
 
-              {/* CTA Button and Disclaimer */}
-              <div className="w-full flex lg:justify-end justify-start flex-col lg:items-end items-start gap-4 mt-4">
+              {/* CTA Button */}
+              <div className="w-full flex lg:justify-end justify-start flex-col sm:flex-row-reverse items-center gap-4 mt-6">
                 <Link
                   to="/create-store"
-                  className="w-full sm:w-auto inline-flex justify-center items-center gap-3 bg-gradient-to-r from-purple-600 to-fuchsia-500 hover:from-purple-700 hover:to-fuchsia-600 text-white px-10 py-5 rounded-2xl font-black text-xl shadow-[0_10px_30px_rgba(168,85,247,0.35)] transition-all duration-300 hover:shadow-[0_15px_40px_rgba(168,85,247,0.45)] hover:-translate-y-1"
+                  className="w-full sm:w-auto inline-flex justify-center items-center gap-3 bg-gradient-to-r from-purple-600 to-fuchsia-500 hover:from-purple-700 hover:to-fuchsia-600 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-[0_10px_30px_rgba(168,85,247,0.35)] transition-all duration-300 hover:shadow-[0_15px_40px_rgba(168,85,247,0.45)] hover:-translate-y-1"
                 >
-                  <ArrowLeft className="w-5 h-5 mx-1" />
                   <span>ابدأ تجربتك مجاناً الآن</span>
+                  <ArrowLeft className="w-5 h-5 mx-1" />
                 </Link>
-                <span className="text-gray-400 dark:text-gray-500 text-sm font-semibold lg:mr-10">لا تحتاج إلى بطاقة ائتمانية</span>
+                <a
+                  href="#features"
+                  className="w-full sm:w-auto flex justify-center items-center gap-2 bg-white dark:bg-[#1a1a24] text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-800 px-8 py-4 rounded-xl font-bold text-lg shadow-sm hover:shadow-md transition-all duration-300 hover:bg-slate-50 dark:hover:bg-slate-800"
+                >
+                  <Sparkles className="w-5 h-5 text-purple-600" />
+                  <span>استعراض المميزات</span>
+                </a>
               </div>
 
-              {/* Divider lines */}
-              <div className="w-full h-px bg-gradient-to-l from-transparent via-gray-200 dark:via-white/10 to-transparent mt-10 mb-4" />
-
-              {/* Feature badges (Footer of text content) */}
-              <div className="flex flex-wrap items-center gap-4 md:gap-8 w-full justify-start lg:justify-end">
-                <div className="flex items-center gap-3 flex-row-reverse">
-                  <span className="text-sm font-bold text-slate-700 dark:text-gray-300">إعداد في دقائق</span>
-                  <Clock className="w-5 h-5 text-slate-500 dark:text-gray-400" />
-                </div>
-                <div className="w-px h-6 bg-gray-200 dark:bg-white/10 hidden md:block" />
-                <div className="flex items-center gap-3 flex-row-reverse">
-                  <span className="text-sm font-bold text-slate-700 dark:text-gray-300">بدون خبرة برمجية</span>
-                  <Code2 className="w-5 h-5 text-slate-500 dark:text-gray-400" />
-                </div>
-                <div className="w-px h-6 bg-gray-200 dark:bg-white/10 hidden md:block" />
-                <div className="flex items-center gap-3 flex-row-reverse">
-                  <span className="text-sm font-bold text-slate-700 dark:text-gray-300">دعم فوري</span>
-                  <Headset className="w-5 h-5 text-slate-500 dark:text-gray-400" />
-                </div>
-              </div>
             </motion.div>
+          </div>
 
+          {/* ===== DASHBOARD MOCKUP ===== */}
+          <motion.div 
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, delay: 0.2, ease: "easeOut" }}
+            className="w-full max-w-6xl mx-auto h-[600px] mt-16 bg-white rounded-3xl border border-gray-100 flex flex-row-reverse overflow-hidden z-20 shadow-[0_40px_100px_rgba(139,92,246,0.15)] relative dark:bg-[#0f172a] dark:border-slate-800"
+          >
+            {/* Sidebar */}
+            <div className="w-[200px] border-r border-gray-100 bg-white flex flex-col py-6 gap-2 z-10 shrink-0 relative dark:bg-[#0f172a] dark:border-slate-800">
+              <div className="flex items-center gap-2 justify-end px-6 mb-8">
+                <span className="font-bold text-xl text-gray-900 dark:text-white">Suriix</span>
+                <img src="/favicon.png" alt="Suriix" className="w-8 h-8 object-contain" />
+              </div>
+              
+              <div className="px-3">
+                <div className="flex items-center gap-3 justify-end w-full px-4 py-3 rounded-xl bg-purple-50 text-purple-600 font-bold text-sm relative dark:bg-purple-900/30 dark:text-purple-400">
+                  <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-purple-600 rounded-l-full" />
+                  <span>الرئيسية</span>
+                  <Home className="w-4 h-4" />
+                </div>
+                {[
+                  { title: "الطلبات", icon: <ShoppingCart className="w-4 h-4" /> },
+                  { title: "المنتجات", icon: <Package className="w-4 h-4" /> },
+                  { title: "العملاء", icon: <Users className="w-4 h-4" /> },
+                  { title: "التقارير", icon: <BarChart4 className="w-4 h-4" /> },
+                  { title: "التسويق", icon: <Mail className="w-4 h-4" /> },
+                  { title: "التطبيقات", icon: <LayoutDashboard className="w-4 h-4" /> },
+                  { title: "الإعدادات", icon: <Settings className="w-4 h-4" /> },
+                ].map((item, idx) => (
+                  <div key={idx} className="flex items-center gap-3 justify-end w-full px-4 py-3 rounded-xl text-gray-500 hover:bg-gray-50 hover:text-gray-700 font-medium text-sm transition-colors cursor-pointer dark:text-gray-400 dark:hover:bg-slate-800 dark:hover:text-gray-200">
+                    <span>{item.title}</span>
+                    {item.icon}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Main Content */}
+            <div className="flex-1 p-8 bg-[#fafafc] dark:bg-[#0f0f13] overflow-hidden flex flex-col relative">
+              <div className="flex flex-row-reverse justify-between items-start mb-6">
+                <div className="flex items-center gap-3 flex-row-reverse">
+                  <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-sm ring-1 ring-gray-100">
+                    <img src="https://i.pravatar.cc/100?img=11" alt="avatar" className="w-full h-full object-cover" />
+                  </div>
+                  <div className="text-right">
+                    <h3 className="font-extrabold text-gray-900 text-base dark:text-white">مرحباً بك، 👋 أحمد</h3>
+                    <p className="text-xs text-gray-400 font-medium dark:text-gray-500">إليك ملخص متجرك اليوم</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Stats Row & Hero Chart (Split) */}
+              <div className="flex flex-row-reverse gap-6 h-full pb-4">
+                {/* Left Stats Grid (Takes 65%) */}
+                <div className="flex-1 flex flex-col gap-6">
+                  {/* Top Stats Cards */}
+                  <div className="grid grid-cols-4 gap-4 flex-row-reverse" style={{ direction: 'rtl' }}>
+                    
+                    {/* Stat 1 */}
+                    <div className="bg-white rounded-2xl border border-gray-100/80 p-4 shadow-sm flex flex-col h-[110px] dark:bg-[#0f172a] dark:border-slate-800">
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400">إجمالي المبيعات</span>
+                        <div className="w-6 h-6 rounded-md bg-purple-50 flex items-center justify-center shrink-0 dark:bg-purple-900/30">
+                          <ShoppingBag className="w-3 h-3 text-purple-600 dark:text-purple-400" />
+                        </div>
+                      </div>
+                      <p className="font-extrabold text-gray-900 text-xl tracking-tight mb-2 dark:text-white">45,231</p>
+                      <span className="text-[10px] font-bold text-emerald-600 flex items-center gap-0.5"><ArrowUpRight className="w-3 h-3"/> +13.3%</span>
+                    </div>
+
+                    {/* Stat 2 */}
+                    <div className="bg-white rounded-2xl border border-gray-100/80 p-4 shadow-sm flex flex-col h-[110px] dark:bg-[#0f172a] dark:border-slate-800">
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400">إجمالي الطلبات</span>
+                        <div className="w-6 h-6 rounded-md bg-emerald-50 flex items-center justify-center shrink-0 dark:bg-emerald-900/30">
+                          <ShoppingCart className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                        </div>
+                      </div>
+                      <p className="font-extrabold text-gray-900 text-xl tracking-tight mb-2 dark:text-white">320</p>
+                      <span className="text-[10px] font-bold text-emerald-600 flex items-center gap-0.5"><ArrowUpRight className="w-3 h-3"/> +8.2%</span>
+                    </div>
+
+                    {/* Stat 3 */}
+                    <div className="bg-white rounded-2xl border border-gray-100/80 p-4 shadow-sm flex flex-col h-[110px] dark:bg-[#0f172a] dark:border-slate-800">
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400">إجمالي العملاء</span>
+                        <div className="w-6 h-6 rounded-md bg-blue-50 flex items-center justify-center shrink-0 dark:bg-blue-900/30">
+                          <Users className="w-3 h-3 text-blue-600 dark:text-blue-400" />
+                        </div>
+                      </div>
+                      <p className="font-extrabold text-gray-900 text-xl tracking-tight mb-2 dark:text-white">12,456</p>
+                      <span className="text-[10px] font-bold text-emerald-600 flex items-center gap-0.5"><ArrowUpRight className="w-3 h-3"/> +15.3%</span>
+                    </div>
+
+                    {/* Stat 4 */}
+                    <div className="bg-white rounded-2xl border border-gray-100/80 p-4 shadow-sm flex flex-col h-[110px] dark:bg-[#0f172a] dark:border-slate-800">
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400">معدل التحويل</span>
+                        <div className="w-6 h-6 rounded-md bg-rose-50 flex items-center justify-center shrink-0 dark:bg-rose-900/30">
+                          <BarChart3 className="w-3 h-3 text-rose-600 dark:text-rose-400" />
+                        </div>
+                      </div>
+                      <p className="font-extrabold text-gray-900 text-xl tracking-tight mb-2 dark:text-white">2.45%</p>
+                      <span className="text-[10px] font-bold text-rose-500 flex items-center gap-0.5"><ArrowUpRight className="w-3 h-3 rotate-90"/> -2.1%</span>
+                    </div>
+
+                  </div>
+
+                  {/* Bottom Stats area */}
+                  <div className="flex gap-6 h-full flex-row-reverse">
+                    {/* Recent Orders List */}
+                    <div className="flex-1 bg-white rounded-2xl border border-gray-100/80 p-4 shadow-sm flex flex-col dark:bg-[#0f172a] dark:border-slate-800" style={{ direction: 'rtl' }}>
+                      <div className="flex justify-between items-center mb-4">
+                        <h4 className="text-sm font-extrabold text-gray-800 dark:text-white">أحدث الطلبات</h4>
+                        <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400 cursor-pointer">عرض الكل</span>
+                      </div>
+                      <div className="flex flex-col gap-3 flex-1 justify-center">
+                        {[
+                          { id: "#1258", name: "محمد السليمي", status: "مكتمل", amount: "450 ريال", color: "bg-emerald-50 text-emerald-600" },
+                          { id: "#1257", name: "سارة العتيبي", status: "قيد الشحن", amount: "230 ريال", color: "bg-blue-50 text-blue-600" },
+                          { id: "#1256", name: "خالد الحربي", status: "ملغى", amount: "150 ريال", color: "bg-rose-50 text-rose-600" },
+                        ].map((ord, i) => (
+                          <div key={i} className="flex justify-between items-center py-2 border-b border-gray-50 last:border-0 dark:border-slate-800">
+                            <div className="flex items-center gap-3">
+                              <span className="text-xs font-bold text-gray-400 dark:text-gray-500">{ord.id}</span>
+                              <span className="text-xs font-bold text-gray-800 dark:text-white">{ord.name}</span>
+                            </div>
+                            <div className="flex items-center gap-4">
+                              <span className="text-xs font-bold text-gray-800 dark:text-gray-300">{ord.amount}</span>
+                              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${ord.color} dark:bg-opacity-20`}>{ord.status}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    {/* Mini Chart */}
+                    <div className="w-[50%] bg-white rounded-2xl border border-gray-100/80 p-4 shadow-sm flex flex-col relative dark:bg-[#0f172a] dark:border-slate-800" style={{ direction: 'rtl' }}>
+                       <div className="flex justify-between items-center mb-4">
+                           <h4 className="text-sm font-extrabold text-gray-800 dark:text-white">أداء المبيعات</h4>
+                           <span className="text-[10px] font-bold text-gray-500 flex items-center gap-1 border rounded-md px-1.5 py-0.5 dark:border-slate-700 dark:text-gray-400">آخر 30 يوم <ChevronDown className="w-3 h-3"/></span>
+                       </div>
+                       <div className="flex-1 relative w-full mt-2">
+                           {/* Simple custom SVG chart to mimic the mockup */}
+                           <svg viewBox="0 0 200 80" className="w-full h-full overflow-visible" preserveAspectRatio="none">
+                             <defs>
+                               <linearGradient id="chartGradMini" x1="0" y1="0" x2="0" y2="1">
+                                 <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.2"/>
+                                 <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0"/>
+                               </linearGradient>
+                             </defs>
+                             <path d="M0,70 L30,50 L60,60 L90,40 L120,50 L150,30 L200,10 L200,80 L0,80 Z" fill="url(#chartGradMini)"/>
+                             <path d="M0,70 L30,50 L60,60 L90,40 L120,50 L150,30 L200,10" fill="none" stroke="#8b5cf6" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                             <circle cx="150" cy="30" r="3" fill="#8b5cf6" stroke="white" strokeWidth="1.5" />
+                           </svg>
+                       </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Big Purple Chart Card (Takes 35%) */}
+                <div className="w-[35%] bg-gradient-to-b from-purple-600 to-[#5B5EE5] rounded-3xl p-6 flex flex-col text-white shadow-xl relative overflow-hidden" style={{ direction: 'rtl' }}>
+                  <div className="absolute -top-24 -right-24 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none" />
+                  
+                  <div className="flex justify-between items-center mb-6 z-10">
+                    <h3 className="font-extrabold text-lg flex items-center gap-2">
+                      <Sparkles className="w-5 h-5 text-purple-200" /> أداء متجرك
+                    </h3>
+                    <button className="text-white/80 hover:text-white transition">
+                      <Settings className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <div className="bg-white/10 border border-white/20 backdrop-blur-md self-start px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 mb-8 z-10 cursor-pointer">
+                    آخر 30 يوم <ChevronDown className="w-3 h-3" />
+                  </div>
+
+                  {/* Main Large Chart */}
+                  <div className="flex-1 w-full relative z-10 opacity-90 mt-4">
+                     <svg viewBox="0 0 200 100" className="w-full h-full overflow-visible" preserveAspectRatio="none">
+                       <path d="M0,80 L40,60 L80,70 L120,40 L160,50 L200,20" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="drop-shadow-lg"/>
+                       <circle cx="40" cy="60" r="4" fill="white" stroke="#a855f7" strokeWidth="2" />
+                       <circle cx="80" cy="70" r="4" fill="white" stroke="#a855f7" strokeWidth="2" />
+                       <circle cx="120" cy="40" r="4" fill="white" stroke="#a855f7" strokeWidth="2" />
+                       <circle cx="160" cy="50" r="4" fill="white" stroke="#a855f7" strokeWidth="2" />
+                       <circle cx="200" cy="20" r="4" fill="white" stroke="#a855f7" strokeWidth="2" />
+                     </svg>
+                  </div>
+
+                  {/* Footer Totals */}
+                  <div className="mt-auto bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-4 flex justify-between items-center z-10">
+                    <div>
+                      <p className="text-xs text-purple-200 mb-0.5">إجمالي المبيعات</p>
+                      <p className="text-2xl font-black">15,230 ريال</p>
+                    </div>
+                    <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                      <BarChart3 className="w-5 h-5 text-white" />
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </motion.div>
+
+          {/* ===== FEATURES BADGES (Bottom of Hero) ===== */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 max-w-5xl mx-auto mt-12 mb-8">
+            <div className="flex flex-col items-center justify-center gap-3 text-center bg-white dark:bg-[#1a1a24] p-6 rounded-2xl border border-gray-100 hover:border-purple-200 dark:border-white/5 dark:hover:border-purple-800/40 shadow-sm transition-all hover:-translate-y-1">
+              <div className="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center dark:bg-purple-900/30 dark:text-purple-400">
+                <ShieldCheck className="w-6 h-6" />
+              </div>
+              <p className="font-bold text-gray-900 text-sm dark:text-white">يومان تجربة مجانية</p>
+              <p className="text-xs text-gray-500 font-medium dark:text-gray-400">جرب المنصة بدون مخاطر</p>
+            </div>
+            
+            <div className="flex flex-col items-center justify-center gap-3 text-center bg-white dark:bg-[#1a1a24] p-6 rounded-2xl border border-gray-100 hover:border-purple-200 dark:border-white/5 dark:hover:border-purple-800/40 shadow-sm transition-all hover:-translate-y-1">
+              <div className="w-12 h-12 rounded-xl bg-fuchsia-50 text-fuchsia-600 flex items-center justify-center dark:bg-fuchsia-900/30 dark:text-fuchsia-400">
+                <CreditCard className="w-6 h-6" />
+              </div>
+              <p className="font-bold text-gray-900 text-sm dark:text-white">لا تحتاج بطاقة ائتمانية</p>
+              <p className="text-xs text-gray-500 font-medium dark:text-gray-400">ابدأ مجاناً بدون أي رسوم</p>
+            </div>
+
+            <div className="flex flex-col items-center justify-center gap-3 text-center bg-white dark:bg-[#1a1a24] p-6 rounded-2xl border border-gray-100 hover:border-purple-200 dark:border-white/5 dark:hover:border-purple-800/40 shadow-sm transition-all hover:-translate-y-1">
+              <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center dark:bg-emerald-900/30 dark:text-emerald-400">
+                <Code2 className="w-6 h-6" />
+              </div>
+              <p className="font-bold text-gray-900 text-sm dark:text-white">بدون خبرة برمجية</p>
+              <p className="text-xs text-gray-500 font-medium dark:text-gray-400">سهولة ومرونة في الاستخدام</p>
+            </div>
+
+            <div className="flex flex-col items-center justify-center gap-3 text-center bg-white dark:bg-[#1a1a24] p-6 rounded-2xl border border-gray-100 hover:border-purple-200 dark:border-white/5 dark:hover:border-purple-800/40 shadow-sm transition-all hover:-translate-y-1">
+              <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center dark:bg-blue-900/30 dark:text-blue-400">
+                <Headset className="w-6 h-6" />
+              </div>
+              <p className="font-bold text-gray-900 text-sm dark:text-white">دعم فني 24/7</p>
+              <p className="text-xs text-gray-500 font-medium dark:text-gray-400">نحن هنا دائماً لمساعدتك</p>
+            </div>
           </div>
         </div>
       </section>
