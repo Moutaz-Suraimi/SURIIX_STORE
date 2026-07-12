@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>YemenSmile | عيادة الأسنان الحديثة</title>
+<meta name="description" content="رعاية أسنان عالية الجودة مع نظام حجز إلكتروني سهل وسريع." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- Header -->
+<header class="site-header">
+  <div class="container nav">
+    <a href="#home" class="logo">
+      <span class="logo-badge">😁</span> ابتسامتك
+    </a>
+    <nav class="nav-links">
+      <a href="#about">من نحن</a>
+      <a href="#services">الخدمات</a>
+      <a href="#booking">الحجز</a>
+      <a href="#testimonials">آراء العملاء</a>
+      <a href="#contact">تواصل</a>
+    </nav>
+    <a href="#booking" class="btn btn-primary btn-sm">📅 احجز الآن</a>
+  </div>
+</header>
+
+<!-- Hero -->
+<section id="home" class="hero">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="container hero-grid">
+    <div class="hero-text">
+      <span class="badge">❤ رقم 1 في رعاية الأسنان</span>
+      <h1>ابتسامتك<span class="gradient-text">تبدأ هنا</span></h1>
+      <p class="lead">رعاية أسنان عالية الجودة بأيدي نخبة من الأطباء، مع نظام حجز إلكتروني سهل وسريع على مدار الساعة.</p>
+      <ul class="ticks">
+        <li>✓ أحدث الأجهزة</li>
+        <li>✓ تعقيم متكامل</li>
+        <li>✓ أطباء معتمدون</li>
+      </ul>
+      <div class="hero-cta">
+        <a href="#booking" class="btn btn-primary btn-lg">📅 احجز موعد الآن →</a>
+        <button onclick="whatsappBook()" class="btn btn-outline btn-lg">💬 واتساب</button>
+      </div>
+      <div class="trust">
+        <div class="avatars">
+          <span style="background:#67a3d9">أ</span>
+          <span style="background:#74b6c9">م</span>
+          <span style="background:#80c4b8">س</span>
+          <span style="background:#8dd1a8">ن</span>
+        </div>
+        <div>
+          <div class="stars">★★★★★</div>
+          <p class="muted small">+5000 مريض سعيد</p>
+        </div>
+      </div>
+    </div>
+    <div class="hero-image-wrap">
+      <div class="hero-image">
+        <img src="assets/hero-clinic.jpg" alt="عيادة أسنان حديثة فاخرة" />
+      </div>
+      <div class="float-card float-tl">
+        <div class="icon-box icon-accent">🛡</div>
+        <div><p class="bold">تعقيم 100%</p><p class="small muted">معايير عالمية</p></div>
+      </div>
+      <div class="float-card float-br">
+        <div class="icon-box icon-primary">🏆</div>
+        <div><p class="bold">+15 سنة خبرة</p><p class="small muted">طاقم متخصص</p></div>
+      </div>
+      <div class="float-card float-bottom">
+        <span class="pulse-dot"></span><p class="small bold">متاح للحجز اليوم</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- About -->
+<section id="about" class="section">
+  <div class="container about-grid">
+    <div>
+      <p class="eyebrow">من نحن</p>
+      <h2>عيادة متخصصة بأعلى المعايير</h2>
+      <p class="muted lead">في YemenSmile نقدم رعاية شاملة لأسنانك بأيدي نخبة من الأطباء المتخصصين، باستخدام أحدث الأجهزة العالمية وأعلى معايير التعقيم والنظافة لضمان تجربة آمنة ومريحة.</p>
+      <div class="features">
+        <div class="feature"><div class="feat-icon">🛡</div><p>تعقيم متكامل</p></div>
+        <div class="feature"><div class="feat-icon">🏆</div><p>خبرة 15 عام</p></div>
+        <div class="feature"><div class="feat-icon">❤</div><p>رعاية مميزة</p></div>
+      </div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat"><p class="stat-n">+5000</p><p class="small muted">مريض سعيد</p></div>
+      <div class="stat"><p class="stat-n">+15</p><p class="small muted">سنة خبرة</p></div>
+      <div class="stat"><p class="stat-n">+20</p><p class="small muted">طبيب متخصص</p></div>
+      <div class="stat"><p class="stat-n">+50</p><p class="small muted">جائزة وتقدير</p></div>
+      <div class="stat"><p class="stat-n">24/7</p><p class="small muted">دعم وحجز</p></div>
+      <div class="stat"><p class="stat-n">100%</p><p class="small muted">تعقيم آمن</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- Services -->
+<section id="services" class="section soft-bg">
+  <div class="container">
+    <div class="section-head">
+      <p class="eyebrow">خدماتنا</p>
+      <h2>رعاية شاملة لكل احتياجاتك</h2>
+    </div>
+    <div class="services-grid">
+      <div class="service-card"><div class="srv-icon">✨</div><h3>تنظيف الأسنان</h3><p class="muted small">تنظيف عميق وإزالة الجير لإبقاء أسنانك صحية ولامعة.</p></div>
+      <div class="service-card"><div class="srv-icon">🦷</div><h3>زراعة الأسنان</h3><p class="muted small">حلول دائمة لاستبدال الأسنان المفقودة بأحدث التقنيات.</p></div>
+      <div class="service-card"><div class="srv-icon">📈</div><h3>تقويم الأسنان</h3><p class="muted small">تقويم تقليدي وشفاف لابتسامة مثالية ومتناسقة.</p></div>
+      <div class="service-card"><div class="srv-icon">😁</div><h3>تجميل الأسنان</h3><p class="muted small">تبييض، فينير، وابتسامة هوليوود بأيدي خبراء متخصصين.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- Booking -->
+<section id="booking" class="section">
+  <div class="container booking-wrap">
+    <div class="section-head">
+      <p class="eyebrow">حجز موعد</p>
+      <h2>احجز زيارتك بسهولة</h2>
+    </div>
+    <form id="bookingForm" class="booking-form">
+      <div class="form-grid">
+        <div class="field"><label for="name">الاسم الكامل</label><input id="name" type="text" placeholder="اكتب اسمك" /></div>
+        <div class="field"><label for="phone">رقم الجوال</label><input id="phone" type="tel" placeholder="+967 7XX XXX XXX" /></div>
+        <div class="field"><label for="service">الخدمة</label>
+          <select id="service">
+            <option value="">اختر الخدمة</option>
+            <option>تنظيف الأسنان</option>
+            <option>زراعة الأسنان</option>
+            <option>تقويم الأسنان</option>
+            <option>تجميل الأسنان</option>
+          </select>
+        </div>
+        <div class="field"><label for="date">التاريخ</label><input id="date" type="date" /></div>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary btn-lg">📅 تأكيد الحجز</button>
+        <button type="button" onclick="whatsappBook()" class="btn btn-accent btn-lg">💬 احجز عبر واتساب</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- Testimonials -->
+<section id="testimonials" class="section soft-bg">
+  <div class="container">
+    <div class="section-head">
+      <p class="eyebrow">آراء عملائنا</p>
+      <h2>ما يقوله مرضانا</h2>
+    </div>
+    <div class="testimonials-grid">
+      <div class="testimonial"><div class="stars">★★★★★</div><p>"تجربة رائعة! الطاقم محترف والعيادة نظيفة جداً. أنصح بهم بشدة."</p><p class="author">— أحمد السيد</p></div>
+      <div class="testimonial"><div class="stars">★★★★★</div><p>"أفضل عيادة أسنان زرتها. الطبيب لطيف والنتائج فاقت توقعاتي."</p><p class="author">— نورة محمد</p></div>
+      <div class="testimonial"><div class="stars">★★★★★</div><p>"خدمة ممتازة وأسعار مناسبة. الحجز عبر الواتساب سهل وسريع."</p><p class="author">— خالد العامري</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- Contact -->
+<section id="contact" class="section">
+  <div class="container contact-grid">
+    <div>
+      <p class="eyebrow">تواصل معنا</p>
+      <h2>نحن هنا لخدمتك</h2>
+      <div class="contact-list">
+        <div class="contact-item"><span class="ci-icon">📞</span><div><p class="small muted">اتصل بنا</p><p class="bold">+967 780 930 635</p></div></div>
+        <div class="contact-item"><span class="ci-icon">📍</span><div><p class="small muted">العنوان</p><p class="bold">صنعاء، شارع حدة، اليمن</p></div></div>
+        <div class="socials">
+          <a href="#" aria-label="Instagram">📷</a>
+          <a href="#" aria-label="Facebook">📘</a>
+          <a href="#" aria-label="Twitter">🐦</a>
+        </div>
+      </div>
+    </div>
+    <div class="map">
+      <iframe title="موقع العيادة" src="https://maps.google.com/maps?q=Sanaa&t=&z=13&ie=UTF8&iwloc=&output=embed" loading="lazy"></iframe>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <p>© <span id="year"></span> ابتسامتك — جميع الحقوق محفوظة</p>
+  <p>© <span id="year"></span> نم التصميم والتطير من  <a href="'https://wa.me/967780930635?text=">suriix</a></p>
+</footer>
+
+<div id="toast" class="toast"></div>
+
+<script src="script.js"></script>
+</body>
+</html>

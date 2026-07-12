@@ -1,0 +1,11 @@
+# Robots.txt for Suriix | سوريكس
+# Website: https://suriix.com
+
+User-agent: *
+Allow: /
+Disallow: /cdn-cgi/
+Disallow: /api/
+
+# Host and Sitemap locations
+Host: https://suriix.com
+Sitemap: https://suriix.com/sitemap.xml

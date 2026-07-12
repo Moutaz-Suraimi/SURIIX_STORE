@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://suriix.com</loc>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://suriix.com" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://suriix.com?lang=en" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://suriix.com?lang=zh" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://suriix.com" />
+    <lastmod>2026-07-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://suriix.com/about</loc>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://suriix.com/about" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://suriix.com/about?lang=en" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://suriix.com/about?lang=zh" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://suriix.com/about" />
+    <lastmod>2026-07-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://suriix.com/solutions</loc>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://suriix.com/solutions" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://suriix.com/solutions?lang=en" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://suriix.com/solutions?lang=zh" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://suriix.com/solutions" />
+    <lastmod>2026-07-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://suriix.com/packages</loc>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://suriix.com/packages" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://suriix.com/packages?lang=en" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://suriix.com/packages?lang=zh" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://suriix.com/packages" />
+    <lastmod>2026-07-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://suriix.com/portfolio</loc>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://suriix.com/portfolio" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://suriix.com/portfolio?lang=en" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://suriix.com/portfolio?lang=zh" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://suriix.com/portfolio" />
+    <lastmod>2026-07-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://suriix.com/ready-websites</loc>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://suriix.com/ready-websites" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://suriix.com/ready-websites?lang=en" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://suriix.com/ready-websites?lang=zh" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://suriix.com/ready-websites" />
+    <lastmod>2026-07-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://suriix.com/testimonials</loc>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://suriix.com/testimonials" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://suriix.com/testimonials?lang=en" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://suriix.com/testimonials?lang=zh" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://suriix.com/testimonials" />
+    <lastmod>2026-07-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://suriix.com/faq</loc>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://suriix.com/faq" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://suriix.com/faq?lang=en" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://suriix.com/faq?lang=zh" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://suriix.com/faq" />
+    <lastmod>2026-07-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://suriix.com/blog</loc>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://suriix.com/blog" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://suriix.com/blog?lang=en" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://suriix.com/blog?lang=zh" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://suriix.com/blog" />
+    <lastmod>2026-07-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://suriix.com/contact</loc>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://suriix.com/contact" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://suriix.com/contact?lang=en" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://suriix.com/contact?lang=zh" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://suriix.com/contact" />
+    <lastmod>2026-07-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://suriix.com/privacy</loc>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://suriix.com/privacy" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://suriix.com/privacy?lang=en" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://suriix.com/privacy?lang=zh" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://suriix.com/privacy" />
+    <lastmod>2026-07-04</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://suriix.com/terms</loc>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://suriix.com/terms" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://suriix.com/terms?lang=en" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://suriix.com/terms?lang=zh" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://suriix.com/terms" />
+    <lastmod>2026-07-04</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://suriix.com/ready-website/photo-01</loc>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://suriix.com/ready-website/photo-01" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://suriix.com/ready-website/photo-01?lang=en" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://suriix.com/ready-website/photo-01?lang=zh" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://suriix.com/ready-website/photo-01" />
+    <lastmod>2026-07-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://suriix.com/ready-website/saas-01</loc>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://suriix.com/ready-website/saas-01" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://suriix.com/ready-website/saas-01?lang=en" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://suriix.com/ready-website/saas-01?lang=zh" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://suriix.com/ready-website/saas-01" />
+    <lastmod>2026-07-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://suriix.com/ready-website/clinic-01</loc>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://suriix.com/ready-website/clinic-01" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://suriix.com/ready-website/clinic-01?lang=en" />
+    <xhtml:link rel="alternate" hreflang="zh" href="https://suriix.com/ready-website/clinic-01?lang=zh" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://suriix.com/ready-website/clinic-01" />
+    <lastmod>2026-07-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+</urlset>

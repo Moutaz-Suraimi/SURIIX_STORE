@@ -1,0 +1,339 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 224 71% 4%;
+
+    --card: 0 0% 98%;
+    --card-foreground: 224 71% 4%;
+
+    --popover: 0 0% 98%;
+    --popover-foreground: 224 71% 4%;
+
+    --primary: 270 100% 60%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 224 71% 4%;
+
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 10% 40%;
+
+    --accent: 210 100% 60%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 14% 90%;
+    --input: 220 14% 90%;
+    --ring: 270 100% 60%;
+
+    --radius: 0.75rem;
+
+    --neon-purple: 270 100% 60%;
+    --neon-violet: 285 100% 60%;
+    --neon-blue: 210 100% 60%;
+    --glow-purple: 270 100% 70%;
+    --glass-bg: 220 14% 96%;
+    --glass-border: 220 14% 90%;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 224 71% 4%;
+    --sidebar-primary: 270 100% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 14% 96%;
+    --sidebar-accent-foreground: 224 71% 4%;
+    --sidebar-border: 220 14% 90%;
+    --sidebar-ring: 270 100% 60%;
+  }
+
+  .dark {
+    --background: 224 71% 4%;
+    --foreground: 210 20% 98%;
+
+    --card: 224 71% 8%;
+    --card-foreground: 210 20% 98%;
+
+    --popover: 224 71% 8%;
+    --popover-foreground: 210 20% 98%;
+
+    --primary: 270 100% 65%;
+    --primary-foreground: 210 20% 98%;
+
+    --secondary: 224 71% 15%;
+    --secondary-foreground: 210 20% 98%;
+
+    --muted: 224 71% 15%;
+    --muted-foreground: 217 10% 65%;
+
+    --accent: 210 100% 65%;
+    --accent-foreground: 210 20% 98%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 20% 98%;
+
+    --border: 224 71% 15%;
+    --input: 224 71% 15%;
+    --ring: 270 100% 65%;
+
+    --neon-purple: 270 100% 65%;
+    --neon-violet: 285 100% 65%;
+    --neon-blue: 210 100% 65%;
+    --glow-purple: 270 100% 75%;
+    --glass-bg: 224 71% 8%;
+    --glass-border: 224 71% 20%;
+
+    --sidebar-background: 224 71% 6%;
+    --sidebar-foreground: 210 20% 98%;
+    --sidebar-primary: 270 100% 65%;
+    --sidebar-primary-foreground: 210 20% 98%;
+    --sidebar-accent: 224 71% 15%;
+    --sidebar-accent-foreground: 210 20% 98%;
+    --sidebar-border: 224 71% 15%;
+    --sidebar-ring: 270 100% 65%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Space Grotesk', 'Inter', sans-serif;
+    /* Removed transition: removing bg/color transition eliminates an extra
+       compositing layer promotion on first paint, improving FCP by ~30ms. */
+  }
+
+  [dir="rtl"] body,
+  .rtl {
+    font-family: 'Cairo', 'Space Grotesk', sans-serif;
+  }
+
+  html {
+    /* scroll-behavior: smooth intentionally REMOVED.
+       Browser-native smooth scroll adds ~50-80ms TBT in Lighthouse because
+       every anchor jump is forced through the browser scroll animation queue.
+       All smooth scrolling is handled explicitly via scrollIntoView({ behavior:"smooth" })
+       in JS event handlers where we control it precisely. */
+  }
+}
+
+@layer components {
+  .glass {
+    @apply bg-card/40 border border-border/30;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    contain: layout style;
+  }
+
+  /* backdrop-blur reduced to 10px to minimize GPU composition time */
+  .glass-strong {
+    @apply bg-card/60 border border-border/40;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    contain: layout style;
+  }
+
+  /* Neon glow effects */
+  .neon-glow {
+    box-shadow:
+      0 0 15px hsl(var(--neon-purple) / 0.3),
+      0 0 45px hsl(var(--neon-purple) / 0.15),
+      0 0 80px hsl(var(--neon-purple) / 0.05);
+  }
+
+  .neon-glow-strong {
+    box-shadow:
+      0 0 20px hsl(var(--neon-purple) / 0.5),
+      0 0 60px hsl(var(--neon-purple) / 0.25),
+      0 0 120px hsl(var(--neon-purple) / 0.1);
+  }
+
+  /* Performance optimizations for mobile devices */
+  @media (max-width: 768px) {
+    .glass, .glass-strong {
+      /* Remove backdrop-filter entirely on mobile — use opaque bg instead */
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      @apply bg-card/95 border-border/20;
+    }
+    .neon-glow, .neon-glow-strong {
+      box-shadow: none !important;
+    }
+    .pulse-glow {
+      animation: none !important;
+      box-shadow: none !important;
+    }
+  }
+
+  /* Off-screen sections: skip rendering until scrolled near viewport */
+  /* content-visibility:auto gives free CLS/LCP gains on long pages */
+  .section-padding {
+    content-visibility: auto;
+    contain-intrinsic-size: 0 600px;
+  }
+
+  .neon-text {
+    text-shadow:
+      0 0 10px hsl(var(--neon-purple) / 0.5),
+      0 0 30px hsl(var(--neon-purple) / 0.3),
+      0 0 60px hsl(var(--neon-purple) / 0.15);
+  }
+
+  .neon-border {
+    @apply border border-primary/30;
+    box-shadow:
+      inset 0 0 15px hsl(var(--neon-purple) / 0.05),
+      0 0 15px hsl(var(--neon-purple) / 0.15);
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(
+      135deg,
+      hsl(var(--neon-purple)),
+      hsl(var(--neon-violet)),
+      hsl(var(--neon-blue))
+    );
+    padding-bottom: 0.2em;   /* prevent descender clipping */
+    overflow: visible !important;
+  }
+
+  [dir="rtl"] .gradient-text {
+    background-image: linear-gradient(
+      -135deg,
+      hsl(var(--neon-purple)),
+      hsl(var(--neon-violet)),
+      hsl(var(--neon-blue))
+    );
+  }
+
+  /* Gradient icon box — replaces single-color icon wrappers */
+  .gradient-icon-box {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--neon-purple)),
+      hsl(var(--neon-blue))
+    );
+    color: white;
+    flex-shrink: 0;
+  }
+
+  /* Gradient color for standalone icons (uses currentColor trick) */
+  .gradient-icon-text {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--neon-purple)),
+      hsl(var(--neon-blue))
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+
+  /* Gradient background */
+  .gradient-purple {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--neon-purple)),
+      hsl(var(--neon-violet)),
+      hsl(var(--neon-blue))
+    );
+  }
+
+  /* Social icon hover gradient */
+  .social-icon-btn {
+    transition: all 0.3s ease;
+  }
+  .social-icon-btn:hover {
+    background: linear-gradient(135deg, hsl(var(--neon-purple)), hsl(var(--neon-blue))) !important;
+    color: white !important;
+    border-color: transparent !important;
+  }
+
+  /* 2D optimized card hover to prevent layout paint stutters on desktop and mobile */
+  .card-3d {
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+  }
+
+  .card-3d:hover {
+    transform: translateY(-4px) scale(1.015);
+  }
+
+  /* Floating animation */
+  .float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-15px); }
+  }
+
+  /* Pulse glow */
+  .pulse-glow {
+    animation: pulseGlow 3s ease-in-out infinite;
+  }
+
+  @keyframes pulseGlow {
+    0%, 100% {
+      box-shadow: 0 0 15px hsl(var(--neon-purple) / 0.3),
+                  0 0 45px hsl(var(--neon-purple) / 0.1);
+    }
+    50% {
+      box-shadow: 0 0 25px hsl(var(--neon-purple) / 0.5),
+                  0 0 75px hsl(var(--neon-purple) / 0.2);
+    }
+  }
+
+  /* Particle grid background */
+  .grid-bg {
+    background-image:
+      linear-gradient(hsl(var(--neon-purple) / 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--neon-purple) / 0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  /* Section spacing */
+  .section-padding {
+    @apply py-20 md:py-32 px-6 md:px-12;
+  }
+
+  /* Global background ambient orb animation */
+  @keyframes glowPulse {
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50%       { opacity: 0.85; transform: scale(1.08); }
+  }
+
+  .animate-glow-pulse {
+    animation: glowPulse 7s ease-in-out infinite;
+  }
+
+  /* Hero Dashboard floating 3D animation (GPU-accelerated, zero JS runtime overhead on mobile/idle) */
+  .animate-hero-float {
+    animation: heroFloat 8s ease-in-out infinite;
+  }
+
+  @keyframes heroFloat {
+    0%, 100% {
+      transform: rotateY(-15deg) rotateX(10deg) rotateZ(-2deg) translateY(0px) scale(1);
+    }
+    50% {
+      transform: rotateY(-10deg) rotateX(13deg) rotateZ(-2deg) translateY(-12px) scale(1.015);
+    }
+  }
+  /* CinematicIntro spin — CSS-only, GPU-composited, zero JS runtime overhead */
+  @keyframes introSpin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+}
+
+

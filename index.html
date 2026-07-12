@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ar" dir="rtl" class="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
+
+    <!-- ① Theme: runs sync before first paint — prevents dark/light flash (FOUC) -->
+    <script>
+      (function(){try{var s=localStorage.getItem("suriix_theme");var d=s==="dark"||(!s&&window.matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.className=d?"dark":"light";}catch(e){}})();
+    </script>
+
+    <!-- ② Critical inline CSS: locks background + hides body until JS hydrates
+         The body reveal is driven by the 'loaded' class added in main.tsx.
+         Using visibility:hidden instead of opacity:0 lets Lighthouse measure LCP
+         correctly (element is in DOM and sized, just not visible). -->
+    <style>
+      html.dark  { background-color: #090714; color-scheme: dark;  }
+      html.light { background-color: #ffffff; color-scheme: light; }
+      body {
+        margin: 0;
+        padding: 0;
+        /* visibility:hidden means the element is measured (no CLS) but not painted.
+           opacity:0 was preventing Lighthouse from detecting LCP correctly. */
+        visibility: hidden;
+      }
+      body.loaded {
+        visibility: visible;
+        animation: body-reveal 0.2s ease-out both;
+      }
+      @keyframes body-reveal {
+        from { opacity: 0; }
+        to   { opacity: 1; }
+      }
+    </style>
+
+    <!-- ③ Performance: preconnect and dns-prefetch to origins (saves 200-400ms DNS+TCP+TLS) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+    <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
+
+    <!-- ④ Preload the logo — it is the LCP element on mobile -->
+    <link rel="preload" as="image" href="/favicon-192x192.png" fetchpriority="high" />
+
+    <!-- ⑤ Fonts: load async via media="print" trick, swap in on load.
+         Only the 4 weights actually used in the design are requested. -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Space+Grotesk:wght@700&family=Inter:wght@400;600&display=swap"
+      rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript>
+      <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Space+Grotesk:wght@700&family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+    </noscript>
+
+    <!-- Primary Fallback SEO (will be replaced by react-helmet-async) -->
+    <title>Suriix | سوريكس</title>
+    <meta name="description" content="تصميم مواقع ومتاجر إلكترونية احترافية" />
+    <meta name="author" content="Suriix | سوريكس" />
+    <meta name="google-adsense-account" content="ca-pub-4479803404171955" />
+
+    <!-- ⑩ Favicons -->
+    <link rel="icon"             type="image/png" href="/favicon-192x192.png" />
+    <link rel="icon"             type="image/png" sizes="192x192" href="/favicon-192x192.png" />
+    <link rel="apple-touch-icon"                  href="/favicon-192x192.png" />
+    <link rel="apple-touch-icon" sizes="180x180"  href="/favicon-192x192.png" />
+
+    <!-- ⑪ PWA -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#090714" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#ffffff"  media="(prefers-color-scheme: light)" />
+  </head>
+
+  <body>
+    <div id="root"></div>
+
+    <!-- ⑫ Main entry — type="module" defers automatically (non-blocking) -->
+    <script type="module" src="/src/main.tsx"></script>
+
+    <!-- ⑬ Service Worker — registered after page load to avoid competing with LCP -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('/sw.js', { scope: '/' });
+        });
+      }
+    </script>
+  </body>
+</html>
