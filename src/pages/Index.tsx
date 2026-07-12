@@ -129,18 +129,50 @@ const Index = () => {
             
             {/* ===== LEFT SIDE: Hero Image ===== */}
             <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.9, ease: "easeOut" }}
-              className="relative hidden lg:flex items-center justify-center order-2 h-[600px] w-full"
+              initial={{ opacity: 0, x: -50, scale: 0.95 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              transition={{ duration: 1, ease: "easeOut" }}
+              className="relative hidden lg:flex items-center justify-center order-2 w-full"
             >
-              {/* Hero Image */}
-              <img
-                src="/hero-image.png"
-                alt="Suriix Dashboard Preview"
-                className="w-full h-full object-contain drop-shadow-2xl"
-                style={{ maxHeight: 560 }}
-              />
+              <div className="relative w-full max-w-[480px] aspect-[4/4.5] rounded-[3rem] p-3 bg-white/40 dark:bg-white/5 backdrop-blur-2xl shadow-[0_40px_100px_-20px_rgba(168,85,247,0.4)] border border-white/60 dark:border-white/10 animate-[float_6s_ease-in-out_infinite] group">
+                {/* Glow behind */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-purple-500/20 to-fuchsia-500/20 rounded-[3rem] -z-10 group-hover:opacity-100 transition-opacity duration-700" />
+                
+                {/* Main Image Container */}
+                <div className="relative w-full h-full rounded-[2.5rem] overflow-hidden bg-white dark:bg-[#15151c] shadow-inner border border-gray-50 dark:border-white/5">
+                   {/* MacOS Window Dots */}
+                   <div className="absolute top-5 left-5 flex gap-1.5 z-10 opacity-90">
+                      <div className="w-3 h-3 rounded-full bg-[#ff5f56]" />
+                      <div className="w-3 h-3 rounded-full bg-[#ffbd2e]" />
+                      <div className="w-3 h-3 rounded-full bg-[#27c93f]" />
+                   </div>
+                   
+                   <img
+                     src="/hero-image.png"
+                     alt="Suriix Platform Preview"
+                     className="w-full h-full object-cover transform scale-[1.03] group-hover:scale-100 transition-transform duration-700 ease-out pt-6"
+                   />
+                </div>
+
+                {/* Floating Badge Overlay */}
+                <div className="absolute -bottom-6 -left-6 bg-white dark:bg-[#1a1a24] p-4 rounded-2xl shadow-2xl shadow-purple-900/20 border border-gray-100 dark:border-white/5 flex items-center gap-4 z-20 animate-[float_5s_ease-in-out_infinite_1.5s]">
+                   <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-500 dark:text-emerald-400 rounded-2xl flex justify-center items-center shrink-0">
+                     <CheckCircle2 className="w-6 h-6" />
+                   </div>
+                   <div className="text-right">
+                     <p className="font-extrabold text-gray-900 dark:text-white text-sm">متجرك جاهز</p>
+                     <p className="text-xs font-bold text-gray-500 dark:text-gray-400">في أقل من 5 دقائق</p>
+                   </div>
+                </div>
+
+                {/* Second Floating Badge */}
+                <div className="absolute top-12 -right-8 bg-white dark:bg-[#1a1a24] py-3 px-5 rounded-full shadow-xl shadow-fuchsia-900/10 border border-gray-100 dark:border-white/5 flex items-center justify-between gap-3 z-20 animate-[float_4s_ease-in-out_infinite_0.5s]">
+                   <span className="font-extrabold text-gray-900 dark:text-white text-sm">إدارة احترافية</span>
+                   <div className="w-6 h-6 bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400 rounded-full flex justify-center items-center">
+                     <Sparkles className="w-3 h-3" />
+                   </div>
+                </div>
+              </div>
             </motion.div>
 
             {/* ===== RIGHT SIDE: Text Content ===== */}
@@ -148,26 +180,30 @@ const Index = () => {
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.7, ease: "easeOut" }}
-              className="text-right space-y-7 order-1 flex flex-col items-start w-full"
+              className="text-right space-y-7 order-1 flex flex-col items-end w-full"
             >
               {/* Badge */}
               <div
-                className="inline-flex items-center gap-2 bg-[#f6f2fe] text-purple-700 px-4 py-2 rounded-full text-xs font-bold font-display tracking-tight"
+                className="inline-flex items-center gap-2 bg-[#f6f2fe] text-purple-700 px-5 py-2.5 rounded-full text-xs font-bold font-display tracking-tight"
               >
-                <Sparkles className="w-4 h-4 fill-purple-600 text-purple-600" />
                 <span>الجيل الجديد للتجارة الذكية</span>
+                <Sparkles className="w-4 h-4 fill-purple-600 text-purple-600" />
               </div>
 
               {/* Heading */}
               <div className="w-full text-right">
-                <h1 className="text-[44px] md:text-5xl lg:text-7xl font-extrabold text-slate-900 leading-[1.15] md:leading-[1.2] tracking-tight dark:text-white">
+                <h1 className="text-[44px] md:text-5xl lg:text-[70px] font-extrabold text-slate-900 leading-[1.2] md:leading-[1.2] tracking-tight dark:text-white pb-3">
                   أنشئ متجرك الذكي
                   <br />
-                  <span className="bg-clip-text text-transparent bg-gradient-to-l from-purple-600 to-fuchsia-500">
-                    في دقائق، وابدأ البيع
+                  <span className="text-[#a855f7]">
+                    في دقائق، وابدأ
                   </span>
                   <br />
-                  <span className="bg-clip-text text-transparent bg-gradient-to-l from-purple-600 to-fuchsia-500">
+                  <span className="text-[#a855f7]">
+                    البيع
+                  </span>
+                  <br />
+                  <span className="text-[#a855f7]">
                     باحترافية.
                   </span>
                 </h1>
@@ -178,24 +214,24 @@ const Index = () => {
                 <span className="font-bold text-gray-800 dark:text-white">Suriix</span> تمنحك كل ما تحتاجه لإطلاق متجرك الإلكتروني بتصميم احترافي، وإدارة سهلة، وتجربة عملاء استثنائية.
               </p>
 
-              {/* CTA Button */}
-              <div className="w-full flex lg:justify-end justify-start flex-col sm:flex-row-reverse items-center gap-4 mt-6">
-                <Link
-                  to="/create-store"
-                  className="w-full sm:w-auto inline-flex justify-center items-center gap-3 bg-gradient-to-r from-purple-600 to-fuchsia-500 hover:from-purple-700 hover:to-fuchsia-600 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-[0_10px_30px_rgba(168,85,247,0.35)] transition-all duration-300 hover:shadow-[0_15px_40px_rgba(168,85,247,0.45)] hover:-translate-y-1"
-                >
-                  <span>ابدأ تجربتك مجاناً الآن</span>
-                  <ArrowLeft className="w-5 h-5 mx-1" />
-                </Link>
+              {/* CTA Buttons Layout */}
+              <div className="flex flex-col sm:flex-row gap-4 mt-6" style={{ direction: 'rtl' }}>
                 <a
                   href="#features"
-                  className="w-full sm:w-auto flex justify-center items-center gap-2 bg-white dark:bg-[#1a1a24] text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-800 px-8 py-4 rounded-xl font-bold text-lg shadow-sm hover:shadow-md transition-all duration-300 hover:bg-slate-50 dark:hover:bg-slate-800"
+                  className="w-full sm:w-auto flex justify-center items-center gap-2 bg-white dark:bg-[#1a1a24] text-purple-700 dark:text-slate-200 border border-slate-200 dark:border-slate-800 px-8 py-4 rounded-xl font-bold text-lg shadow-sm hover:shadow-md transition-all duration-300 hover:bg-slate-50 dark:hover:bg-slate-800"
                 >
                   <Sparkles className="w-5 h-5 text-purple-600" />
                   <span>استعراض المميزات</span>
                 </a>
+                <Link
+                  to="/create-store"
+                  className="w-full sm:w-auto inline-flex justify-center items-center gap-3 bg-fuchsia-500 hover:bg-fuchsia-600 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-[0_10px_30px_rgba(217,70,239,0.35)] transition-all duration-300 hover:shadow-[0_15px_40px_rgba(217,70,239,0.45)] hover:-translate-y-1"
+                  style={{ background: 'linear-gradient(90deg, #b04bf6, #bf5afe)' }}
+                >
+                  <span>ابدأ تجربتك مجاناً الآن</span>
+                  <ArrowLeft className="w-5 h-5 mx-1" />
+                </Link>
               </div>
-
             </motion.div>
           </div>
 
@@ -204,13 +240,15 @@ const Index = () => {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, delay: 0.2, ease: "easeOut" }}
-            className="w-full max-w-6xl mx-auto h-[600px] mt-16 bg-white rounded-3xl border border-gray-100 flex flex-row-reverse overflow-hidden z-20 shadow-[0_40px_100px_rgba(139,92,246,0.15)] relative dark:bg-[#0f172a] dark:border-slate-800"
+            className="w-full max-w-[1200px] mx-auto h-[550px] mt-16 bg-white rounded-3xl border border-gray-100 flex flex-row overflow-hidden z-20 shadow-[0_40px_100px_rgba(139,92,246,0.15)] relative dark:bg-[#0f172a] dark:border-slate-800"
           >
-            {/* Sidebar */}
-            <div className="w-[200px] border-r border-gray-100 bg-white flex flex-col py-6 gap-2 z-10 shrink-0 relative dark:bg-[#0f172a] dark:border-slate-800">
-              <div className="flex items-center gap-2 justify-end px-6 mb-8">
+            {/* Sidebar (Left edge) */}
+            <div className="w-[180px] border-r-0 border-l border-gray-100 bg-white flex flex-col py-6 gap-2 z-10 shrink-0 relative dark:bg-[#0f172a] dark:border-slate-800">
+              <div className="flex items-center gap-2 px-6 mb-8 justify-end">
                 <span className="font-bold text-xl text-gray-900 dark:text-white">Suriix</span>
-                <img src="/favicon.png" alt="Suriix" className="w-8 h-8 object-contain" />
+                <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
+                   <div className="font-bold text-lg text-purple-600">S</div>
+                </div>
               </div>
               
               <div className="px-3">
@@ -236,170 +274,196 @@ const Index = () => {
               </div>
             </div>
 
-            {/* Main Content */}
-            <div className="flex-1 p-8 bg-[#fafafc] dark:bg-[#0f0f13] overflow-hidden flex flex-col relative">
-              <div className="flex flex-row-reverse justify-between items-start mb-6">
-                <div className="flex items-center gap-3 flex-row-reverse">
-                  <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-sm ring-1 ring-gray-100">
-                    <img src="https://i.pravatar.cc/100?img=11" alt="avatar" className="w-full h-full object-cover" />
-                  </div>
-                  <div className="text-right">
-                    <h3 className="font-extrabold text-gray-900 text-base dark:text-white">مرحباً بك، 👋 أحمد</h3>
-                    <p className="text-xs text-gray-400 font-medium dark:text-gray-500">إليك ملخص متجرك اليوم</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Stats Row & Hero Chart (Split) */}
-              <div className="flex flex-row-reverse gap-6 h-full pb-4">
-                {/* Left Stats Grid (Takes 65%) */}
-                <div className="flex-1 flex flex-col gap-6">
-                  {/* Top Stats Cards */}
-                  <div className="grid grid-cols-4 gap-4 flex-row-reverse" style={{ direction: 'rtl' }}>
-                    
-                    {/* Stat 1 */}
-                    <div className="bg-white rounded-2xl border border-gray-100/80 p-4 shadow-sm flex flex-col h-[110px] dark:bg-[#0f172a] dark:border-slate-800">
-                      <div className="flex justify-between items-center mb-1">
-                        <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400">إجمالي المبيعات</span>
-                        <div className="w-6 h-6 rounded-md bg-purple-50 flex items-center justify-center shrink-0 dark:bg-purple-900/30">
-                          <ShoppingBag className="w-3 h-3 text-purple-600 dark:text-purple-400" />
-                        </div>
-                      </div>
-                      <p className="font-extrabold text-gray-900 text-xl tracking-tight mb-2 dark:text-white">45,231</p>
-                      <span className="text-[10px] font-bold text-emerald-600 flex items-center gap-0.5"><ArrowUpRight className="w-3 h-3"/> +13.3%</span>
-                    </div>
-
-                    {/* Stat 2 */}
-                    <div className="bg-white rounded-2xl border border-gray-100/80 p-4 shadow-sm flex flex-col h-[110px] dark:bg-[#0f172a] dark:border-slate-800">
-                      <div className="flex justify-between items-center mb-1">
-                        <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400">إجمالي الطلبات</span>
-                        <div className="w-6 h-6 rounded-md bg-emerald-50 flex items-center justify-center shrink-0 dark:bg-emerald-900/30">
-                          <ShoppingCart className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
-                        </div>
-                      </div>
-                      <p className="font-extrabold text-gray-900 text-xl tracking-tight mb-2 dark:text-white">320</p>
-                      <span className="text-[10px] font-bold text-emerald-600 flex items-center gap-0.5"><ArrowUpRight className="w-3 h-3"/> +8.2%</span>
-                    </div>
-
-                    {/* Stat 3 */}
-                    <div className="bg-white rounded-2xl border border-gray-100/80 p-4 shadow-sm flex flex-col h-[110px] dark:bg-[#0f172a] dark:border-slate-800">
-                      <div className="flex justify-between items-center mb-1">
-                        <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400">إجمالي العملاء</span>
-                        <div className="w-6 h-6 rounded-md bg-blue-50 flex items-center justify-center shrink-0 dark:bg-blue-900/30">
-                          <Users className="w-3 h-3 text-blue-600 dark:text-blue-400" />
-                        </div>
-                      </div>
-                      <p className="font-extrabold text-gray-900 text-xl tracking-tight mb-2 dark:text-white">12,456</p>
-                      <span className="text-[10px] font-bold text-emerald-600 flex items-center gap-0.5"><ArrowUpRight className="w-3 h-3"/> +15.3%</span>
-                    </div>
-
-                    {/* Stat 4 */}
-                    <div className="bg-white rounded-2xl border border-gray-100/80 p-4 shadow-sm flex flex-col h-[110px] dark:bg-[#0f172a] dark:border-slate-800">
-                      <div className="flex justify-between items-center mb-1">
-                        <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400">معدل التحويل</span>
-                        <div className="w-6 h-6 rounded-md bg-rose-50 flex items-center justify-center shrink-0 dark:bg-rose-900/30">
-                          <BarChart3 className="w-3 h-3 text-rose-600 dark:text-rose-400" />
-                        </div>
-                      </div>
-                      <p className="font-extrabold text-gray-900 text-xl tracking-tight mb-2 dark:text-white">2.45%</p>
-                      <span className="text-[10px] font-bold text-rose-500 flex items-center gap-0.5"><ArrowUpRight className="w-3 h-3 rotate-90"/> -2.1%</span>
-                    </div>
-
-                  </div>
-
-                  {/* Bottom Stats area */}
-                  <div className="flex gap-6 h-full flex-row-reverse">
-                    {/* Recent Orders List */}
-                    <div className="flex-1 bg-white rounded-2xl border border-gray-100/80 p-4 shadow-sm flex flex-col dark:bg-[#0f172a] dark:border-slate-800" style={{ direction: 'rtl' }}>
-                      <div className="flex justify-between items-center mb-4">
-                        <h4 className="text-sm font-extrabold text-gray-800 dark:text-white">أحدث الطلبات</h4>
-                        <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400 cursor-pointer">عرض الكل</span>
-                      </div>
-                      <div className="flex flex-col gap-3 flex-1 justify-center">
-                        {[
-                          { id: "#1258", name: "محمد السليمي", status: "مكتمل", amount: "450 ريال", color: "bg-emerald-50 text-emerald-600" },
-                          { id: "#1257", name: "سارة العتيبي", status: "قيد الشحن", amount: "230 ريال", color: "bg-blue-50 text-blue-600" },
-                          { id: "#1256", name: "خالد الحربي", status: "ملغى", amount: "150 ريال", color: "bg-rose-50 text-rose-600" },
-                        ].map((ord, i) => (
-                          <div key={i} className="flex justify-between items-center py-2 border-b border-gray-50 last:border-0 dark:border-slate-800">
-                            <div className="flex items-center gap-3">
-                              <span className="text-xs font-bold text-gray-400 dark:text-gray-500">{ord.id}</span>
-                              <span className="text-xs font-bold text-gray-800 dark:text-white">{ord.name}</span>
-                            </div>
-                            <div className="flex items-center gap-4">
-                              <span className="text-xs font-bold text-gray-800 dark:text-gray-300">{ord.amount}</span>
-                              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${ord.color} dark:bg-opacity-20`}>{ord.status}</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    {/* Mini Chart */}
-                    <div className="w-[50%] bg-white rounded-2xl border border-gray-100/80 p-4 shadow-sm flex flex-col relative dark:bg-[#0f172a] dark:border-slate-800" style={{ direction: 'rtl' }}>
-                       <div className="flex justify-between items-center mb-4">
-                           <h4 className="text-sm font-extrabold text-gray-800 dark:text-white">أداء المبيعات</h4>
-                           <span className="text-[10px] font-bold text-gray-500 flex items-center gap-1 border rounded-md px-1.5 py-0.5 dark:border-slate-700 dark:text-gray-400">آخر 30 يوم <ChevronDown className="w-3 h-3"/></span>
-                       </div>
-                       <div className="flex-1 relative w-full mt-2">
-                           {/* Simple custom SVG chart to mimic the mockup */}
-                           <svg viewBox="0 0 200 80" className="w-full h-full overflow-visible" preserveAspectRatio="none">
-                             <defs>
-                               <linearGradient id="chartGradMini" x1="0" y1="0" x2="0" y2="1">
-                                 <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.2"/>
-                                 <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0"/>
-                               </linearGradient>
-                             </defs>
-                             <path d="M0,70 L30,50 L60,60 L90,40 L120,50 L150,30 L200,10 L200,80 L0,80 Z" fill="url(#chartGradMini)"/>
-                             <path d="M0,70 L30,50 L60,60 L90,40 L120,50 L150,30 L200,10" fill="none" stroke="#8b5cf6" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                             <circle cx="150" cy="30" r="3" fill="#8b5cf6" stroke="white" strokeWidth="1.5" />
-                           </svg>
-                       </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Right Big Purple Chart Card (Takes 35%) */}
-                <div className="w-[35%] bg-gradient-to-b from-purple-600 to-[#5B5EE5] rounded-3xl p-6 flex flex-col text-white shadow-xl relative overflow-hidden" style={{ direction: 'rtl' }}>
-                  <div className="absolute -top-24 -right-24 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none" />
+            {/* Main Content Area */}
+            <div className="flex-1 p-6 bg-[#fafafc] dark:bg-[#0f0f13] overflow-hidden flex flex-col gap-6">
+               <div className="flex flex-row-reverse gap-6 h-full">
                   
-                  <div className="flex justify-between items-center mb-6 z-10">
-                    <h3 className="font-extrabold text-lg flex items-center gap-2">
-                      <Sparkles className="w-5 h-5 text-purple-200" /> أداء متجرك
-                    </h3>
-                    <button className="text-white/80 hover:text-white transition">
-                      <Settings className="w-4 h-4" />
-                    </button>
+                  {/* Right Column (Avatar + Purple Card) */}
+                  <div className="w-[30%] min-w-[280px] flex flex-col gap-6">
+                      <div className="flex items-center justify-start gap-3 flex-row-reverse">
+                         <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-sm ring-1 ring-purple-100">
+                            <img src="https://i.pravatar.cc/150?img=11" alt="avatar" className="w-full h-full object-cover" />
+                         </div>
+                         <div className="text-right">
+                            <p className="font-extrabold text-gray-900 text-[15px] dark:text-white">مرحباً بك، 👋 أحمد</p>
+                            <p className="text-[11px] text-gray-400 font-medium">إليك ملخص متجرك اليوم</p>
+                         </div>
+                      </div>
+
+                      <div className="flex-1 bg-gradient-to-b from-purple-600 to-[#5B5EE5] rounded-3xl p-6 flex flex-col text-white shadow-xl relative overflow-hidden" style={{ direction: 'rtl' }}>
+                        <div className="absolute -top-16 -right-16 w-48 h-48 bg-white/10 rounded-full blur-3xl pointer-events-none" />
+                        
+                        <div className="flex justify-between items-center mb-6 z-10">
+                          <h3 className="font-extrabold text-lg flex items-center gap-2">
+                             أداء متجرك <Sparkles className="w-5 h-5 text-purple-200" /> 
+                          </h3>
+                        </div>
+
+                        <div className="bg-white/10 border border-white/20 backdrop-blur-md self-start px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 mb-8 z-10">
+                          آخر 30 يوم <ChevronDown className="w-3 h-3" />
+                        </div>
+
+                        {/* Main Purple Chart Line */}
+                        <div className="flex-1 w-full relative z-10 opacity-100 mt-2">
+                           <svg viewBox="0 0 200 100" className="w-full h-full overflow-visible" preserveAspectRatio="none">
+                             <path d="M0,80 L30,60 L60,80 L90,40 L120,60 L150,20 L200,30" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="drop-shadow-lg"/>
+                             <circle cx="30" cy="60" r="3" fill="white" stroke="#a855f7" strokeWidth="2" />
+                             <circle cx="60" cy="80" r="3" fill="white" stroke="#a855f7" strokeWidth="2" />
+                             <circle cx="90" cy="40" r="3" fill="white" stroke="#a855f7" strokeWidth="2" />
+                             <circle cx="120" cy="60" r="3" fill="white" stroke="#a855f7" strokeWidth="2" />
+                             <circle cx="150" cy="20" r="3" fill="white" stroke="#a855f7" strokeWidth="2" />
+                             <circle cx="200" cy="30" r="4" fill="#a855f7" stroke="#fbbf24" strokeWidth="2" />
+                           </svg>
+                        </div>
+
+                        {/* Footer Totals */}
+                        <div className="mt-auto bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-4 flex justify-between items-center z-10">
+                          <div>
+                            <p className="text-2xl font-black">15,230 ريال</p>
+                            <p className="text-[10px] text-purple-200">إجمالي المبيعات</p>
+                          </div>
+                          <div className="w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center">
+                            <span className="text-amber-400 font-bold text-xs">⭐</span>
+                          </div>
+                        </div>
+                      </div>
                   </div>
 
-                  <div className="bg-white/10 border border-white/20 backdrop-blur-md self-start px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 mb-8 z-10 cursor-pointer">
-                    آخر 30 يوم <ChevronDown className="w-3 h-3" />
-                  </div>
+                  {/* Left Column (Stats + Bottom Charts) */}
+                  <div className="flex-1 flex flex-col gap-6">
+                      {/* Top 4 Stats Cards */}
+                      <div className="grid grid-cols-4 gap-4 flex-row" style={{ direction: 'ltr' }}>
+                          <div className="bg-white rounded-3xl border border-gray-100 p-4 shadow-sm flex flex-col h-[140px] dark:bg-[#0f172a] dark:border-slate-800 text-right">
+                             <div className="flex justify-between items-start mb-2">
+                                <div className="w-8 h-8 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center shrink-0">
+                                   <BarChart3 className="w-4 h-4" />
+                                </div>
+                                <span className="text-[10px] font-bold text-gray-500">معدل التحويل</span>
+                             </div>
+                             <p className="font-extrabold text-gray-900 text-xl tracking-tight mb-2">2.45%</p>
+                             <div className="mt-auto flex justify-between items-end">
+                                <span className="text-[10px] font-bold text-rose-500 flex items-center gap-0.5"><ArrowUpRight className="w-3 h-3 rotate-90"/> -2.1%</span>
+                                <svg width="40" height="20" viewBox="0 0 40 20" className="overflow-visible"><path d="M0,15 L10,5 L20,10 L30,0 L40,10" fill="none" stroke="#f43f5e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                             </div>
+                          </div>
 
-                  {/* Main Large Chart */}
-                  <div className="flex-1 w-full relative z-10 opacity-90 mt-4">
-                     <svg viewBox="0 0 200 100" className="w-full h-full overflow-visible" preserveAspectRatio="none">
-                       <path d="M0,80 L40,60 L80,70 L120,40 L160,50 L200,20" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="drop-shadow-lg"/>
-                       <circle cx="40" cy="60" r="4" fill="white" stroke="#a855f7" strokeWidth="2" />
-                       <circle cx="80" cy="70" r="4" fill="white" stroke="#a855f7" strokeWidth="2" />
-                       <circle cx="120" cy="40" r="4" fill="white" stroke="#a855f7" strokeWidth="2" />
-                       <circle cx="160" cy="50" r="4" fill="white" stroke="#a855f7" strokeWidth="2" />
-                       <circle cx="200" cy="20" r="4" fill="white" stroke="#a855f7" strokeWidth="2" />
-                     </svg>
-                  </div>
+                          <div className="bg-white rounded-3xl border border-gray-100 p-4 shadow-sm flex flex-col h-[140px] dark:bg-[#0f172a] dark:border-slate-800 text-right">
+                             <div className="flex justify-between items-start mb-2">
+                                <div className="w-8 h-8 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
+                                   <ShoppingBag className="w-4 h-4" />
+                                </div>
+                                <span className="text-[10px] font-bold text-gray-500">إجمالي المبيعات</span>
+                             </div>
+                             <p className="font-extrabold text-gray-900 text-xl tracking-tight mb-2">45,231</p>
+                             <div className="mt-auto flex justify-between items-end">
+                                <span className="text-[10px] font-bold text-emerald-500 flex items-center gap-0.5"><ArrowUpRight className="w-3 h-3"/> +13.3%</span>
+                                <svg width="40" height="20" viewBox="0 0 40 20" className="overflow-visible"><path d="M0,15 L10,10 L20,15 L30,5 L40,0" fill="none" stroke="#8b5cf6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                             </div>
+                          </div>
 
-                  {/* Footer Totals */}
-                  <div className="mt-auto bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-4 flex justify-between items-center z-10">
-                    <div>
-                      <p className="text-xs text-purple-200 mb-0.5">إجمالي المبيعات</p>
-                      <p className="text-2xl font-black">15,230 ريال</p>
-                    </div>
-                    <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                      <BarChart3 className="w-5 h-5 text-white" />
-                    </div>
-                  </div>
-                </div>
+                          <div className="bg-white rounded-3xl border border-gray-100 p-4 shadow-sm flex flex-col h-[140px] dark:bg-[#0f172a] dark:border-slate-800 text-right">
+                             <div className="flex justify-between items-start mb-2">
+                                <div className="w-8 h-8 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center shrink-0">
+                                   <ShoppingCart className="w-4 h-4" />
+                                </div>
+                                <span className="text-[10px] font-bold text-gray-500">إجمالي الطلبات</span>
+                             </div>
+                             <p className="font-extrabold text-gray-900 text-xl tracking-tight mb-2">320</p>
+                             <div className="mt-auto flex justify-between items-end">
+                                <span className="text-[10px] font-bold text-emerald-500 flex items-center gap-0.5"><ArrowUpRight className="w-3 h-3"/> +8.2%</span>
+                                <svg width="40" height="20" viewBox="0 0 40 20" className="overflow-visible"><path d="M0,20 L10,10 L20,15 L30,5 L40,10" fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                             </div>
+                          </div>
 
-              </div>
+                          <div className="bg-white rounded-3xl border border-gray-100 p-4 shadow-sm flex flex-col h-[140px] dark:bg-[#0f172a] dark:border-slate-800 text-right">
+                             <div className="flex justify-between items-start mb-2">
+                                <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center shrink-0">
+                                   <Users className="w-4 h-4" />
+                                </div>
+                                <span className="text-[10px] font-bold text-gray-500">إجمالي العملاء</span>
+                             </div>
+                             <p className="font-extrabold text-gray-900 text-xl tracking-tight mb-2">12,456</p>
+                             <div className="mt-auto flex justify-between items-end">
+                                <span className="text-[10px] font-bold text-emerald-500 flex items-center gap-0.5"><ArrowUpRight className="w-3 h-3"/> +15.3%</span>
+                                <svg width="40" height="20" viewBox="0 0 40 20" className="overflow-visible"><path d="M0,15 L10,5 L20,10 L30,0 L40,10" fill="none" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                             </div>
+                          </div>
+                      </div>
+
+                      {/* Bottom Row */}
+                      <div className="flex gap-4 h-full flex-row" style={{ direction: 'rtl' }}>
+                          <div className="flex-1 bg-white rounded-3xl border border-gray-100 p-5 shadow-sm flex flex-col dark:bg-[#0f172a] dark:border-slate-800">
+                             <div className="flex justify-between items-center mb-6">
+                                <h4 className="text-sm font-extrabold text-gray-800">أحدث الطلبات</h4>
+                                <span className="text-[10px] font-bold text-purple-600">عرض الكل</span>
+                             </div>
+                             <div className="flex flex-col gap-4 flex-1">
+                                <div className="flex flex-row-reverse justify-between items-center py-1">
+                                  <div className="flex flex-row-reverse items-center gap-6 w-full text-xs font-bold font-mono justify-between px-2">
+                                     <span className="text-gray-400">#1258</span>
+                                     <span className="text-gray-900">محمد السليمي</span>
+                                     <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-500">مكتمل</span>
+                                     <span className="text-gray-900">450 ريال</span>
+                                  </div>
+                                </div>
+                                <div className="flex flex-row-reverse justify-between items-center py-1">
+                                  <div className="flex flex-row-reverse items-center gap-6 w-full text-xs font-bold font-mono justify-between px-2">
+                                     <span className="text-gray-400">#1257</span>
+                                     <span className="text-gray-900">سارة العتيبي</span>
+                                     <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-500">قيد الشحن</span>
+                                     <span className="text-gray-900">230 ريال</span>
+                                  </div>
+                                </div>
+                                <div className="flex flex-row-reverse justify-between items-center py-1">
+                                  <div className="flex flex-row-reverse items-center gap-6 w-full text-xs font-bold font-mono justify-between px-2">
+                                     <span className="text-gray-400">#1256</span>
+                                     <span className="text-gray-900">خالد الحربي</span>
+                                     <span className="px-2 py-0.5 rounded-full bg-rose-50 text-rose-500">ملغى</span>
+                                     <span className="text-gray-900">150 ريال</span>
+                                  </div>
+                                </div>
+                             </div>
+                          </div>
+
+                          <div className="w-[50%] bg-white rounded-3xl border border-gray-100 p-5 shadow-sm flex flex-col relative dark:bg-[#0f172a] dark:border-slate-800">
+                             <div className="flex justify-between items-center mb-4">
+                               <h4 className="text-sm font-extrabold text-gray-800">أداء المبيعات</h4>
+                               <span className="text-[10px] font-bold text-gray-500 flex items-center gap-1 border rounded-md px-2 py-1">آخر 30 يوم <ChevronDown className="w-3 h-3"/></span>
+                             </div>
+                             <div className="flex-1 relative w-full mt-4">
+                                {/* SVG Line chart matching bottom left */}
+                                <svg viewBox="0 0 200 80" className="w-full h-full overflow-visible" preserveAspectRatio="none">
+                                 <defs>
+                                   <linearGradient id="grad2" x1="0" y1="0" x2="0" y2="1">
+                                     <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.2"/>
+                                     <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0"/>
+                                   </linearGradient>
+                                 </defs>
+                                 <path d="M0,70 L40,50 L80,70 L120,30 L160,50 L200,20 L200,80 L0,80 Z" fill="url(#grad2)"/>
+                                 <path d="M0,70 L40,50 L80,70 L120,30 L160,50 L200,20" fill="none" stroke="#8b5cf6" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                 <circle cx="120" cy="30" r="3" fill="#8b5cf6" stroke="white" strokeWidth="1.5" />
+                                 <rect x="100" y="5" width="40" height="15" rx="3" fill="#8b5cf6" />
+                                 <text x="120" y="15" fontSize="6" fill="white" fontWeight="bold" textAnchor="middle">ريال 15,230</text>
+                               </svg>
+                               <div className="absolute bottom-[-10px] left-0 w-full flex justify-between text-[8px] text-gray-400 font-bold">
+                                  <span>29 مايو</span>
+                                  <span>8 مايو</span>
+                                  <span>15 مايو</span>
+                                  <span>22 مايو</span>
+                                  <span>1 مايو</span>
+                               </div>
+                               <div className="absolute top-0 right-[-15px] h-full flex flex-col justify-between text-[8px] text-gray-400 font-bold items-end">
+                                  <span>20K</span>
+                                  <span>15K</span>
+                                  <span>10K</span>
+                                  <span>5K</span>
+                                  <span>0</span>
+                               </div>
+                             </div>
+                          </div>
+                      </div>
+                  </div>
+               </div>
             </div>
           </motion.div>
 
@@ -443,62 +507,159 @@ const Index = () => {
 
       {/* ===== FEATURES SECTION ===== */}
       <section id="features" className="py-24 bg-white dark:bg-[#15151c] relative transition-colors">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 overflow-x-hidden lg:overflow-x-visible">
           
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-purple-600 font-bold bg-purple-50 dark:bg-purple-900/20 px-4 py-1.5 rounded-full text-sm inline-block mb-4 border border-purple-100 dark:border-purple-800/40">لماذا Suriix؟</span>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white mb-6">كل ما تحتاجه لبناء متجر ناجح</h2>
-            <p className="text-lg text-gray-600 dark:text-gray-400">من الأدوات الذكية إلى التصميمات الاحترافية، نوفر لك كل ما تحتاجه للتركيز على ما يهم حقاً: نمو متجرك.</p>
+          <div className="text-center max-w-2xl mx-auto mb-12 lg:mb-24 relative z-10">
+            <span className="text-purple-600 font-bold bg-purple-50 dark:bg-purple-900/20 px-5 py-2 rounded-full text-sm inline-block mb-6 border border-purple-100 dark:border-purple-800/40">لماذا Suriix ؟؟</span>
+            <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-6 leading-tight tracking-tight">
+               كل ما تحتاجه لبناء <br className="hidden md:block" />
+               <span className="text-purple-600">متجر ناجح</span>
+            </h2>
+            <p className="text-lg text-gray-500 dark:text-gray-400 font-medium pb-4">
+              من الأدوات الذكية إلى التصاميم الاحترافية، نوفر لك كل ما تحتاجه للتركيز على ما يهم حقاً: نمو متجرك.
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                icon: <LayoutDashboard className="w-6 h-6 text-purple-600" />,
-                title: "إدارة ذكية",
-                desc: "لوحة تحكم متكاملة لإدارة المنتجات، الطلبات، والعملاء بسهولة تامة.",
-                soon: false
-              },
-              {
-                icon: <Palette className="w-6 h-6 text-fuchsia-600" />,
-                title: "تصاميم احترافية",
-                desc: "قوالب حديثة ومتجاوبة تعكس هوية علامتك التجارية بشكل مبهر.",
-                soon: true
-              },
-              {
-                icon: <Zap className="w-6 h-6 text-yellow-500" />,
-                title: "إنشاء سريع وسهل",
-                desc: "أنشئ متجرك في دقائق بدون تعقيد أو أي خبرة برمجية سابقة.",
-                soon: false
-              },
-              {
-                icon: <BarChart4 className="w-6 h-6 text-blue-500" />,
-                title: "تحليلات وتقارير",
-                desc: "تقارير دقيقة تساعدك على اتخاذ قرارات ذكية وتطوير متجرك.",
-                soon: false
-              },
-            ].map((feature, idx) => (
-              <motion.div 
-                key={idx}
-                variants={fadeUp}
-                initial="initial"
-                whileInView="animate"
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.1 }}
-                className={`relative bg-white dark:bg-[#1a1a24] p-8 rounded-2xl border shadow-sm hover:shadow-xl transition-all duration-300 group flex items-start space-x-6 space-x-reverse ${feature.soon ? 'border-fuchsia-100 dark:border-fuchsia-900/40 opacity-80' : 'border-gray-100 dark:border-white/5 hover:border-purple-100 dark:hover:border-purple-800/40'}`}
-              >
-                {feature.soon && (
-                  <span className="absolute top-4 left-4 bg-fuchsia-100 dark:bg-fuchsia-900/30 text-fuchsia-600 dark:text-fuchsia-400 text-[10px] font-bold px-2.5 py-1 rounded-full border border-fuchsia-200 dark:border-fuchsia-800/40">قريباً</span>
-                )}
-                <div className="w-14 h-14 rounded-xl bg-gray-50 dark:bg-white/5 flex items-center justify-center shrink-0 group-hover:bg-purple-50 dark:group-hover:bg-purple-900/20 transition-colors">
-                  <div className="group-hover:scale-110 transition-transform">{feature.icon}</div>
+          {/* Desktop Circular Layout (hidden on mobile, visible lg) */}
+          <div className="relative hidden lg:flex h-[760px] mx-auto items-center justify-center mt-8 mb-16 pointer-events-none" style={{ width: '100%' }}>
+             
+             {/* Abstract Origin Point at absolute center */}
+             <div className="absolute left-1/2 top-1/2 w-0 h-0 flex items-center justify-center">
+             
+                 {/* 1. The Dashed Ring (r = 180px -> w=360px) */}
+                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[360px] h-[360px] rounded-full border-[1.5px] border-dashed border-purple-200 dark:border-white/10 -z-10" />
+
+                 {/* 2. The Center Graphic */}
+                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[11rem] h-[11rem] bg-gradient-to-br from-[#aa48f8] to-[#7f34f8] rounded-[3rem] shadow-[0_30px_60px_-15px_rgba(155,77,255,0.6)] flex items-center justify-center text-white z-10 transform hover:scale-105 transition-transform duration-700 ease-out group pointer-events-auto">
+                     <span className="font-display font-extrabold text-[5.5rem] opacity-95 drop-shadow-xl select-none" style={{ textShadow: "0 10px 30px rgba(0,0,0,0.2)" }}>S</span>
+                     <div className="absolute inset-0 bg-gradient-to-tr from-white/0 to-white/20 rounded-[3rem] opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                     <div className="absolute -top-3 -right-3 w-9 h-9 bg-gray-900 rounded-full border-4 border-white dark:border-[#15151c] shadow-lg flex items-center justify-center -z-10 group-hover:-translate-y-2 transition-transform duration-500">
+                        <ShoppingBag className="w-4 h-4 text-white" />
+                     </div>
+                 </div>
+
+                 {/* ========== CARD 01: TOP ========== */}
+                 {/* Dot at y=-180px */}
+                 <div className="absolute left-1/2 bottom-[180px] -translate-x-1/2 translate-y-1/2 w-3.5 h-3.5 rounded-full bg-purple-500 ring-[6px] ring-white dark:ring-[#15151c] z-10" />
+                 {/* Connecting line UP to card (Length: 50px) */}
+                 <div className="absolute left-1/2 bottom-[180px] -translate-x-1/2 w-[1.5px] h-[50px] border-l-[1.5px] border-dashed border-purple-200 dark:border-white/10" />
+                 {/* The Card (Bottom edge touching y=-230px) */}
+                 <div className="absolute bottom-[230px] left-1/2 -translate-x-1/2 z-20 pointer-events-auto">
+                     <div className="w-[310px] bg-white dark:bg-[#1a1a24] rounded-[2rem] p-4 flex flex-row items-center shadow-[0_20px_50px_-12px_rgba(0,0,0,0.08)] dark:shadow-purple-900/10 border border-gray-50 dark:border-white/5 relative group hover:-translate-y-2 transition-transform duration-500 ease-out text-right cursor-default">
+                        <div className="absolute -top-3 right-8 bg-purple-100 dark:bg-purple-900/60 text-purple-700 dark:text-purple-300 px-3.5 py-1.5 rounded-full font-extrabold text-[11px] ring-4 ring-white dark:ring-[#1a1a24]">01</div>
+                        <div className="flex-1 pr-4 pl-0">
+                           <h3 className="font-extrabold text-[15px] text-gray-900 dark:text-white mb-2 group-hover:text-purple-600 transition-colors">إنشاء سريع وسهل</h3>
+                           <p className="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed font-bold block">أنشئ متجرك في دقائق بدون أي تعقيد أو خبرة برمجية سابقة.</p>
+                        </div>
+                        <div className="w-[60px] h-[60px] rounded-[1.5rem] bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0 ml-2">
+                           <Zap className="w-7 h-7 fill-purple-600 dark:fill-purple-400" />
+                        </div>
+                     </div>
+                 </div>
+
+                 {/* ========== CARD 03: BOTTOM ========== */}
+                 {/* Dot at y=180px */}
+                 <div className="absolute left-1/2 top-[180px] -translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full bg-blue-500 ring-[6px] ring-white dark:ring-[#15151c] z-10" />
+                 {/* Connecting line DOWN to card (Length: 50px) */}
+                 <div className="absolute left-1/2 top-[180px] -translate-x-1/2 w-[1.5px] h-[50px] border-l-[1.5px] border-dashed border-blue-200 dark:border-white/10" />
+                 {/* The Card (Top edge touching y=230px) */}
+                 <div className="absolute top-[230px] left-1/2 -translate-x-1/2 z-20 pointer-events-auto">
+                     <div className="w-[310px] bg-white dark:bg-[#1a1a24] rounded-[2rem] p-4 flex flex-row items-center shadow-[0_20px_50px_-12px_rgba(0,0,0,0.08)] dark:shadow-blue-900/10 border border-gray-50 dark:border-white/5 relative group hover:translate-y-2 transition-transform duration-500 ease-out text-right cursor-default">
+                        <div className="absolute -top-3 right-8 bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 px-3.5 py-1.5 rounded-full font-extrabold text-[11px] ring-4 ring-white dark:ring-[#1a1a24]">03</div>
+                        <div className="flex-1 pr-4 pl-0">
+                           <h3 className="font-extrabold text-[15px] text-gray-900 dark:text-white mb-2 group-hover:text-blue-600 transition-colors">إدارة ذكية</h3>
+                           <p className="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed font-bold block">لوحة تحكم متكاملة لإدارة المنتجات، الطلبات والعملاء بسهولة تامة.</p>
+                        </div>
+                        <div className="w-[60px] h-[60px] rounded-[1.5rem] bg-blue-50 dark:bg-blue-900/30 text-blue-500 dark:text-blue-400 flex items-center justify-center shrink-0 ml-2">
+                           <LayoutDashboard className="w-7 h-7 fill-blue-500 dark:fill-blue-400" />
+                        </div>
+                     </div>
+                 </div>
+
+                 {/* ========== CARD 02: RIGHT ========== */}
+                 <div className="absolute top-1/2 right-[-180px] -translate-y-1/2 translate-x-1/2 w-3.5 h-3.5 rounded-full bg-pink-500 ring-[6px] ring-white dark:ring-[#15151c] z-10" />
+                 <div className="absolute top-1/2 right-[-180px] -translate-y-1/2 w-[60px] h-[1.5px] border-t-[1.5px] border-dashed border-pink-200 dark:border-white/10" />
+                 <div className="absolute top-1/2 left-[240px] -translate-y-1/2 z-20 pointer-events-auto">
+                     <div className="w-[310px] bg-white dark:bg-[#1a1a24] rounded-[2rem] p-4 flex flex-row items-center shadow-[0_20px_50px_-12px_rgba(0,0,0,0.08)] dark:shadow-pink-900/10 border border-gray-50 dark:border-white/5 relative group hover:translate-x-2 transition-transform duration-500 ease-out text-right cursor-default">
+                        <div className="absolute -top-3 right-8 bg-pink-100 dark:bg-pink-900/60 text-pink-700 dark:text-pink-300 px-3.5 py-1.5 rounded-full font-extrabold text-[11px] ring-4 ring-white dark:ring-[#1a1a24]">02</div>
+                        <div className="flex-1 pr-4 pl-0">
+                           <h3 className="font-extrabold text-[15px] text-gray-900 dark:text-white mb-2 group-hover:text-pink-600 transition-colors">تصاميم احترافية</h3>
+                           <p className="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed font-bold block">قوالب حديثة ومتجاوبة تعكس هوية علامتك التجارية بشكل مميز.</p>
+                        </div>
+                        <div className="w-[60px] h-[60px] rounded-[1.5rem] bg-pink-50 dark:bg-pink-900/30 text-pink-500 dark:text-pink-400 flex items-center justify-center shrink-0 ml-2">
+                           <Palette className="w-7 h-7 fill-pink-500 dark:fill-pink-400" />
+                        </div>
+                     </div>
+                 </div>
+
+                 {/* ========== CARD 04: LEFT ========== */}
+                 <div className="absolute top-1/2 left-[-180px] -translate-y-1/2 -translate-x-1/2 w-3.5 h-3.5 rounded-full bg-emerald-500 ring-[6px] ring-white dark:ring-[#15151c] z-10" />
+                 <div className="absolute top-1/2 left-[-180px] -translate-y-1/2 w-[60px] h-[1.5px] border-t-[1.5px] border-dashed border-emerald-200 dark:border-white/10 -translate-x-[100%]" />
+                 <div className="absolute top-1/2 right-[240px] -translate-y-1/2 z-20 pointer-events-auto">
+                     <div className="w-[310px] bg-white dark:bg-[#1a1a24] rounded-[2rem] p-4 flex flex-row items-center shadow-[0_20px_50px_-12px_rgba(0,0,0,0.08)] dark:shadow-emerald-900/10 border border-gray-50 dark:border-white/5 relative group hover:-translate-x-2 transition-transform duration-500 ease-out text-right cursor-default">
+                        <div className="absolute -top-3 right-8 bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 px-3.5 py-1.5 rounded-full font-extrabold text-[11px] ring-4 ring-white dark:ring-[#1a1a24]">04</div>
+                        <div className="flex-1 pr-4 pl-0">
+                           <h3 className="font-extrabold text-[15px] text-gray-900 dark:text-white mb-2 group-hover:text-emerald-600 transition-colors">تحليلات وتقارير</h3>
+                           <p className="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed font-bold block">تقارير دقيقة تساعدك على اتخاذ قرارات ذكية وتطوير متجرك.</p>
+                        </div>
+                        <div className="w-[60px] h-[60px] rounded-[1.5rem] bg-emerald-50 dark:bg-emerald-900/30 text-emerald-500 dark:text-emerald-400 flex items-center justify-center shrink-0 ml-2">
+                           <BarChart4 className="w-7 h-7 fill-emerald-500 dark:fill-emerald-400" />
+                        </div>
+                     </div>
+                 </div>
+
+             </div>
+          </div>
+
+          {/* Mobile Linear Layout (visible only on mobile/tablet) */}
+          <div className="lg:hidden flex flex-col gap-6 w-full max-w-md mx-auto z-20 relative px-4 mt-8">
+             {/* Card 01 */}
+             <div className="w-full bg-white dark:bg-[#1a1a24] rounded-[2rem] p-5 flex flex-row items-center shadow-[0_20px_50px_-12px_rgba(0,0,0,0.08)] dark:shadow-purple-900/10 border border-gray-50 dark:border-white/5 relative group transition-transform duration-300 text-right cursor-default">
+                <div className="absolute -top-3 right-8 bg-purple-100 dark:bg-purple-900/60 text-purple-700 dark:text-purple-300 px-4 py-1.5 rounded-full font-extrabold text-[11px] ring-4 ring-white dark:ring-[#1a1a24]">01</div>
+                <div className="flex-1 pr-4 pl-2">
+                   <h3 className="font-extrabold text-[16px] text-gray-900 dark:text-white mb-2">إنشاء سريع وسهل</h3>
+                   <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed font-bold block">أنشئ متجرك في دقائق بدون أي تعقيد أو خبرة برمجية سابقة.</p>
                 </div>
-                <div>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">{feature.title}</h3>
-                  <p className="text-gray-600 dark:text-gray-400 leading-relaxed text-sm">{feature.desc}</p>
+                <div className="w-[65px] h-[65px] rounded-[1.5rem] bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0 ml-2">
+                   <Zap className="w-8 h-8 fill-purple-600 dark:fill-purple-400" />
                 </div>
-              </motion.div>
-            ))}
+             </div>
+
+             {/* Card 02 */}
+             <div className="w-full bg-white dark:bg-[#1a1a24] rounded-[2rem] p-5 flex flex-row items-center shadow-[0_20px_50px_-12px_rgba(0,0,0,0.08)] dark:shadow-pink-900/10 border border-gray-50 dark:border-white/5 relative group transition-transform duration-300 text-right cursor-default">
+                <div className="absolute -top-3 right-8 bg-pink-100 dark:bg-pink-900/60 text-pink-700 dark:text-pink-300 px-4 py-1.5 rounded-full font-extrabold text-[11px] ring-4 ring-white dark:ring-[#1a1a24]">02</div>
+                <div className="flex-1 pr-4 pl-2">
+                   <h3 className="font-extrabold text-[16px] text-gray-900 dark:text-white mb-2">تصاميم احترافية</h3>
+                   <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed font-bold block">قوالب حديثة ومتجاوبة تعكس هوية علامتك التجارية بشكل مميز.</p>
+                </div>
+                <div className="w-[65px] h-[65px] rounded-[1.5rem] bg-pink-50 dark:bg-pink-900/30 text-pink-500 dark:text-pink-400 flex items-center justify-center shrink-0 ml-2">
+                   <Palette className="w-8 h-8 fill-pink-500 dark:fill-pink-400" />
+                </div>
+             </div>
+
+             {/* Card 03 */}
+             <div className="w-full bg-white dark:bg-[#1a1a24] rounded-[2rem] p-5 flex flex-row items-center shadow-[0_20px_50px_-12px_rgba(0,0,0,0.08)] dark:shadow-blue-900/10 border border-gray-50 dark:border-white/5 relative group transition-transform duration-300 text-right cursor-default">
+                <div className="absolute -top-3 right-8 bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 px-4 py-1.5 rounded-full font-extrabold text-[11px] ring-4 ring-white dark:ring-[#1a1a24]">03</div>
+                <div className="flex-1 pr-4 pl-2">
+                   <h3 className="font-extrabold text-[16px] text-gray-900 dark:text-white mb-2">إدارة ذكية</h3>
+                   <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed font-bold block">لوحة تحكم متكاملة لإدارة المنتجات، الطلبات والعملاء بسهولة تامة.</p>
+                </div>
+                <div className="w-[65px] h-[65px] rounded-[1.5rem] bg-blue-50 dark:bg-blue-900/30 text-blue-500 dark:text-blue-400 flex items-center justify-center shrink-0 ml-2">
+                   <LayoutDashboard className="w-8 h-8 fill-blue-500 dark:fill-blue-400" />
+                </div>
+             </div>
+
+             {/* Card 04 */}
+             <div className="w-full bg-white dark:bg-[#1a1a24] rounded-[2rem] p-5 flex flex-row items-center shadow-[0_20px_50px_-12px_rgba(0,0,0,0.08)] dark:shadow-emerald-900/10 border border-gray-50 dark:border-white/5 relative group transition-transform duration-300 text-right cursor-default">
+                <div className="absolute -top-3 right-8 bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 px-4 py-1.5 rounded-full font-extrabold text-[11px] ring-4 ring-white dark:ring-[#1a1a24]">04</div>
+                <div className="flex-1 pr-4 pl-2">
+                   <h3 className="font-extrabold text-[16px] text-gray-900 dark:text-white mb-2">تحليلات وتقارير</h3>
+                   <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed font-bold block">تقارير دقيقة تساعدك على اتخاذ قرارات ذكية وتطوير متجرك.</p>
+                </div>
+                <div className="w-[65px] h-[65px] rounded-[1.5rem] bg-emerald-50 dark:bg-emerald-900/30 text-emerald-500 dark:text-emerald-400 flex items-center justify-center shrink-0 ml-2">
+                   <BarChart4 className="w-8 h-8 fill-emerald-500 dark:fill-emerald-400" />
+                </div>
+             </div>
           </div>
 
         </div>
