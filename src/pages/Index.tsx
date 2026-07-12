@@ -10,7 +10,7 @@ import {
   CheckCircle2,
   Home, Package, BarChart3, Users, Settings, LogOut, ArrowUpRight, 
   ChevronDown, Headphones, Watch, Briefcase, Sparkles, Clock, Code2, Headset,
-  Mail, Moon, Sun
+  Mail, Moon, Sun, Menu, X
 } from "lucide-react";
 
 const fadeUp = {
@@ -21,6 +21,7 @@ const fadeUp = {
 
 const Index = () => {
   const [isDark, setIsDark] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('suriix_theme');
@@ -54,7 +55,7 @@ const Index = () => {
               <span className="font-bold text-2xl tracking-tight text-gray-900 dark:text-white bg-clip-text">Suriix</span>
             </div>
 
-            {/* Nav Links */}
+            {/* Nav Links - Desktop */}
             <div className="hidden md:flex space-x-8 space-x-reverse items-center justify-center flex-1">
               <a href="#" className="relative text-purple-700 dark:text-purple-400 font-black hover:text-purple-800 dark:hover:text-purple-300 transition">
                 الرئيسية
@@ -86,11 +87,32 @@ const Index = () => {
               <Link to="/create-store?mode=login" className="hidden sm:inline-flex text-gray-700 dark:text-gray-200 font-extrabold border border-gray-200 dark:border-white/10 hover:border-gray-300 dark:hover:border-white/20 hover:bg-gray-50 dark:hover:bg-white/5 transition px-6 py-2.5 rounded-xl text-sm dark:bg-[#0f172a]">
                 تسجيل الدخول
               </Link>
-              <Link to="/create-store" className="bg-gradient-to-r from-purple-600 to-fuchsia-500 hover:from-purple-700 hover:to-fuchsia-600 text-white px-8 py-2.5 rounded-xl font-bold shadow-md hover:shadow-lg transition-all duration-300 text-sm">
+              <Link to="/create-store" className="hidden sm:inline-flex bg-gradient-to-r from-purple-600 to-fuchsia-500 hover:from-purple-700 hover:to-fuchsia-600 text-white px-8 py-2.5 rounded-xl font-bold shadow-md hover:shadow-lg transition-all duration-300 text-sm">
                 ابدأ الآن
               </Link>
+              {/* Mobile hamburger */}
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="md:hidden w-10 h-10 flex items-center justify-center rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-300"
+              >
+                {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </button>
             </div>
           </div>
+
+          {/* Mobile Menu */}
+          {isMobileMenuOpen && (
+            <div className="md:hidden border-t border-gray-100 dark:border-white/5 py-4 space-y-1">
+              <a href="#" className="block px-4 py-3 text-sm font-bold text-purple-700 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-white/5 rounded-xl">الرئيسية</a>
+              <a href="#features" onClick={() => setIsMobileMenuOpen(false)} className="block px-4 py-3 text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl">المميزات</a>
+              <a href="#pricing" onClick={() => setIsMobileMenuOpen(false)} className="block px-4 py-3 text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl">الأسعار</a>
+              <a href="#templates" onClick={() => setIsMobileMenuOpen(false)} className="block px-4 py-3 text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl">قوالب المتاجر</a>
+              <div className="border-t border-gray-100 dark:border-white/5 pt-3 mt-3 flex flex-col gap-2 px-4">
+                <Link to="/create-store?mode=login" onClick={() => setIsMobileMenuOpen(false)} className="w-full text-center py-3 font-bold text-sm border border-gray-200 dark:border-white/10 rounded-xl text-gray-700 dark:text-gray-200">تسجيل الدخول</Link>
+                <Link to="/create-store" onClick={() => setIsMobileMenuOpen(false)} className="w-full text-center py-3 font-bold text-sm bg-gradient-to-r from-purple-600 to-fuchsia-500 text-white rounded-xl">ابدأ الآن</Link>
+              </div>
+            </div>
+          )}
         </div>
       </nav>
 
@@ -543,30 +565,30 @@ const Index = () => {
             <div>
               <h4 className="font-bold text-gray-900 dark:text-white mb-6">الشركة</h4>
               <ul className="space-y-3 text-sm text-gray-500 dark:text-gray-400 font-medium">
-                <li><a href="#" className="hover:text-purple-600 dark:hover:text-purple-400">من نحن</a></li>
-                <li><a href="#" className="hover:text-purple-600 dark:hover:text-purple-400">المدونة</a></li>
-                <li><a href="#" className="hover:text-purple-600 dark:hover:text-purple-400">وظائف</a></li>
-                <li><a href="#" className="hover:text-purple-600 dark:hover:text-purple-400">تواصل معنا</a></li>
+                <li><Link to="/about" className="hover:text-purple-600 dark:hover:text-purple-400">من نحن</Link></li>
+                <li><Link to="/blog" className="hover:text-purple-600 dark:hover:text-purple-400">المدونة</Link></li>
+                <li><Link to="/careers" className="hover:text-purple-600 dark:hover:text-purple-400">وظائف</Link></li>
+                <li><Link to="/contact" className="hover:text-purple-600 dark:hover:text-purple-400">تواصل معنا</Link></li>
               </ul>
             </div>
 
             <div>
               <h4 className="font-bold text-gray-900 dark:text-white mb-6">الدعم</h4>
               <ul className="space-y-3 text-sm text-gray-500 dark:text-gray-400 font-medium">
-                <li><a href="#" className="hover:text-purple-600 dark:hover:text-purple-400">مركز المساعدة</a></li>
-                <li><a href="#" className="hover:text-purple-600 dark:hover:text-purple-400">الشروط والأحكام</a></li>
-                <li><a href="#" className="hover:text-purple-600 dark:hover:text-purple-400">سياسة الخصوصية</a></li>
-                <li><a href="#" className="hover:text-purple-600 dark:hover:text-purple-400">الأسئلة الشائعة</a></li>
+                <li><Link to="/help" className="hover:text-purple-600 dark:hover:text-purple-400">مركز المساعدة</Link></li>
+                <li><Link to="/terms" className="hover:text-purple-600 dark:hover:text-purple-400">الشروط والأحكام</Link></li>
+                <li><Link to="/privacy" className="hover:text-purple-600 dark:hover:text-purple-400">سياسة الخصوصية</Link></li>
+                <li><Link to="/faq" className="hover:text-purple-600 dark:hover:text-purple-400">الأسئلة الشائعة</Link></li>
               </ul>
             </div>
 
             <div>
               <h4 className="font-bold text-gray-900 dark:text-white mb-6">الموارد</h4>
               <ul className="space-y-3 text-sm text-gray-500 dark:text-gray-400 font-medium">
-                <li><a href="#" className="hover:text-purple-600 dark:hover:text-purple-400">دليل البدء</a></li>
-                <li><a href="#" className="hover:text-purple-600 dark:hover:text-purple-400">أدوات مجانية</a></li>
-                <li><a href="#" className="hover:text-purple-600 dark:hover:text-purple-400">شركاؤنا تقنياً</a></li>
-                <li><a href="#" className="hover:text-purple-600 dark:hover:text-purple-400">التحديثات</a></li>
+                <li><Link to="/guide" className="hover:text-purple-600 dark:hover:text-purple-400">دليل البدء</Link></li>
+                <li><Link to="/tools" className="hover:text-purple-600 dark:hover:text-purple-400">أدوات مجانية</Link></li>
+                <li><Link to="/partners" className="hover:text-purple-600 dark:hover:text-purple-400">شركاؤنا تقنياً</Link></li>
+                <li><Link to="/updates" className="hover:text-purple-600 dark:hover:text-purple-400">التحديثات</Link></li>
               </ul>
             </div>
 

@@ -27,6 +27,20 @@ const MarketerSignup = lazy(() => import("./pages/MarketerSignup"));
 const MarketerDashboard = lazy(() => import("./pages/MarketerDashboard"));
 const RefForwarder = lazy(() => import("./pages/RefForwarder"));
 
+// Static pages
+const About = lazy(() => import("./pages/static/About"));
+const Blog = lazy(() => import("./pages/static/Blog"));
+const Careers = lazy(() => import("./pages/static/Careers"));
+const Contact = lazy(() => import("./pages/static/Contact"));
+const HelpCenter = lazy(() => import("./pages/static/HelpCenter"));
+const Terms = lazy(() => import("./pages/static/Terms"));
+const Privacy = lazy(() => import("./pages/static/Privacy"));
+const FAQ = lazy(() => import("./pages/static/FAQ"));
+const GettingStarted = lazy(() => import("./pages/static/GettingStarted"));
+const FreeTools = lazy(() => import("./pages/static/FreeTools"));
+const TechnicalPartners = lazy(() => import("./pages/static/TechnicalPartners"));
+const Updates = lazy(() => import("./pages/static/Updates"));
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -85,6 +99,18 @@ const App = () => {
                     <Route path="/marketer/dashboard" element={<MarketerDashboard />} />
                     <Route path="/ref/:code" element={<RefForwarder />} />
                     <Route path="/ref" element={<RefForwarder />} />
+                    <Route path="/about" element={<About />} />
+                    <Route path="/blog" element={<Blog />} />
+                    <Route path="/careers" element={<Careers />} />
+                    <Route path="/contact" element={<Contact />} />
+                    <Route path="/help" element={<HelpCenter />} />
+                    <Route path="/terms" element={<Terms />} />
+                    <Route path="/privacy" element={<Privacy />} />
+                    <Route path="/faq" element={<FAQ />} />
+                    <Route path="/getting-started" element={<GettingStarted />} />
+                    <Route path="/free-tools" element={<FreeTools />} />
+                    <Route path="/partners" element={<TechnicalPartners />} />
+                    <Route path="/updates" element={<Updates />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </Suspense>

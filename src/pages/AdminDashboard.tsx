@@ -8,12 +8,13 @@ import {
   Settings, LogOut, Bell, Sun, Moon, Search, ChevronLeft, Hexagon,
   Eye, Edit, Trash2, Plus, CheckCircle2, XCircle, MoreVertical,
   Filter, AlertTriangle, Download, Wallet, ArrowUpFromLine, Gift,
-  Clock, FileText, Check, ChevronRight, Lock, TrendingUp
+  Clock, FileText, Check, ChevronRight, Lock, TrendingUp, Menu, X
 } from 'lucide-react';
 
 const AdminDashboard = () => {
   const [activeSection, setActiveSection] = useState('overview');
   const [isDark, setIsDark] = useState(document.documentElement.classList.contains('dark'));
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   // Data States
   const [usersList, setUsersList] = useState<any[]>([]);
@@ -551,8 +552,21 @@ const AdminDashboard = () => {
   return (
     <div className="min-h-screen bg-[#F9F9FC] dark:bg-[#111116] flex font-sans text-gray-800 dark:text-gray-200" dir="rtl">
 
-      {/* SIDEBAR */}
-      <aside className="w-72 bg-white dark:bg-[#1A1A24] border-l border-gray-100 dark:border-white/5 flex flex-col transition-all h-screen sticky top-0 shrink-0 shadow-sm z-10">
+      {/* MOBILE SIDEBAR BACKDROP */}
+      {isMobileSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+          onClick={() => setIsMobileSidebarOpen(false)}
+        />
+      )}
+
+      {/* SIDEBAR — fixed overlay on mobile, sticky in-flow on desktop */}
+      <aside className={`
+        fixed inset-y-0 right-0 w-72 bg-white dark:bg-[#1A1A24] border-l border-gray-100 dark:border-white/5 flex flex-col shadow-xl z-40
+        transition-transform duration-300 ease-in-out
+        ${isMobileSidebarOpen ? 'translate-x-0' : 'translate-x-full'}
+        lg:relative lg:translate-x-0 lg:top-0 lg:h-screen lg:sticky lg:z-10 lg:shrink-0 lg:shadow-sm
+      `}>
 
         {/* LOGO */}
         <div className="h-20 flex items-center justify-center border-b border-gray-50 dark:border-white/5 mx-4">
@@ -574,7 +588,7 @@ const AdminDashboard = () => {
             return (
               <button
                 key={item.id}
-                onClick={() => setActiveSection(item.id)}
+                onClick={() => { setActiveSection(item.id); setIsMobileSidebarOpen(false); }}
                 className={`w-full flex items-center gap-3.5 px-6 py-3.5 transition-all font-bold text-sm
                 ${active
                     ? 'bg-purple-50 text-purple-600 dark:bg-purple-500/10 dark:text-purple-400 border-r-4 border-purple-600'
@@ -618,10 +632,17 @@ const AdminDashboard = () => {
       <main className="flex-1 flex flex-col min-h-screen">
 
         {/* HEADER */}
-        <header className="h-20 bg-white dark:bg-[#1A1A24] border-b border-gray-100 dark:border-white/5 flex items-center justify-between px-8 sticky top-0 z-10 shadow-sm">
-          <div className="flex items-center gap-3 text-sm font-bold text-gray-800 dark:text-gray-200">
-            <span className="font-black text-[15px]">المدير العام Console</span>
-            <div className="w-2 h-2 rounded-full bg-purple-600"></div>
+        <header className="h-16 lg:h-20 bg-white dark:bg-[#1A1A24] border-b border-gray-100 dark:border-white/5 flex items-center justify-between px-4 lg:px-8 sticky top-0 z-20 shadow-sm">
+          <div className="flex items-center gap-3">
+            {/* Hamburger - visible only on mobile */}
+            <button
+              onClick={() => setIsMobileSidebarOpen(true)}
+              className="lg:hidden w-10 h-10 flex items-center justify-center rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-300"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+            <span className="font-black text-[13px] lg:text-[15px] text-gray-800 dark:text-gray-200">المدير العام Console</span>
+            <div className="w-2 h-2 rounded-full bg-purple-600 hidden lg:block"></div>
           </div>
 
           <div className="flex items-center gap-6">

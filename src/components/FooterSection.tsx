@@ -36,21 +36,25 @@ const FooterSection = () => {
             <h4 className="font-semibold text-foreground mb-4">{t("footer.company")}</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li onClick={() => handleNav("/about")} className="hover:text-primary transition-colors cursor-pointer">{t("nav.about")}</li>
-              <li onClick={() => handleNav("/contact")} className="hover:text-primary transition-colors cursor-pointer">{t("nav.contact")}</li>
+              <li onClick={() => handleNav("/careers")} className="hover:text-primary transition-colors cursor-pointer">وظائف</li>
+              <li onClick={() => handleNav("/partners")} className="hover:text-primary transition-colors cursor-pointer">شركاؤنا تقنياً</li>
+              <li onClick={() => handleNav("/updates")} className="hover:text-primary transition-colors cursor-pointer">التحديثات</li>
             </ul>
           </div>
           <div>
-            <h4 className="font-semibold text-foreground mb-4">{t("footer.packages")}</h4>
+            <h4 className="font-semibold text-foreground mb-4">الدعم</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li onClick={() => handleNav("/packages")} className="hover:text-primary transition-colors cursor-pointer">{t("packages.websites")}</li>
-              <li onClick={() => handleNav("/packages")} className="hover:text-primary transition-colors cursor-pointer">{t("packages.ecommerce")}</li>
+              <li onClick={() => handleNav("/help")} className="hover:text-primary transition-colors cursor-pointer">مركز المساعدة</li>
+              <li onClick={() => handleNav("/faq")} className="hover:text-primary transition-colors cursor-pointer">{t("nav.faq")}</li>
+              <li onClick={() => handleNav("/contact")} className="hover:text-primary transition-colors cursor-pointer">{t("nav.contact")}</li>
+              <li onClick={() => handleNav("/getting-started")} className="hover:text-primary transition-colors cursor-pointer">دليل البدء</li>
             </ul>
           </div>
           <div>
             <h4 className="font-semibold text-foreground mb-4">{t("footer.resources")}</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li onClick={() => handleNav("/faq")} className="hover:text-primary transition-colors cursor-pointer">{t("nav.faq")}</li>
               <li onClick={() => handleNav("/blog")} className="hover:text-primary transition-colors cursor-pointer">{t("nav.blog")}</li>
+              <li onClick={() => handleNav("/free-tools")} className="hover:text-primary transition-colors cursor-pointer">أدوات مجانية</li>
               <li>
                 <Link to="/privacy" className="hover:text-primary transition-colors">{t("footer.privacy")}</Link>
               </li>
