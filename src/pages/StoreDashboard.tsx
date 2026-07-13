@@ -317,7 +317,7 @@ const StoreDashboard = () => {
   const themeTextColor = isStarterTheme ? 'text-emerald-500' : isEliteTheme ? 'text-purple-600' : 'text-primary';
 
   return (
-    <div className="flex h-screen bg-[#F4F7FB] dark:bg-[#0f172a] text-slate-900 dark:text-white transition-colors" dir="rtl">
+    <div className="flex h-screen bg-[#F4F7FB] dark:bg-[#0f172a] text-slate-900 dark:text-white transition-colors overflow-hidden" dir="rtl">
 
       {/* PENDING OVERLAY */}
       {showPendingModal && (
@@ -372,35 +372,60 @@ const StoreDashboard = () => {
         </div>
       )}
 
+      {/* SIDEBAR OVERLAY - mobile backdrop */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            key="sidebar-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 bg-black/60 z-40 md:hidden backdrop-blur-[2px]"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+        )}
+      </AnimatePresence>
+
       {/* SIDEBAR */}
-      {isMobileMenuOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-40 md:hidden"
-          onClick={() => setIsMobileMenuOpen(false)}
-        />
-      )}
-      <aside className={`fixed md:relative top-0 right-0 z-50 w-[260px] bg-white dark:bg-slate-900 border-l border-border/40 dark:border-white/5 flex flex-col h-full shrink-0 shadow-sm transition-transform duration-300 ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-[260px] md:translate-x-0'}`}>
-        <div className="h-20 flex items-center gap-3 px-6 mt-2 shrink-0 justify-between md:justify-start">
+      <aside
+        className={`
+          fixed md:relative top-0 right-0 z-50
+          w-[280px] md:w-[260px]
+          bg-white dark:bg-slate-900
+          border-l border-border/40 dark:border-white/5
+          flex flex-col h-full shrink-0
+          shadow-2xl md:shadow-sm
+          transition-transform duration-300 ease-in-out
+          ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full md:translate-x-0'}
+        `}
+      >
+        {/* Sidebar Header */}
+        <div className="h-16 md:h-20 flex items-center gap-3 px-5 mt-0 md:mt-2 shrink-0 justify-between border-b border-border/30 dark:border-white/5 md:border-none">
           <div className="flex items-center gap-3">
-            <div className={`w-10 h-10 ${headerIconClass} rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg`}>
+            <div className={`w-9 h-9 md:w-10 md:h-10 ${headerIconClass} rounded-xl flex items-center justify-center text-white font-bold text-lg md:text-xl shadow-lg`}>
               {storeData.initial}
             </div>
             <div className="flex flex-col">
-              <span className="font-bold text-lg text-foreground leading-tight truncate w-24">{storeData.name}</span>
+              <span className="font-bold text-base md:text-lg text-foreground leading-tight truncate max-w-[130px]">{storeData.name}</span>
               <span className={`text-xs ${themeTextColor} font-semibold`}>لوحة التحكم</span>
             </div>
           </div>
-          <button className="md:hidden" onClick={() => setIsMobileMenuOpen(false)}>
-            <XCircle className="w-6 h-6 text-muted-foreground" />
+          <button
+            className="md:hidden p-2 rounded-xl hover:bg-muted/60 transition-colors"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            <XCircle className="w-5 h-5 text-muted-foreground" />
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-1 custom-scrollbar">
+        {/* Nav Items */}
+        <div className="flex-1 overflow-y-auto px-3 py-4 space-y-0.5 custom-scrollbar">
           {SidebarMenu.map((item) => (
             <button
               key={item.id}
               onClick={() => { setActiveTab(item.id); setIsMobileMenuOpen(false); }}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition font-medium text-[15px]
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 font-medium text-[15px]
                  ${activeTab === item.id
                   ? activeTabClass
                   : 'text-muted-foreground hover:bg-muted/80 hover:text-foreground'
@@ -413,7 +438,7 @@ const StoreDashboard = () => {
         </div>
 
         {/* Logout Button */}
-        <div className="px-4 pb-6 shrink-0">
+        <div className="px-3 pb-6 shrink-0 border-t border-border/30 dark:border-white/5 pt-3">
           <button
             onClick={async () => {
               await supabase.auth.signOut();
@@ -424,7 +449,7 @@ const StoreDashboard = () => {
               localStorage.removeItem('suriix_active_tab');
               window.location.href = '/create-store';
             }}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 font-bold text-[15px] transition"
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 font-bold text-[15px] transition-all duration-200"
           >
             <LogOut className="w-5 h-5 shrink-0" />
             <span className="flex-1 text-right">تسجيل الخروج</span>
@@ -433,33 +458,41 @@ const StoreDashboard = () => {
       </aside>
 
       {/* MAIN CONTENT */}
-      <main className="flex-1 flex flex-col h-full overflow-hidden relative">
+      <main className="flex-1 flex flex-col min-h-0 overflow-hidden relative w-full">
 
         {/* HEADER */}
-        <header className="h-20 shrink-0 px-4 md:px-8 flex items-center justify-between">
-          {/* Store Identity (Right side of Main) */}
-          <div className="flex items-center gap-3">
-            <button onClick={() => setIsMobileMenuOpen(true)} className="md:hidden p-2 text-foreground">
-              <Menu className="w-6 h-6" />
+        <header className="h-16 shrink-0 px-4 md:px-8 flex items-center justify-between bg-[#F4F7FB] dark:bg-[#0f172a] border-b border-border/20 dark:border-white/5">
+          {/* Right side: Hamburger + Store Name */}
+          <div className="flex items-center gap-2.5 min-w-0 flex-1">
+            {/* Hamburger - mobile only */}
+            <button
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="md:hidden p-2 rounded-xl bg-white dark:bg-slate-800 border border-border/40 dark:border-white/10 shadow-sm text-foreground hover:bg-muted transition-colors shrink-0"
+            >
+              <Menu className="w-5 h-5" />
             </button>
-            <div className="flex md:hidden w-10 h-10 bg-white rounded-xl border border-border/50 shadow-sm items-center justify-center shrink-0 dark:bg-[#0f172a]">
-              <span className={`font-bold ${themeTextColor} text-lg`}>{storeData.initial}</span>
+
+            {/* Store Avatar - mobile only */}
+            <div className="flex md:hidden w-8 h-8 bg-white rounded-xl border border-border/50 shadow-sm items-center justify-center shrink-0 dark:bg-[#0f172a]">
+              <span className={`font-bold ${themeTextColor} text-sm`}>{storeData.initial}</span>
             </div>
-            <div>
-              <h1 className="font-bold text-xl leading-tight truncate w-40">{storeData.name}</h1>
+
+            {/* Store Name + Status */}
+            <div className="min-w-0">
+              <h1 className="font-bold text-base md:text-xl leading-tight truncate max-w-[140px] md:max-w-none">{storeData.name}</h1>
               {!isPending ? (
-                <div className="flex items-center gap-1 text-xs text-green-600 font-bold bg-green-50 px-2 py-0.5 rounded-md mt-0.5 w-fit">
-                  متجر نشط <BadgeCheck className="w-3 h-3" />
+                <div className="flex items-center gap-1 text-[10px] text-green-600 font-bold bg-green-50 dark:bg-green-950/40 dark:text-green-400 px-1.5 py-0.5 rounded-md mt-0.5 w-fit">
+                  نشط <BadgeCheck className="w-2.5 h-2.5" />
                 </div>
               ) : (
-                <div className="flex items-center gap-1 text-xs text-amber-600 font-bold bg-amber-50 px-2 py-0.5 rounded-md mt-0.5 w-fit">
-                  متجر غير نشط <Lock className="w-3 h-3" />
+                <div className="flex items-center gap-1 text-[10px] text-amber-600 font-bold bg-amber-50 dark:bg-amber-950/40 dark:text-amber-400 px-1.5 py-0.5 rounded-md mt-0.5 w-fit">
+                  غير نشط <Lock className="w-2.5 h-2.5" />
                 </div>
               )}
             </div>
 
-            {/* Sub Info */}
-            <div className="mr-8 pr-8 border-r border-border/50 hidden md:flex flex-col text-sm text-muted-foreground min-w-[200px]">
+            {/* Sub Info - desktop only */}
+            <div className="mr-6 pr-6 border-r border-border/50 hidden md:flex flex-col text-sm text-muted-foreground min-w-[200px]">
               <div className="truncate">رابط المتجر: <a href={`/store/${storeData.url}`} target="_blank" className="font-bold text-primary hover:underline mx-1">{storeData.url}</a></div>
               <div className="flex items-center gap-2">الاشتراك: <span className="font-bold text-slate-800 dark:text-slate-200">{isPending || storeData.package === 'Starter' ? 'لا يوجد' : (storeData.package ? `باقة ${storeData.package}` : 'لا يوجد')}</span>
                 {!isPending && storeData.daysLeft != null && storeData.daysLeft > 0 && (
@@ -474,18 +507,21 @@ const StoreDashboard = () => {
             </div>
           </div>
 
-          {/* Actions (Left side of Main) */}
-          <div className="flex items-center gap-4">
-            <button onClick={toggleTheme} className="bg-white dark:bg-slate-800 p-2 rounded-xl shadow-sm border border-border/40 dark:border-white/10 relative cursor-pointer hover:bg-muted transition text-slate-700 dark:text-slate-300">
-              {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+          {/* Left side: Actions */}
+          <div className="flex items-center gap-2 md:gap-3 shrink-0">
+            {/* Theme Toggle */}
+            <button onClick={toggleTheme} className="bg-white dark:bg-slate-800 p-2 rounded-xl shadow-sm border border-border/40 dark:border-white/10 cursor-pointer hover:bg-muted transition text-slate-700 dark:text-slate-300">
+              {isDark ? <Sun className="w-4 h-4 md:w-5 md:h-5" /> : <Moon className="w-4 h-4 md:w-5 md:h-5" />}
             </button>
+
+            {/* Notifications */}
             <div className="relative">
               <div onClick={() => setShowNotifications(!showNotifications)} className="bg-white dark:bg-slate-800 p-2 rounded-xl shadow-sm border border-border/40 dark:border-white/10 relative cursor-pointer hover:bg-muted transition text-slate-700 dark:text-slate-300">
-                <Bell className="w-5 h-5 opacity-70" />
+                <Bell className="w-4 h-4 md:w-5 md:h-5 opacity-70" />
                 {unread > 0 && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-slate-800 text-[8px] font-black text-white flex items-center justify-center">{unread}</span>}
               </div>
               {showNotifications && (
-                <div className="absolute top-12 left-0 w-80 bg-white dark:bg-slate-800 border border-border/40 dark:border-white/10 rounded-2xl shadow-xl z-50 overflow-hidden">
+                <div className="absolute top-12 left-0 w-72 md:w-80 bg-white dark:bg-slate-800 border border-border/40 dark:border-white/10 rounded-2xl shadow-xl z-50 overflow-hidden">
                   <div className="p-4 border-b border-border/40 dark:border-white/10 flex items-center justify-between">
                     <h3 className="font-bold text-slate-900 dark:text-white">الإشعارات</h3>
                     {unread > 0 && (
@@ -505,7 +541,9 @@ const StoreDashboard = () => {
                 </div>
               )}
             </div>
-            <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white font-bold cursor-pointer shadow-sm">
+
+            {/* User Avatar */}
+            <div className="w-8 h-8 md:w-10 md:h-10 bg-primary rounded-xl flex items-center justify-center text-white font-bold cursor-pointer shadow-sm text-sm md:text-base">
               {storeData.initial}
             </div>
           </div>
@@ -578,23 +616,23 @@ const StoreDashboard = () => {
             {activeTab === 'overview' && (
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 max-w-6xl mx-auto pt-2">
 
-                {/* WELCOME BANNER (Gradient from Blue to Purple to match image exactly) */}
-                <div className="w-full bg-gradient-to-r from-[#4F46E5] to-[#8B5CF6] rounded-[24px] p-8 md:p-10 flex flex-col md:flex-row items-center justify-between text-white shadow-xl shadow-primary/10 relative overflow-hidden">
+                {/* WELCOME BANNER */}
+                <div className="w-full bg-gradient-to-r from-[#4F46E5] to-[#8B5CF6] rounded-[20px] md:rounded-[24px] p-6 md:p-10 flex flex-col md:flex-row items-start md:items-center justify-between text-white shadow-xl shadow-primary/10 relative overflow-hidden gap-5 md:gap-0">
                   {/* Background graphical elements */}
                   <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4 dark:bg-[#0f172a]"></div>
                   <div className="absolute bottom-0 left-0 w-64 h-64 bg-black/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/4"></div>
 
-                  <div className="z-10 text-center md:text-right mb-6 md:mb-0">
-                    <h2 className="text-3xl md:text-4xl font-bold font-display mb-2">مرحباً بك في <br /><span className="truncate block max-w-sm">{storeData.name}</span></h2>
-                    <p className="text-white/80 md:text-lg">متجرك جاهز، ابدأ بإضافة منتجاتك الآن</p>
+                  <div className="z-10 text-right">
+                    <h2 className="text-2xl md:text-4xl font-bold font-display mb-1 md:mb-2">مرحباً بك 👋<br /><span className="truncate block max-w-[220px] md:max-w-sm text-xl md:text-4xl">{storeData.name}</span></h2>
+                    <p className="text-white/80 text-sm md:text-lg">متجرك جاهز، ابدأ بإضافة منتجاتك الآن</p>
                   </div>
 
-                  <div className="z-10 flex items-center gap-4">
-                    <button onClick={() => window.open(`/store/${storeData.url}`, '_blank')} className="px-6 py-3 rounded-full border border-white/30 text-white hover:bg-white/10 transition font-bold flex items-center gap-2 dark:bg-[#0f172a]">
-                      <ExternalLink className="w-5 h-5" /> زيارة المتجر
+                  <div className="z-10 flex items-center gap-2 md:gap-4 w-full md:w-auto">
+                    <button onClick={() => window.open(`/store/${storeData.url}`, '_blank')} className="flex-1 md:flex-none px-4 md:px-6 py-2.5 md:py-3 rounded-full border border-white/30 text-white hover:bg-white/10 transition font-bold flex items-center justify-center gap-2 text-sm md:text-base">
+                      <ExternalLink className="w-4 h-4 md:w-5 md:h-5" /> زيارة المتجر
                     </button>
-                    <button className="px-6 py-3 rounded-full bg-white text-primary hover:scale-105 shadow-lg transition font-bold flex items-center gap-2 dark:bg-[#0f172a]">
-                      <Plus className="w-5 h-5" /> إضافة منتج
+                    <button onClick={() => setActiveTab('products')} className="flex-1 md:flex-none px-4 md:px-6 py-2.5 md:py-3 rounded-full bg-white text-primary hover:scale-105 shadow-lg transition font-bold flex items-center justify-center gap-2 text-sm md:text-base">
+                      <Plus className="w-4 h-4 md:w-5 md:h-5" /> إضافة منتج
                     </button>
                   </div>
                 </div>
