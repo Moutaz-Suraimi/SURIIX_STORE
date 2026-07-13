@@ -147,15 +147,15 @@ const MarketerDashboard = () => {
   );
 
   return (
-    <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#0a0a0f] font-cairo flex" dir="rtl">
+    <div className="flex h-screen overflow-hidden bg-[#f8f9fc] dark:bg-[#0a0a0f] font-cairo" dir="rtl">
 
       {/* Mobile overlay */}
       {sidebarOpen && (
-        <div className="fixed inset-0 bg-black/40 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
+        <div className="fixed inset-0 bg-black/60 z-40 lg:hidden backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
       )}
 
       {/* SIDEBAR */}
-      <aside className={`${sidebarOpen ? 'translate-x-0' : 'translate-x-full'} lg:translate-x-0 fixed lg:static top-0 right-0 h-full w-[280px] bg-white dark:bg-[#0f0f13] border-l border-gray-100 dark:border-white/5 flex flex-col flex-shrink-0 z-50 lg:z-auto transition-transform duration-300`}>
+      <aside className={`${sidebarOpen ? 'translate-x-0' : 'translate-x-full'} lg:translate-x-0 fixed lg:static top-0 right-0 h-full w-[280px] bg-white dark:bg-[#0f0f13] border-l border-gray-100 dark:border-white/5 flex flex-col flex-shrink-0 z-50 lg:z-auto transition-transform duration-300 shadow-2xl lg:shadow-none`}>
         <div className="p-6 pb-2 text-center border-b border-gray-50">
           <div className="flex items-center justify-center gap-2 mb-2">
             <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
@@ -187,11 +187,11 @@ const MarketerDashboard = () => {
       </aside>
 
       {/* MAIN CONTENT */}
-      <main className="flex-1 overflow-x-hidden">
+      <main className="flex-1 overflow-x-hidden overflow-y-auto w-full">
         {/* HEADER */}
-        <header className="sticky top-0 z-30 bg-white border-b border-gray-100 px-6 py-4 flex justify-between items-center dark:bg-[#0f172a]">
+        <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-gray-100 px-4 py-3 min-h-16 flex justify-between items-center dark:bg-[#0f172a]/90">
           <div className="flex items-center gap-3">
-            <button onClick={() => setSidebarOpen(true)} className="lg:hidden w-9 h-9 rounded-lg bg-gray-50 flex items-center justify-center text-gray-600 dark:bg-[#0f172a] dark:text-slate-300">
+            <button onClick={() => setSidebarOpen(true)} className="lg:hidden w-9 h-9 rounded-lg bg-gray-50 flex items-center justify-center text-gray-600 dark:bg-[#1a1a24] dark:border dark:border-white/10 dark:text-slate-300 shrink-0">
               <ChevronDown className="w-5 h-5 rotate-90" />
             </button>
             <div>

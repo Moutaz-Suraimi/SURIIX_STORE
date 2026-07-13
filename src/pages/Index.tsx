@@ -108,6 +108,11 @@ const Index = () => {
               <a href="#features" onClick={() => setIsMobileMenuOpen(false)} className="block px-4 py-3 text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl">المميزات</a>
               <a href="#pricing" onClick={() => setIsMobileMenuOpen(false)} className="block px-4 py-3 text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl">الأسعار</a>
               <a href="#templates" onClick={() => setIsMobileMenuOpen(false)} className="block px-4 py-3 text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl">قوالب المتاجر</a>
+              <div className="pt-2 pb-1 border-t border-gray-100 dark:border-white/5 mt-2">
+                <p className="px-4 py-1 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">نظام المسوقين</p>
+                <Link to="/marketer/login" onClick={() => setIsMobileMenuOpen(false)} className="block px-4 py-2.5 text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl">تسجيل الدخول كمسوق</Link>
+                <Link to="/marketer/signup" onClick={() => setIsMobileMenuOpen(false)} className="block px-4 py-2.5 text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl">إنشاء حساب مسوق</Link>
+              </div>
               <div className="border-t border-gray-100 dark:border-white/5 pt-3 mt-3 flex flex-col gap-2 px-4">
                 <Link to="/create-store?mode=login" onClick={() => setIsMobileMenuOpen(false)} className="w-full text-center py-3 font-bold text-sm border border-gray-200 dark:border-white/10 rounded-xl text-gray-700 dark:text-gray-200">تسجيل الدخول</Link>
                 <Link to="/create-store" onClick={() => setIsMobileMenuOpen(false)} className="w-full text-center py-3 font-bold text-sm bg-gradient-to-r from-purple-600 to-fuchsia-500 text-white rounded-xl">ابدأ الآن</Link>
