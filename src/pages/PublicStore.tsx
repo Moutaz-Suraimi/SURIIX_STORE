@@ -1743,7 +1743,7 @@ const PublicStore = () => {
             <p className="text-slate-500 mb-8 max-w-md dark:text-slate-300">نحن هنا لمساعدتك والإجابة على جميع استفساراتك. لا تتردد في الاتصال بنا.</p>
             <div className="flex justify-center gap-4">
               <a href={`https://wa.me/${storeData?.whatsapp?.replace('+','')}`} target="_blank" className="bg-[#25D366] text-white px-8 py-3 rounded-xl font-bold flex items-center gap-2 hover:opacity-90 transition"><MessageSquare className="w-5 h-5"/> واتساب</a>
-              <a href={`mailto:${storeData?.email || 'support@suriix.com'}`} className="bg-slate-100 text-slate-700 px-8 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-slate-200 transition dark:text-white dark:bg-[#0f172a]">البريد الإلكتروني</a>
+              <a href={`mailto:${storeData?.email || 'support@suriix.store'}`} className="bg-slate-100 text-slate-700 px-8 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-slate-200 transition dark:text-white dark:bg-[#0f172a]">البريد الإلكتروني</a>
             </div>
           </section>
         )}

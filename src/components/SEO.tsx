@@ -13,7 +13,7 @@ interface SEOProps {
   noIndex?: boolean;
 }
 
-const siteUrl = "https://suriix.com";
+const siteUrl = "https://suriix.store";
 const defaultOgImage = `${siteUrl}/favicon-192x192.png`;
 
 // High-quality default localized meta tags for all static routes

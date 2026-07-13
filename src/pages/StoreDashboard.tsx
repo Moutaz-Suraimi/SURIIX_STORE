@@ -937,14 +937,17 @@ const StoreDashboard = () => {
                 if (!uid) {
                   try {
                     const localSess = JSON.parse(localStorage.getItem('suriix_auth_session') || '{}');
-                    if (localSess && localSess.id) {
-                      uid = localSess.id;
-                    }
+                    if (localSess && localSess.id) uid = localSess.id;
                   } catch (e) { }
                 }
-
-                if (!uid && storeData.id && !String(storeData.id).startsWith("local-")) {
-                  uid = (storeData as any).owner_id || storeData.id;
+                const isValidUUID = (v: any) => {
+                  if (!v) return false;
+                  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(v));
+                };
+                if (!isValidUUID(uid)) {
+                  const ownerId = (storeData as any).owner_id;
+                  if (isValidUUID(ownerId)) uid = ownerId;
+                  else if (isValidUUID(storeData.id)) uid = storeData.id;
                 }
 
                 if (uid) {
@@ -992,12 +995,15 @@ const StoreDashboard = () => {
                     console.error("Recharge insertion error:", err);
                   }
                 } else {
-                  // Fallback for guest/local mode
-                  const reqStr = localStorage.getItem('suriix_local_recharge_requests') || '[]';
-                  const lrr = JSON.parse(reqStr);
-                  lrr.push({ id: `req_${Date.now()}`, user_id: storeData.id, amount: amount, currency: 'YER', status: 'pending', created_at: new Date().toISOString(), user_name: storeData.name, user_email: storeData.url });
-                  localStorage.setItem('suriix_local_recharge_requests', JSON.stringify(lrr));
-                  alert(`تم حفظ طلب شحن بمبلغ ${amount.toLocaleString()} ر.ي محلياً (يرجى تسجيل الدخول لإرساله للإدارة).`);
+                  // No authenticated user — guide to WhatsApp or show error
+                  const waMsg = encodeURIComponent(`مرحباً، أود طلب شحن رصيد بمبلغ ${amount?.toLocaleString()} ر.ي لمتجر: ${storeData?.name || ''}`);
+                  const waNumber = (storeData?.whatsapp || '').replace(/\D/g, '');
+                  if (waNumber) {
+                    window.open(`https://wa.me/${waNumber}?text=${waMsg}`, '_blank');
+                    toast.success('تم فتح واتساب لإرسال طلب الشحن للدعم الفني.');
+                  } else {
+                    toast.error('يرجى تسجيل الدخول لإرسال طلب الشحن عبر النظام.');
+                  }
                 }
               }} />
             }

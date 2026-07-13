@@ -43,7 +43,7 @@ const AdminLogin = () => {
         .eq('id', user.id)
         .single();
 
-      if (profile?.role === 'admin' || profile?.role === 'SUPER_ADMIN' || email === 'admin@suriix.com' || email === 'wmoutaz84@gmail.com') {
+      if (profile?.role === 'admin' || profile?.role === 'SUPER_ADMIN' || email === 'admin@suriix.store' || email === 'wmoutaz84@gmail.com') {
         localStorage.setItem("suriix_admin_auth", "true");
         localStorage.setItem("suriix_user_role", "SUPER_ADMIN");
         window.location.href = "/admin/dashboard";
@@ -98,7 +98,7 @@ const AdminLogin = () => {
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 className="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3.5 pr-11 text-sm font-bold text-white focus:outline-none focus:border-primary transition-colors focus:bg-slate-900"
-                placeholder="admin@suriix.com"
+                placeholder="admin@suriix.store"
                 dir="ltr"
               />
               <Mail className="w-5 h-5 text-slate-500 absolute right-4 top-3.5 dark:text-slate-300" />

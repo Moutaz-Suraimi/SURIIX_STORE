@@ -36,7 +36,7 @@ export const ReferralsTab = ({ storeData }: { storeData: any }) => {
     fetchReferralData();
   }, [storeData]);
 
-  const referralLink = `https://suriix.com/register?ref=${referralCode || 'PENDING'}`;
+  const referralLink = `https://suriix.store/register?ref=${referralCode || 'PENDING'}`;
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(referralLink);

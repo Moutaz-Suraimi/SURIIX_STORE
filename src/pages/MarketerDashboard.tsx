@@ -72,7 +72,7 @@ const MarketerDashboard = () => {
   const handleCopy = () => {
     const nameEn = marketer?.name_en?.replace(/\s+/g, '-').toLowerCase() || "marketer";
     const code = marketer?.referral_code || "XXXX";
-    const link = `https://suriix.com/ref/${nameEn}-${code}`;
+    const link = `https://suriix.store/ref/${nameEn}-${code}`;
     navigator.clipboard.writeText(link);
     toast.success("تم نسخ رابط الإحالة بنجاح");
   };
@@ -122,7 +122,7 @@ const MarketerDashboard = () => {
 
   const displayName = marketer?.name_ar || marketer?.name_en || "مسوق";
   const nameEn = marketer?.name_en?.replace(/\s+/g, '-').toLowerCase() || "marketer";
-  const referralLink = `https://suriix.com/ref/${nameEn}-${marketer?.referral_code || "..."}`;
+  const referralLink = `https://suriix.store/ref/${nameEn}-${marketer?.referral_code || "..."}`;
 
   const navItems: { key: Tab; label: string; icon: any }[] = [
     { key: "home", label: "الرئيسية", icon: Home },
@@ -138,6 +138,14 @@ const MarketerDashboard = () => {
     if (st === "approved") return <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-600 flex items-center gap-1"><CheckCircle className="w-3 h-3" />مكتمل</span>;
     if (st === "rejected") return <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-red-50 text-red-500 flex items-center gap-1"><XCircle className="w-3 h-3" />مرفوض</span>;
     return <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-orange-50 text-orange-500 flex items-center gap-1"><Clock className="w-3 h-3" />قيد المراجعة</span>;
+  };
+
+  const handleNotificationClick = (n: any) => {
+    markAsRead(n.id);
+    setShowNotifications(false);
+    if (n.type === 'referral' || n.type === 'commission' || n.title?.includes('إحالة') || n.title?.includes('عمولة')) setActiveTab('referrals');
+    else if (n.type === 'withdrawal' || n.type === 'wallet' || n.title?.includes('سحب')) setActiveTab('withdrawals');
+    else setActiveTab('home');
   };
 
   if (isLoading) return (
@@ -221,8 +229,8 @@ const MarketerDashboard = () => {
                   </div>
                   <div className="max-h-72 overflow-y-auto divide-y divide-gray-50">
                     {notifications.length > 0 ? notifications.map((n: any) => (
-                      <div key={n.id} onClick={() => markAsRead(n.id)}
-                        className={`p-3 cursor-pointer hover:bg-gray-50 ${!n.is_read ? 'bg-purple-50/60' : ''}`}>
+                      <div key={n.id} onClick={() => handleNotificationClick(n)}
+                        className={`p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 ${!n.is_read ? 'bg-purple-50/60' : ''}`}>
                         <div className="flex gap-2">
                           <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${!n.is_read ? 'bg-purple-500' : 'bg-gray-200'}`} />
                           <div>

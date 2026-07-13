@@ -220,12 +220,12 @@ export const InvoiceModal = ({ isOpen, onClose, transactions, currentSettings, s
              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                    <div className="w-20 h-20 bg-white p-1 rounded-xl border border-slate-200 shrink-0 dark:bg-[#0f172a] dark:border-slate-800">
-                      <img src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://suriix.com/verify/INV-2025`} alt="QR" className="w-full h-full opacity-80" />
+                      <img src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://suriix.store/verify/INV-2025`} alt="QR" className="w-full h-full opacity-80" />
                    </div>
                    <div className="space-y-1">
                       <p className="text-xs text-slate-400 font-bold dark:text-slate-300">للتحقق من صحة الفاتورة</p>
                       <p className="text-[10px] text-slate-400 dark:text-slate-300">امسح رمز QR</p>
-                      <p className="text-[10px] text-slate-400 dark:text-slate-300">أو قم بزيارة: <a href="#" className="text-[#7e6af2] hover:underline">suriix.com/verify</a></p>
+                      <p className="text-[10px] text-slate-400 dark:text-slate-300">أو قم بزيارة: <a href="#" className="text-[#7e6af2] hover:underline">suriix.store/verify</a></p>
                    </div>
                 </div>
                 
