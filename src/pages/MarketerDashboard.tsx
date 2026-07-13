@@ -216,7 +216,7 @@ const MarketerDashboard = () => {
                 {unread > 0 && <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-[9px] font-black rounded-full flex items-center justify-center">{unread}</span>}
               </button>
               {showNotifications && (
-                <div className="absolute top-14 left-0 w-80 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 overflow-hidden dark:bg-[#0f172a]" style={{ right: 0, left: 'auto' }}>
+                <div className="fixed top-[70px] left-4 right-4 sm:absolute sm:top-14 sm:left-0 sm:right-auto sm:w-80 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 overflow-hidden dark:bg-[#0f172a]">
                   <div className="p-4 border-b border-gray-50 flex justify-between items-center">
                     <div className="flex items-center gap-2">
                       <h3 className="font-bold text-gray-900 dark:text-white">الإشعارات</h3>
@@ -263,10 +263,10 @@ const MarketerDashboard = () => {
             <div className="space-y-6">
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {[
-                  { label: "إجمالي الأرباح", value: `$${(marketer?.total_profits || 0).toFixed(2)}`, icon: TrendingUp, color: "purple" },
+                  { label: "إجمالي الأرباح", value: `${(marketer?.total_profits || 0).toLocaleString()} ر.ي`, icon: TrendingUp, color: "purple" },
                   { label: "عدد الإحالات", value: referrals.length, icon: Users, color: "blue" },
-                  { label: "الرصيد المتاح", value: `$${(marketer?.available_balance || 0).toFixed(2)}`, icon: HandCoins, color: "emerald" },
-                  { label: "إجمالي السحوبات", value: `$${(marketer?.total_withdrawals || 0).toFixed(2)}`, icon: Upload, color: "fuchsia" },
+                  { label: "الرصيد المتاح", value: `${(marketer?.available_balance || 0).toLocaleString()} ر.ي`, icon: HandCoins, color: "emerald" },
+                  { label: "إجمالي السحوبات", value: `${(marketer?.total_withdrawals || 0).toLocaleString()} ر.ي`, icon: Upload, color: "fuchsia" },
                 ].map((s, i) => (
                   <div key={i} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 dark:bg-[#0f172a]">
                     <div className={`w-10 h-10 rounded-xl bg-${s.color}-50 text-${s.color}-600 flex items-center justify-center mb-3`}>
@@ -305,7 +305,7 @@ const MarketerDashboard = () => {
                             <td className="py-3 font-bold text-gray-900 dark:text-white">{r.client_name}</td>
                             <td className="py-3 text-center text-gray-600 dark:text-slate-300">{r.package_name}</td>
                             <td className="py-3 text-center">{statusBadge(r.status)}</td>
-                            <td className="py-3 text-left font-black text-emerald-600 font-mono">${(r.commission || 0).toFixed(2)}</td>
+                            <td className="py-3 text-left font-black text-emerald-600 font-mono">{`${(r.commission || 0).toLocaleString()} ر.ي`}</td>
                           </tr>
                         ))}
                       </tbody>

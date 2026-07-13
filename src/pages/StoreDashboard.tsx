@@ -613,7 +613,34 @@ const StoreDashboard = () => {
           )}
 
           <AnimatePresence mode="wait">
-            {activeTab === 'overview' && (
+            {activeTab === 'overview' && (() => {
+              const realOrders = storeData?.orders || [];
+              const completedOrders = realOrders.filter((o: any) => o.status === 'مكتمل');
+              const totalProfits = completedOrders.reduce((sum: number, o: any) => {
+                 const val = Number(String(o.total || o.amount || '0').replace(/[^0-9.]/g, ''));
+                 return sum + (isNaN(val) ? 0 : val);
+              }, 0);
+              
+              const productSalesMap = new Map();
+              completedOrders.forEach((o: any) => {
+                if (Array.isArray(o.items)) {
+                  o.items.forEach((item: any) => {
+                     const pid = item.product_id || item.id;
+                     if (pid) {
+                       productSalesMap.set(pid, (productSalesMap.get(pid) || 0) + Number(item.quantity || 1));
+                     }
+                  });
+                }
+              });
+
+              const computedBestSellers = [...(storeData?.products || [])]
+                .map((p: any) => ({ ...p, realSales: productSalesMap.get(p.id) || 0 }))
+                .sort((a: any, b: any) => b.realSales - a.realSales)
+                .slice(0, 3);
+                
+              const computedRecentOrders = [...realOrders].reverse().slice(0, 5);
+
+              return (
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 max-w-6xl mx-auto pt-2">
 
                 {/* WELCOME BANNER */}
@@ -651,7 +678,7 @@ const StoreDashboard = () => {
                   </div>
                   <div className={statBoxClasses}>
                     <div className="w-12 h-12 bg-green-50 text-green-500 rounded-2xl flex items-center justify-center mb-4"><CreditCard className="w-6 h-6" /></div>
-                    <span className="font-bold text-3xl text-foreground">{(storeData?.wallet_yer || storeData?.wallet || 0).toLocaleString()} <span className="text-lg">ر.ي</span></span>
+                    <span className="font-bold text-3xl text-foreground">{totalProfits.toLocaleString()} <span className="text-lg">ر.ي</span></span>
                     <span className="text-sm text-muted-foreground mt-1 font-medium">إجمالي الأرباح</span>
                   </div>
                   <div className={statBoxClasses}>
@@ -689,14 +716,14 @@ const StoreDashboard = () => {
                     </div>
 
                     <div className="space-y-4">
-                      {(storeData.products && storeData.products.length > 0 ? storeData.products.slice(0, 3) : bestSellers).map((item: any, idx: number) => (
+                      {(computedBestSellers.length > 0 ? computedBestSellers : bestSellers).map((item: any, idx: number) => (
                         <div key={item.id || idx} className="flex items-center gap-4 bg-muted/20 p-3 rounded-2xl border border-transparent hover:border-border/50 transition">
                           <div className="w-16 h-16 rounded-xl flex items-center justify-center text-3xl overflow-hidden bg-white shrink-0 border border-border/40 shadow-sm dark:bg-[#0f172a] dark:border-slate-800">
-                            {item.img && String(item.img).includes('http') ? <img src={item.img} loading="lazy" decoding="async" className="w-full h-full object-cover" /> : <div className="animate-pulse">{item.img || '📦'}</div>}
+                            {item.img && (String(item.img).includes('http') || String(item.img).startsWith('data:')) ? <img src={item.img} loading="lazy" decoding="async" className="w-full h-full object-cover" /> : <div className="text-3xl flex items-center justify-center">{item.img || '📦'}</div>}
                           </div>
                           <div className="flex-1">
                             <h4 className="font-bold text-foreground">{item.name}</h4>
-                            <span className="text-xs text-muted-foreground font-medium">{item.sales || Math.floor(Math.random() * 80) + 10} مبيعة</span>
+                            <span className="text-xs text-muted-foreground font-medium">{item.realSales || 0} مبيعة</span>
                           </div>
                           <div className="text-left leading-tight">
                             <span className="block font-bold text-green-600 text-lg">{item.price ? `${Number(item.price).toLocaleString()} ر.ي` : item.rev}</span>
@@ -726,7 +753,7 @@ const StoreDashboard = () => {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-border/30">
-                          {recentOrders.map(order => (
+                          {computedRecentOrders.map(order => (
                             <tr key={order.id} className="hover:bg-muted/10">
                               <td className="py-4 px-2 font-bold font-mono">{order.id}</td>
                               <td className="py-4 font-medium">{order.name}</td>
@@ -784,7 +811,8 @@ const StoreDashboard = () => {
                 </div>
 
               </motion.div>
-            )}
+              );
+            })()}
 
 
             {/* ACTIVE TAB RENDERER */}
