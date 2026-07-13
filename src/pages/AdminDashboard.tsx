@@ -127,7 +127,7 @@ const AdminDashboard = () => {
   const fetchStores = async () => {
     const { data: storesData, error } = await supabase
       .from('stores')
-      .select('*, users(name, email, phone)')
+      .select('*, users!stores_user_id_fkey(name, email, phone, status, subscription_ends_at)')
       .order('created_at', { ascending: false });
       
     if (storesData) {
@@ -145,8 +145,26 @@ const AdminDashboard = () => {
           const marketerNode = ref?.marketers;
           // Support arrays if supabase returns an array for one-to-one or use object directly
           const marketer = Array.isArray(marketerNode) ? marketerNode[0] : marketerNode;
+          const isUserActive = st.users && st.users.status === 'active';
+          let isExpired = false;
+          if (st.users?.subscription_ends_at) {
+            isExpired = new Date(st.users.subscription_ends_at) < new Date();
+          }
+          
+          let isActive = false;
+          if (typeof st.is_active === 'boolean') {
+            isActive = st.is_active;
+          } else {
+            isActive = isUserActive;
+          }
+          
+          // إن كان منتهياً، فهو ليس نشطاً
+          if (isExpired) isActive = false;
+          
           return {
             ...st,
+            is_active: isActive,
+            tier: st.tier || ((isUserActive && !isExpired) ? 'مشترك (قيد التحديث)' : null),
             marketer_name: marketer?.name_ar || marketer?.name_en || null
           };
         });
@@ -381,6 +399,10 @@ const AdminDashboard = () => {
     try {
       const { error } = await supabase.from('stores').update({ is_active: !currentStatus }).eq('id', storeId);
       if (error) throw error;
+      const store = storesList.find(s => s.id === storeId);
+      if (store?.user_id) {
+        await supabase.from('users').update({ status: !currentStatus ? 'active' : 'suspended' }).eq('id', store.user_id);
+      }
       fetchStores();
       toast.success(!currentStatus ? 'تم تفعيل المتجر بنجاح' : 'تم إيقاف المتجر بنجاح');
     } catch (e: any) {

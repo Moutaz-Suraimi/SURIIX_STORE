@@ -828,14 +828,22 @@ const StoreDashboard = () => {
                 const expiryString = expiryDate.toISOString();
 
                 if (uid) {
-                  const { error } = await supabase.from('users').update({
+                  const { error: userError } = await supabase.from('users').update({
                     wallet_yer: newWallet,
                     status: 'active',
                     subscription_ends_at: expiryString
                   }).eq('id', uid);
-                  if (error) {
-                    alert(`فشل تحديث الاشتراك: ${error.message}`);
+                  if (userError) {
+                    alert(`فشل تحديث الاشتراك: ${userError.message}`);
                     return;
+                  }
+
+                  // تحديث جدول المتاجر ليعكس الباقة وحالة النشاط للإدارة
+                  if (storeData.id && !String(storeData.id).startsWith("local-")) {
+                    await supabase.from('stores').update({
+                      is_active: true,
+                      tier: pkg
+                    }).eq('id', storeData.id);
                   }
                 }
 
