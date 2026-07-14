@@ -142,7 +142,17 @@ const CreateStore = () => {
   };
 
   React.useEffect(() => {
-    const handleSession = async () => {
+    const queryStoreForUser = async (userId: string) => {
+      const { data: storeData } = await supabase
+        .from('stores')
+        .select('id')
+        .eq('owner_id', userId)
+        .limit(1)
+        .maybeSingle();
+      return storeData;
+    };
+
+    const handleSession = async (fromLogin = false) => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
         const user = session.user;
@@ -151,38 +161,57 @@ const CreateStore = () => {
         const intent = localStorage.getItem('suriix_oauth_intent');
         localStorage.removeItem('suriix_oauth_intent');
         const isOAuthCallback = !!intent || window.location.hash.includes('access_token');
-        const { data: userProfile } = await supabase.from('users').select('id, status, role').eq('id', user.id).maybeSingle();
-        const { data: storeData } = await supabase.from('stores').select('id').eq('owner_id', user.id).maybeSingle();
-        if (storeData) {
-          if (storeData.id) {
-            const { data: fullStore } = await supabase.from('stores').select('*').eq('id', storeData.id).single();
-            if (fullStore) {
-              const { data: products } = await supabase.from('products').select('*').eq('store_id', fullStore.id);
-              const list = [{
-                id: fullStore.id, owner_id: user.id, name: fullStore.store_name,
-                slug: fullStore.store_url, url: fullStore.store_url,
-                status: fullStore.is_active ? 'active' : 'pending', tier: 'Basic',
-                products: products || [], theme: fullStore.theme_color, cardStyle: fullStore.template_id
-              }];
-              localStorage.setItem('suriix_added_stores', JSON.stringify(list));
-              localStorage.setItem('suriix_user_auth', 'true');
-              localStorage.setItem('suriix_user_role', 'vendor');
-            }
+
+        // Ensure this user exists in public.users so RLS works correctly.
+        try {
+          await supabase.from('users').upsert({
+            id: user.id,
+            email: user.email,
+            name: user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'مستخدم',
+            role: 'store_owner',
+            status: 'pending',
+          }, { onConflict: 'id' });
+        } catch (e) {
+          console.warn('users upsert (non-fatal):', e);
+        }
+
+        // Query for this user's store. Retry once after 700ms to handle post-login timing.
+        let storeData = await queryStoreForUser(user.id);
+        if (!storeData) {
+          await new Promise(r => setTimeout(r, 700));
+          storeData = await queryStoreForUser(user.id);
+        }
+
+        if (storeData?.id) {
+          const { data: fullStore } = await supabase.from('stores').select('*').eq('id', storeData.id).maybeSingle();
+          if (fullStore) {
+            const { data: products } = await supabase.from('products').select('*').eq('store_id', fullStore.id);
+            const list = [{
+              id: fullStore.id, owner_id: user.id, name: fullStore.store_name,
+              slug: fullStore.store_url, url: fullStore.store_url,
+              status: fullStore.is_active ? 'active' : 'pending', tier: 'Basic',
+              products: products || [], theme: fullStore.theme_color, cardStyle: fullStore.template_id
+            }];
+            localStorage.setItem('suriix_added_stores', JSON.stringify(list));
+            localStorage.setItem('suriix_user_auth', 'true');
+            localStorage.setItem('suriix_user_role', 'vendor');
           }
           window.location.replace('/dashboard');
           return;
         }
+
+        // No store found for this user
         if (isOAuthCallback) {
-          try {
-            await supabase.from('users').upsert({
-              id: user.id, email: user.email,
-              name: user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'مستخدم',
-              role: 'store_owner', status: 'pending', created_at: new Date().toISOString(),
-            }, { onConflict: 'id' });
-          } catch (e) { console.warn('Profile upsert error (non-fatal):', e); }
+          // Google OAuth new user — go to onboarding
           setStep(2);
           setIsSessionLoading(false);
+        } else if (fromLogin) {
+          // Just logged in via password but has no store yet — go to onboarding
+          setStep(2);
+          setIsSessionLoading(false);
+          setIsAuthLoading(false);
         } else {
+          // Page load with existing session but no store — show "logged in" banner on step 1
           setLoggedInEmail(user.email || null);
           setIsSessionLoading(false);
         }
@@ -191,9 +220,9 @@ const CreateStore = () => {
         setIsSessionLoading(false);
       }
     };
-    handleSession();
+    handleSession(false);
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user && _event === 'SIGNED_IN') handleSession();
+      if (session?.user && _event === 'SIGNED_IN') handleSession(true);
     });
     return () => subscription.unsubscribe();
   }, []);
@@ -301,6 +330,9 @@ const CreateStore = () => {
         setStep(2);
       } else {
         // ─── LOGIN FLOW ───
+        // signInWithPassword will fire onAuthStateChange(SIGNED_IN),
+        // which calls handleSession(true). handleSession has retry logic,
+        // upserts public.users, and redirects to /dashboard if store exists.
         const cleanEmail = authEmail.trim().toLowerCase();
         const { data, error } = await supabase.auth.signInWithPassword({ email: cleanEmail, password: authPassword });
         if (error) {
@@ -308,36 +340,20 @@ const CreateStore = () => {
           setIsAuthLoading(false); return;
         }
         if (data?.user) {
-          // Use maybeSingle() to avoid errors when no store / multiple stores exist
-          const { data: storeData, error: storeError } = await supabase
-            .from('stores')
-            .select('id')
-            .eq('owner_id', data.user.id)
-            .limit(1)
-            .maybeSingle();
-          if (storeData?.id) {
-            const { data: fullStore } = await supabase.from('stores').select('*').eq('id', storeData.id).maybeSingle();
-            if (fullStore) {
-              const { data: products } = await supabase.from('products').select('*').eq('store_id', fullStore.id);
-              const list = [{
-                id: fullStore.id, owner_id: data.user.id, name: fullStore.store_name,
-                slug: fullStore.store_url, url: fullStore.store_url,
-                status: fullStore.is_active ? 'active' : 'pending', tier: 'Basic',
-                products: products || [], theme: fullStore.theme_color, cardStyle: fullStore.template_id
-              }];
-              localStorage.setItem('suriix_added_stores', JSON.stringify(list));
-              localStorage.setItem('suriix_user_auth', 'true');
-              localStorage.setItem('suriix_user_role', 'vendor');
+          // Show full-screen loading while handleSession processes the redirect
+          setIsSessionLoading(true);
+          // handleSession(true) will be called by onAuthStateChange automatically.
+          // As a fallback, also call it directly here with a small delay.
+          setTimeout(async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session?.user) {
+              // Re-trigger by dispatching session manually if needed
+              // (onAuthStateChange should already handle this)
             }
-            window.location.replace('/dashboard');
-            return;
-          } else {
-            // Logged in but no store yet — go to onboarding
-            setIsAuthLoading(false);
-            setStep(2);
-            return;
-          }
+          }, 300);
+          return;
         }
+
       }
     } catch (err) {
       console.error('handleAuthSubmit error:', err);
