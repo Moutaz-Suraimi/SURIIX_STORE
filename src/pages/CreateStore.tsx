@@ -78,6 +78,7 @@ const CreateStore = () => {
   const initialMode = searchParams.get("mode") === "login" ? "login" : "register";
 
   const [step, setStep] = useState<number>(1);
+  const [isAuthLoading, setIsAuthLoading] = useState(false);
 
   // Referral (from /ref/:code redirect)
   const [referralMarketerName, setReferralMarketerName] = useState<string | null>(null);
@@ -251,68 +252,98 @@ const CreateStore = () => {
   };
 
   const handleAuthSubmit = async () => {
-    if (authMode === "register") {
-      const passwordProps = checkPasswordStrength(authPassword);
-      if (!passwordProps.valid) { toast.error("كلمة المرور لا تستوفي كافة شروط الأمان. يرجى تصحيحها."); return; }
-      if (authPassword !== authConfirmPassword) { toast.error("كلمة المرور غير متطابقة"); return; }
-      const cleanEmail = authEmail.trim().toLowerCase();
-      const SUPABASE_URL = "https://rajvyxdfibpamanmmkgf.supabase.co";
-      const fnResponse = await fetch(`${SUPABASE_URL}/functions/v1/create-user`, {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: cleanEmail, password: authPassword }),
-      });
-      const fnResult = await fnResponse.json();
-      if (fnResult.error) {
-        const errorMsg = typeof fnResult.error === 'object' ? JSON.stringify(fnResult.error) : fnResult.error;
-        toast.error("حدث خطأ أثناء التسجيل: " + errorMsg);
-        return;
-      }
-      if (fnResult.session?.access_token) {
-        await supabase.auth.setSession({ access_token: fnResult.session.access_token, refresh_token: fnResult.session.refresh_token });
-        const userId = fnResult.session.user?.id;
-        if (userId) {
-          await supabase.from("users").upsert([{ id: userId, email: cleanEmail, role: "store_owner", status: "pending" }]);
-          import("@/lib/notifications").then(({ notificationEvents, notification }) => {
-            notification.send({ user_id: userId, role: 'store_owner', type: 'system', title: 'مرحباً بك في سريكس', message: 'تهانينا! تم إنشاء حسابك بنجاح. يمكنك الآن استكمال إعداد متجرك.' });
-            notificationEvents.adminAlert(`تم تسجيل عضو جديد: ${authEmail}`);
-          }).catch(console.error);
+    if (!authEmail.trim()) { toast.error("الرجاء إدخال البريد الإلكتروني"); return; }
+    if (!authPassword) { toast.error("الرجاء إدخال كلمة المرور"); return; }
+    setIsAuthLoading(true);
+    try {
+      if (authMode === "register") {
+        const passwordProps = checkPasswordStrength(authPassword);
+        if (!passwordProps.valid) { toast.error("كلمة المرور لا تستوفي كافة شروط الأمان. يرجى تصحيحها."); setIsAuthLoading(false); return; }
+        if (authPassword !== authConfirmPassword) { toast.error("كلمة المرور غير متطابقة"); setIsAuthLoading(false); return; }
+        const cleanEmail = authEmail.trim().toLowerCase();
+        const SUPABASE_URL = "https://rajvyxdfibpamanmmkgf.supabase.co";
+        const fnResponse = await fetch(`${SUPABASE_URL}/functions/v1/create-user`, {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: cleanEmail, password: authPassword }),
+        });
+        const fnResult = await fnResponse.json();
+        if (fnResult.error) {
+          const errorMsg = typeof fnResult.error === 'object' ? JSON.stringify(fnResult.error) : fnResult.error;
+          toast.error("حدث خطأ أثناء التسجيل: " + errorMsg);
+          setIsAuthLoading(false); return;
         }
-        setStep(2);
-        return;
-      }
-      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email: cleanEmail, password: authPassword });
-      if (signInError || !signInData?.user) {
-        toast.error("تم إنشاء حسابك بنجاح ✅\nالآن قم بتسجيل الدخول بنفس البريد وكلمة المرور.");
-        setAuthMode("login");
-        return;
-      }
-      await supabase.from("users").upsert([{ id: signInData.user.id, email: cleanEmail, role: "store_owner", status: "pending" }]);
-      import("@/lib/notifications").then(({ notificationEvents, notification }) => {
-        notification.send({ user_id: signInData.user.id, role: 'store_owner', type: 'system', title: 'مرحباً بك في سريكس', message: 'تهانينا! تم إنشاء حسابك بنجاح. يمكنك الآن استكمال إعداد متجرك.' });
-        notificationEvents.adminAlert(`تم تسجيل عضو جديد: ${authEmail}`);
-      }).catch(console.error);
-      setStep(2);
-    } else {
-      const cleanEmail = authEmail.trim().toLowerCase();
-      const { data, error } = await supabase.auth.signInWithPassword({ email: cleanEmail, password: authPassword });
-      if (error) { toast.error("بيانات الدخول غير صحيحة"); return; }
-      if (data?.user) {
-        const { data: storeData } = await supabase.from('stores').select('id').eq('owner_id', data.user.id).single();
-        if (storeData) {
-          const { data: fullStore } = await supabase.from('stores').select('*').eq('id', storeData.id).single();
-          if (fullStore) {
-            const { data: products } = await supabase.from('products').select('*').eq('store_id', fullStore.id);
-            const list = [{ id: fullStore.id, owner_id: data.user.id, name: fullStore.store_name, slug: fullStore.store_url, url: fullStore.store_url, status: fullStore.is_active ? 'active' : 'pending', tier: 'Basic', products: products || [], theme: fullStore.theme_color, cardStyle: fullStore.template_id }];
-            localStorage.setItem('suriix_added_stores', JSON.stringify(list));
-            localStorage.setItem('suriix_user_auth', 'true');
-            localStorage.setItem('suriix_user_role', 'vendor');
+        if (fnResult.session?.access_token) {
+          await supabase.auth.setSession({ access_token: fnResult.session.access_token, refresh_token: fnResult.session.refresh_token });
+          const userId = fnResult.session.user?.id;
+          if (userId) {
+            await supabase.from("users").upsert([{ id: userId, email: cleanEmail, role: "store_owner", status: "pending" }]);
+            import("@/lib/notifications").then(({ notificationEvents, notification }) => {
+              notification.send({ user_id: userId, role: 'store_owner', type: 'system', title: 'مرحباً بك في سريكس', message: 'تهانينا! تم إنشاء حسابك بنجاح. يمكنك الآن استكمال إعداد متجرك.' });
+              notificationEvents.adminAlert(`تم تسجيل عضو جديد: ${authEmail}`);
+            }).catch(console.error);
           }
-          window.location.href = '/dashboard';
+          setIsAuthLoading(false);
+          setStep(2);
           return;
-        } else { setStep(2); return; }
+        }
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email: cleanEmail, password: authPassword });
+        if (signInError || !signInData?.user) {
+          toast.error("تم إنشاء حسابك بنجاح ✅\nالآن قم بتسجيل الدخول بنفس البريد وكلمة المرور.");
+          setAuthMode("login");
+          setIsAuthLoading(false); return;
+        }
+        await supabase.from("users").upsert([{ id: signInData.user.id, email: cleanEmail, role: "store_owner", status: "pending" }]);
+        import("@/lib/notifications").then(({ notificationEvents, notification }) => {
+          notification.send({ user_id: signInData.user.id, role: 'store_owner', type: 'system', title: 'مرحباً بك في سريكس', message: 'تهانينا! تم إنشاء حسابك بنجاح. يمكنك الآن استكمال إعداد متجرك.' });
+          notificationEvents.adminAlert(`تم تسجيل عضو جديد: ${authEmail}`);
+        }).catch(console.error);
+        setIsAuthLoading(false);
+        setStep(2);
+      } else {
+        // ─── LOGIN FLOW ───
+        const cleanEmail = authEmail.trim().toLowerCase();
+        const { data, error } = await supabase.auth.signInWithPassword({ email: cleanEmail, password: authPassword });
+        if (error) {
+          toast.error("بيانات الدخول غير صحيحة. تحقق من البريد الإلكتروني وكلمة المرور.");
+          setIsAuthLoading(false); return;
+        }
+        if (data?.user) {
+          // Use maybeSingle() to avoid errors when no store / multiple stores exist
+          const { data: storeData, error: storeError } = await supabase
+            .from('stores')
+            .select('id')
+            .eq('owner_id', data.user.id)
+            .limit(1)
+            .maybeSingle();
+          if (storeData?.id) {
+            const { data: fullStore } = await supabase.from('stores').select('*').eq('id', storeData.id).maybeSingle();
+            if (fullStore) {
+              const { data: products } = await supabase.from('products').select('*').eq('store_id', fullStore.id);
+              const list = [{
+                id: fullStore.id, owner_id: data.user.id, name: fullStore.store_name,
+                slug: fullStore.store_url, url: fullStore.store_url,
+                status: fullStore.is_active ? 'active' : 'pending', tier: 'Basic',
+                products: products || [], theme: fullStore.theme_color, cardStyle: fullStore.template_id
+              }];
+              localStorage.setItem('suriix_added_stores', JSON.stringify(list));
+              localStorage.setItem('suriix_user_auth', 'true');
+              localStorage.setItem('suriix_user_role', 'vendor');
+            }
+            window.location.replace('/dashboard');
+            return;
+          } else {
+            // Logged in but no store yet — go to onboarding
+            setIsAuthLoading(false);
+            setStep(2);
+            return;
+          }
+        }
       }
+    } catch (err) {
+      console.error('handleAuthSubmit error:', err);
+      toast.error("حدث خطأ غير متوقع، يرجى المحاولة مرة أخرى");
+      setIsAuthLoading(false);
     }
-    setStep(2);
   };
 
   const handleGoogleSignIn = async () => {
@@ -503,8 +534,12 @@ const CreateStore = () => {
                 </div>
               </div>
             )}
-            <button onClick={handleAuthSubmit} className="w-full bg-primary hover:bg-primary/90 text-white rounded-xl py-4 font-black flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/20 cursor-pointer mt-4 transition-all">
-              {authMode === 'register' ? 'إنشاء حساب 🚀' : 'تسجيل الدخول'}
+            <button onClick={handleAuthSubmit} disabled={isAuthLoading} className="w-full bg-primary hover:bg-primary/90 disabled:opacity-70 disabled:cursor-not-allowed text-white rounded-xl py-4 font-black flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/20 cursor-pointer mt-4 transition-all">
+              {isAuthLoading ? (
+                <><svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>{authMode === 'register' ? 'جاري الإنشاء...' : 'جاري الدخول...'}</>
+              ) : (
+                authMode === 'register' ? 'إنشاء حساب 🚀' : 'تسجيل الدخول'
+              )}
             </button>
           </div>
 
