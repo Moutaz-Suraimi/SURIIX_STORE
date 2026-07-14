@@ -198,7 +198,7 @@ const CustomerDashboardUi = ({ customer, storeData, cart, navigate, slug, active
          {activeTab === 'dashboard' && (
            <div className="space-y-8">
              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center dark:bg-[#0f172a]">
+                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center dark:bg-[#0f172a] dark:border-slate-800">
                     <div className="flex-1">
                        <h4 className="text-slate-500 text-sm font-bold mb-1 dark:text-slate-300">المحفظة</h4>
                        <div className="text-2xl font-black text-slate-800 dark:text-white">${customer?.wallet || '0.00'}</div>
@@ -208,7 +208,7 @@ const CustomerDashboardUi = ({ customer, storeData, cart, navigate, slug, active
                        <Wallet className="w-6 h-6"/>
                     </div>
                  </div>
-                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center dark:bg-[#0f172a]">
+                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center dark:bg-[#0f172a] dark:border-slate-800">
                     <div className="flex-1">
                        <h4 className="text-slate-500 text-sm font-bold mb-1 dark:text-slate-300">الطلبات</h4>
                        <div className="text-2xl font-black text-slate-800 dark:text-white">{customerOrders?.length || 0}</div>
@@ -218,7 +218,7 @@ const CustomerDashboardUi = ({ customer, storeData, cart, navigate, slug, active
                        <Package className="w-6 h-6"/>
                     </div>
                  </div>
-                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center dark:bg-[#0f172a]">
+                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center dark:bg-[#0f172a] dark:border-slate-800">
                     <div className="flex-1">
                        <h4 className="text-slate-500 text-sm font-bold mb-1 dark:text-slate-300">المفضلة</h4>
                        <div className="text-2xl font-black text-slate-800 dark:text-white">0</div>
@@ -228,7 +228,7 @@ const CustomerDashboardUi = ({ customer, storeData, cart, navigate, slug, active
                        <Heart className="w-6 h-6"/>
                     </div>
                  </div>
-                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center dark:bg-[#0f172a]">
+                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center dark:bg-[#0f172a] dark:border-slate-800">
                     <div className="flex-1">
                        <h4 className="text-slate-500 text-sm font-bold mb-1 dark:text-slate-300">الكوبونات</h4>
                        <div className="text-2xl font-black text-slate-800 dark:text-white">3</div>
@@ -241,7 +241,7 @@ const CustomerDashboardUi = ({ customer, storeData, cart, navigate, slug, active
              </div>
 
              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-100 dark:bg-[#0f172a]">
+                <div className="lg:col-span-2 bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-100 dark:bg-[#0f172a] dark:border-slate-800">
                    <div className="flex justify-between items-center mb-6">
                       <h3 className="font-black text-lg text-slate-800 dark:text-white">آخر الطلبات</h3>
                       <button className="text-[#5B5EE5] text-sm font-bold hover:underline flex items-center gap-1"><ChevronLeft className="w-4 h-4"/> عرض جميع الطلبات</button>
@@ -269,7 +269,7 @@ const CustomerDashboardUi = ({ customer, storeData, cart, navigate, slug, active
                      )}
                    </div>
                    
-                   <button className="w-full mt-6 py-4 rounded-xl border border-slate-200 text-[#5B5EE5] font-bold text-sm flex justify-center items-center gap-2 hover:bg-[#5B5EE5] hover:text-white hover:border-transparent transition dark:border-slate-800">
+                   <button className="w-full mt-6 py-4 rounded-xl border border-slate-200 text-[#5B5EE5] font-bold text-sm flex justify-center items-center gap-2 hover:bg-[#5B5EE5] hover:text-white hover:border-transparent transition dark:border-slate-700 dark:bg-slate-800/50 dark:hover:bg-[#5B5EE5]">
                       <Package className="w-4 h-4"/> تتبع جميع الطلبات
                    </button>
                 </div>
@@ -383,7 +383,7 @@ const CustomerDashboardUi = ({ customer, storeData, cart, navigate, slug, active
          )}
          
          {activeTab === 'orders' && (
-            <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-100 dark:bg-[#0f172a]">
+            <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-100 dark:bg-[#0f172a] dark:border-slate-800">
               <h3 className="text-xl font-black text-slate-800 mb-6 flex items-center gap-2 dark:text-white"><Package className="w-6 h-6 text-[#5B5EE5]"/> طلباتي</h3>
               {(!customerOrders || customerOrders.length === 0) ? (
                  <div className="text-center py-12 text-slate-400 dark:text-slate-300">
@@ -442,7 +442,7 @@ const CustomerDashboardUi = ({ customer, storeData, cart, navigate, slug, active
          )}
          
          {activeTab === 'addresses' && (
-            <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-100 dark:bg-[#0f172a]">
+            <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-100 dark:bg-[#0f172a] dark:border-slate-800">
               <div className="flex justify-between items-center mb-6">
                  <h3 className="text-xl font-black text-slate-800 flex items-center gap-2 dark:text-white"><MapPin className="w-6 h-6 text-[#5B5EE5]"/> عناويني</h3>
                  <button onClick={() => setIsAddressModalOpen(true)} className="bg-[#5B5EE5]/10 text-[#5B5EE5] px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-1 hover:bg-[#5B5EE5]/20 transition"><Plus className="w-4 h-4"/> إضافة عنوان</button>
@@ -463,7 +463,7 @@ const CustomerDashboardUi = ({ customer, storeData, cart, navigate, slug, active
          )}
          
          {activeTab === 'favorites' && (
-            <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-100 dark:bg-[#0f172a]">
+            <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-100 dark:bg-[#0f172a] dark:border-slate-800">
               <h3 className="text-xl font-black text-slate-800 mb-6 flex items-center gap-2 dark:text-white"><Heart className="w-6 h-6 text-rose-500 fill-rose-500"/> المفضلة</h3>
               <div className="text-center py-20 text-slate-400 dark:text-slate-300">
                  <Heart className="w-16 h-16 mx-auto mb-4 opacity-20" />
@@ -474,7 +474,7 @@ const CustomerDashboardUi = ({ customer, storeData, cart, navigate, slug, active
          )}
          
          {activeTab === 'coupons' && (
-            <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-100 dark:bg-[#0f172a]">
+            <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-100 dark:bg-[#0f172a] dark:border-slate-800">
               <h3 className="text-xl font-black text-slate-800 mb-6 flex items-center gap-2 dark:text-white"><Tag className="w-6 h-6 text-emerald-500"/> الكوبونات والعروض</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                  <div className="border border-dashed border-emerald-300 bg-emerald-50 rounded-2xl p-5 flex items-center">
@@ -492,7 +492,7 @@ const CustomerDashboardUi = ({ customer, storeData, cart, navigate, slug, active
          )}
          
          {activeTab === 'notifications' && (
-            <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-100 dark:bg-[#0f172a]">
+            <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-100 dark:bg-[#0f172a] dark:border-slate-800">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-xl font-black text-slate-800 flex items-center gap-2 dark:text-white">
                   <Bell className="w-6 h-6 text-amber-500"/> الإشعارات
@@ -549,7 +549,7 @@ const CustomerDashboardUi = ({ customer, storeData, cart, navigate, slug, active
          )}
          
          {activeTab === 'settings' && (
-            <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-100 dark:bg-[#0f172a]">
+            <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-100 dark:bg-[#0f172a] dark:border-slate-800">
               <h3 className="text-xl font-black text-slate-800 mb-6 flex items-center gap-2 dark:text-white"><Settings className="w-6 h-6 text-slate-600 dark:text-slate-300"/> إعدادات الحساب</h3>
               <div className="max-w-xl space-y-5">
                  <div>
@@ -571,7 +571,7 @@ const CustomerDashboardUi = ({ customer, storeData, cart, navigate, slug, active
          )}
          
          {activeTab === 'password' && (
-            <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-100 dark:bg-[#0f172a]">
+            <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-100 dark:bg-[#0f172a] dark:border-slate-800">
               <h3 className="text-xl font-black text-slate-800 mb-6 flex items-center gap-2 dark:text-white"><Lock className="w-6 h-6 text-slate-600 dark:text-slate-300"/> تغيير كلمة المرور</h3>
               <div className="max-w-xl space-y-5">
                  <div>
@@ -701,12 +701,15 @@ const PublicStore = () => {
   React.useEffect(() => {
     setAppliedCoupon(null);
   }, [productId]);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-
   // Auto-login removed
   // Customers must now explicitly register or log in via the store's authentication flow
   React.useEffect(() => {
-    // Intentionally left blank to prevent store owners from being auto-enrolled as customers
+    // Force clear auto-created customers from previous buggy behaviour once
+    if (localStorage.getItem('suriix_cleaned_store_customer') !== 'true') {
+      localStorage.removeItem(`suriix_customer_${slug}`);
+      setCustomer(null);
+      localStorage.setItem('suriix_cleaned_store_customer', 'true');
+    }
   }, [slug]);
 
   // Customer Account State
