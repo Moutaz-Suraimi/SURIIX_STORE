@@ -298,7 +298,11 @@ const CreateStore = () => {
         const fnResult = await fnResponse.json();
         if (fnResult.error) {
           const errorMsg = typeof fnResult.error === 'object' ? JSON.stringify(fnResult.error) : fnResult.error;
-          toast.error("حدث خطأ أثناء التسجيل: " + errorMsg);
+          if (errorMsg.includes('already been registered') || errorMsg.includes('already registered')) {
+            toast.error("هذا البريد الإلكتروني مسجل مسبقاً. يرجى تسجيل الدخول أو استخدام بريد مختلف.");
+          } else {
+            toast.error("حدث خطأ أثناء التسجيل: " + errorMsg);
+          }
           setIsAuthLoading(false); return;
         }
         if (fnResult.session?.access_token) {
@@ -388,7 +392,8 @@ const CreateStore = () => {
         } else if (userError) { console.error("Error creating user:", userError); }
       } else {
         const SUPABASE_URL = "https://rajvyxdfibpamanmmkgf.supabase.co";
-        const saveRes = await fetch(`${SUPABASE_URL}/functions/v1/save-store`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: ownerEmail, storeName: storeName || "متجري الجديد", storeSlug, merchantName: merchantName || "صاحب المتجر", phone: cleanPhone, themeStyle, templateId: TEMPLATE_CARDS[0].name }) });
+        // Passing isActive: false to edge function (if supported), else it defaults to what the edge function does
+        const saveRes = await fetch(`${SUPABASE_URL}/functions/v1/save-store`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: ownerEmail, storeName: storeName || "متجري الجديد", storeSlug, merchantName: merchantName || "صاحب المتجر", phone: cleanPhone, themeStyle, templateId: TEMPLATE_CARDS[0].name, isActive: false }) });
         const saveResult = await saveRes.json();
         if (saveResult.storeId) realStoreId = saveResult.storeId;
         if (saveResult.error) console.error("save-store error:", saveResult.error);

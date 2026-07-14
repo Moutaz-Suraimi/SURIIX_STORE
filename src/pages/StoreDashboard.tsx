@@ -76,7 +76,6 @@ const StoreDashboard = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isPending, setIsPending] = useState(false);
   const [showPendingModal, setShowPendingModal] = useState(false);
-  const isGuest = localStorage.getItem("suriix_guest_mode") === "true";
   const [subscriptionPlans, setSubscriptionPlans] = useState<any[]>([]);
   const [notifUserId, setNotifUserId] = useState<string | null>(null);
   const { notifications, unread, markAsRead, markAllAsRead } = useNotifications(notifUserId);
@@ -268,16 +267,14 @@ const StoreDashboard = () => {
                     } else if (userData.status === 'pending' && !localIsActive) {
                       // Only show pending if BOTH Supabase AND localStorage agree it's pending
                       setIsPending(true);
-                      if (sessionStorage.getItem('suriix_guest_skip') !== 'true') {
-                        setShowPendingModal(true);
-                      }
+                      setShowPendingModal(true);
                     }
                   } else {
                     // No user row in DB — trust localStorage status instead of blocking
                     if (latestStore.status === 'active' || latestStore.tier) {
                       setIsPending(false);
                       setShowPendingModal(false);
-                    } else if (sessionStorage.getItem('suriix_guest_skip') !== 'true') {
+                    } else {
                       setIsPending(true);
                       setShowPendingModal(true);
                     }
@@ -287,9 +284,7 @@ const StoreDashboard = () => {
                 // Local store — read status directly from localStorage
                 if (latestStore.status === 'pending') {
                   setIsPending(true);
-                  if (sessionStorage.getItem('suriix_guest_skip') !== 'true') {
-                    setShowPendingModal(true);
-                  }
+                  setShowPendingModal(true);
                 } else if (latestStore.status === 'active' || latestStore.status === 'نشط') {
                   setIsPending(false);
                   setShowPendingModal(false);
@@ -357,16 +352,9 @@ const StoreDashboard = () => {
                   }
                 } catch (_) { }
               }}
-              className="w-full py-4 rounded-xl bg-slate-50 dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-white font-bold text-sm transition flex items-center justify-center gap-2 mb-3 shadow-sm"
+              className="w-full py-4 rounded-xl bg-slate-50 dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-white font-bold text-sm transition flex items-center justify-center gap-2 shadow-sm"
             >
               تحديث الحالة <span className="text-blue-500 bg-blue-100 p-1 rounded-md ml-1"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /></svg></span>
-            </button>
-
-            <button onClick={() => {
-              sessionStorage.setItem('suriix_guest_skip', 'true');
-              setShowPendingModal(false);
-            }} className="text-xs font-bold text-slate-400 hover:text-slate-600 transition underline decoration-slate-300 underline-offset-4 dark:text-slate-300">
-              تخطي كضيف (معاينة فقط)
             </button>
           </div>
         </div>
@@ -565,18 +553,6 @@ const StoreDashboard = () => {
           </div>
         )}
         <div className="flex-1 overflow-y-auto px-4 md:px-8 pb-12 custom-scrollbar relative">
-
-          {isGuest && !isPending && (
-            <div className="w-full mt-4 p-4 bg-primary/10 border border-indigo-200 text-indigo-700 rounded-xl flex flex-col md:flex-row items-center justify-between gap-3 z-40 font-bold text-sm shadow-sm relative">
-              <div className="flex items-center gap-2">
-                <Eye className="w-5 h-5 flex-shrink-0" />
-                <span>أنت في وضع المعاينة (ضيف). يمكنك تصفح لوحة التحكم بحرية، ولكن لا يمكنك إجراء أي تعديلات.</span>
-              </div>
-              <button onClick={() => { localStorage.removeItem("suriix_guest_mode"); window.location.href = "/create-store"; }} className="bg-primary text-white px-6 py-2 rounded-xl text-xs hover:bg-indigo-700 transition flex-shrink-0 shadow-sm relative z-50">
-                سجل الآن للحفظ
-              </button>
-            </div>
-          )}
 
           {isPending && !showPendingModal && (
             <div className="w-full mt-4 p-4 bg-amber-50 border border-amber-200 text-amber-700 rounded-xl flex flex-col md:flex-row items-center justify-between gap-3 z-40 font-bold text-sm shadow-sm relative">

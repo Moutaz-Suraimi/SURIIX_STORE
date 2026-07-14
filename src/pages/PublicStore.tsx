@@ -133,7 +133,7 @@ const CustomerDashboardUi = ({ customer, storeData, cart, navigate, slug, active
   ];
 
   return (
-    <div className="flex h-screen bg-[#F8FAFC]">
+    <div className="flex h-screen bg-[#F8FAFC] dark:bg-slate-900 text-slate-800 dark:text-white">
       <aside className="w-[280px] bg-[#1a1c29] text-white flex flex-col h-full shrink-0 overflow-y-auto">
         <div className="p-8 flex justify-center">
             {storeData?.logo ? <img src={storeData.logo} className="h-10 object-contain" /> : <div className="text-2xl font-black tracking-widest uppercase">SURIIX</div>}
@@ -703,41 +703,10 @@ const PublicStore = () => {
   }, [productId]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
+  // Auto-login removed
+  // Customers must now explicitly register or log in via the store's authentication flow
   React.useEffect(() => {
-    const checkGoogleAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user?.email) {
-        const email = session.user.email;
-        const name = session.user.user_metadata?.full_name || session.user.user_metadata?.name || email.split('@')[0];
-        
-        let existing: any = null;
-        try { existing = JSON.parse(localStorage.getItem(`suriix_customer_${slug}`) || 'null'); } catch {}
-        
-        if (existing && existing.email === email) {
-           setCustomer(existing);
-        } else {
-           const newCustomer = { name, email, phone: '', wallet: 0, joinDate: new Date().toLocaleDateString('ar-SA') };
-           localStorage.setItem(`suriix_customer_${slug}`, JSON.stringify(newCustomer));
-           setCustomer(newCustomer);
-           
-           // Background insert to DB
-           try {
-             let realStoreId: string | null = null;
-             const isUUID = (val: any) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(val));
-             const st = JSON.parse(localStorage.getItem('suriix_added_stores') || '[]').find((s:any)=>s.slug===slug || s.url===slug);
-             if (st?.id && isUUID(st.id)) realStoreId = st.id;
-             if (!realStoreId && slug) {
-                const { data: storeRow } = await supabase.from('stores').select('id').eq('store_url', slug).single();
-                if (storeRow?.id) realStoreId = storeRow.id;
-             }
-             if (realStoreId) {
-               await supabase.from('store_customers').insert({ store_id: realStoreId, name, email, phone: '' });
-             }
-           } catch(e) {}
-        }
-      }
-    };
-    checkGoogleAuth();
+    // Intentionally left blank to prevent store owners from being auto-enrolled as customers
   }, [slug]);
 
   // Customer Account State
