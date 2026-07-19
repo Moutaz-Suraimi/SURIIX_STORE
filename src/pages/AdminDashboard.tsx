@@ -58,6 +58,9 @@ const AdminDashboard = () => {
   const [isStoreEditOpen, setIsStoreEditOpen] = useState(false);
   const [isAddStoreOpen, setIsAddStoreOpen] = useState(false);
   const [storeSearch, setStoreSearch] = useState('');
+  const [storeStatusFilter, setStoreStatusFilter] = useState<'all' | 'active' | 'inactive'>('active');
+  const [isActivateModalOpen, setIsActivateModalOpen] = useState(false);
+  const [activateDurationDays, setActivateDurationDays] = useState(7);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -127,7 +130,7 @@ const AdminDashboard = () => {
   const fetchStores = async () => {
     const { data: storesData, error } = await supabase
       .from('stores')
-      .select('*, users!stores_user_id_fkey(name, email, phone, status, subscription_ends_at)')
+      .select('*, users!stores_owner_id_fkey(name, email, phone, status, subscription_ends_at)')
       .order('created_at', { ascending: false });
       
     if (storesData) {
@@ -151,14 +154,10 @@ const AdminDashboard = () => {
             isExpired = new Date(st.users.subscription_ends_at) < new Date();
           }
           
-          let isActive = false;
-          if (typeof st.is_active === 'boolean') {
-            isActive = st.is_active;
-          } else {
-            isActive = isUserActive;
-          }
+          // A store is active if: db flag is true, OR user is active with valid subscription
+          let isActive = st.is_active === true || (isUserActive && !isExpired);
           
-          // إن كان منتهياً، فهو ليس نشطاً
+          // If subscription expired, override to false
           if (isExpired) isActive = false;
           
           return {
@@ -379,7 +378,7 @@ const AdminDashboard = () => {
 
   const handleToggleUserStatus = async (userId: string, currentStatus: string) => {
     try {
-      const newStatus = currentStatus === 'active' ? 'banned' : 'active';
+      const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
       const { error } = await supabase.from('users').update({ status: newStatus }).eq('id', userId);
       if (error) throw error;
       
@@ -389,24 +388,76 @@ const AdminDashboard = () => {
 
       fetchUsers();
       fetchStores();
-      toast.success(newStatus === 'banned' ? 'تم حظر المستخدم وإيقاف متجره بنجاح' : 'تم استرجاع المستخدم وتفعيل متجره بنجاح');
+      toast.success(newStatus === 'inactive' ? 'تم تعطيل المستخدم وإيقاف متجره بنجاح' : 'تم تفعيل المستخدم ومتجره بنجاح');
     } catch (e: any) {
       toast.error('حدث خطأ: ' + e.message);
     }
   };
 
-  const handleToggleStoreStatus = async (storeId: string, currentStatus: boolean) => {
-    try {
-      const { error } = await supabase.from('stores').update({ is_active: !currentStatus }).eq('id', storeId);
-      if (error) throw error;
+  const handleToggleStoreStatus = (storeId: string, currentStatus: boolean) => {
+    if (!currentStatus) {
+      // Activating: open duration picker modal
       const store = storesList.find(s => s.id === storeId);
-      if (store?.user_id) {
-        await supabase.from('users').update({ status: !currentStatus ? 'active' : 'suspended' }).eq('id', store.user_id);
+      setSelectedStore(store);
+      setActivateDurationDays(7);
+      setIsActivateModalOpen(true);
+    } else {
+      // Deactivating: immediate suspend
+      (async () => {
+        try {
+          const { error } = await supabase.from('stores').update({ is_active: false }).eq('id', storeId);
+          if (error) throw error;
+          const store = storesList.find(s => s.id === storeId);
+          if (store?.user_id) {
+            await supabase.from('users').update({ status: 'pending', package: null, subscription_ends_at: null }).eq('id', store.user_id);
+          }
+          fetchStores();
+          toast.success('تم إيقاف المتجر وتعليق الاشتراك بنجاح');
+        } catch (e: any) {
+          toast.error('حدث خطأ: ' + (e as any).message);
+        }
+      })();
+    }
+  };
+
+  const handleActivateStore = async () => {
+    if (!selectedStore) return;
+    try {
+      const endsAt = new Date();
+      endsAt.setDate(endsAt.getDate() + activateDurationDays);
+
+      // 1. Activate the store
+      const { error: storeErr } = await supabase.from('stores').update({ is_active: true, tier: 'الانطلاقة' }).eq('id', selectedStore.id);
+      if (storeErr) throw storeErr;
+
+      // 2. Set user as active + assign starter package + set expiry (NO wallet changes)
+      if (selectedStore.user_id) {
+        const { error: userErr } = await supabase.from('users').update({
+          status: 'active',
+          package: 'الانطلاقة',
+          subscription_ends_at: endsAt.toISOString(),
+        }).eq('id', selectedStore.user_id);
+        if (userErr) throw userErr;
       }
+
+      // 3. Notify the user
+      if (selectedStore.user_id) {
+        await notification.send({
+          user_id: selectedStore.user_id,
+          role: 'store_owner',
+          type: 'wallet',
+          title: '✅ تم تفعيل متجرك!',
+          message: `تم تفعيل متجرك بباقة الانطلاقة لمدة ${activateDurationDays} يوم. تاريخ انتهاء الاشتراك: ${endsAt.toLocaleDateString('ar-EG')}.`,
+        });
+      }
+
+      toast.success(`تم تفعيل المتجر بباقة الانطلاقة لمدة ${activateDurationDays} يوم!`);
+      setIsActivateModalOpen(false);
+      setSelectedStore(null);
       fetchStores();
-      toast.success(!currentStatus ? 'تم تفعيل المتجر بنجاح' : 'تم إيقاف المتجر بنجاح');
+      fetchUsers();
     } catch (e: any) {
-      toast.error('حدث خطأ: ' + e.message);
+      toast.error('حدث خطأ أثناء التفعيل: ' + e.message);
     }
   };
 
@@ -431,9 +482,8 @@ const AdminDashboard = () => {
         .from('stores')
         .update({
           store_name: selectedStore.store_name,
-          slug: selectedStore.slug,
-          is_active: selectedStore.is_active,
-          tier: selectedStore.tier
+          store_url: selectedStore.store_url,
+          is_active: selectedStore.is_active
         })
         .eq('id', selectedStore.id);
       
@@ -448,22 +498,21 @@ const AdminDashboard = () => {
 
   const handleAddStore = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedStore?.user_id || !selectedStore?.store_name || !selectedStore?.slug) {
+    if (!selectedStore?.owner_id || !selectedStore?.store_name || !selectedStore?.store_url) {
       toast.error('يرجى تعبئة جميع الحقول المطلوبة');
       return;
     }
     try {
       const { error } = await supabase.from('stores').insert({
-        user_id: selectedStore.user_id,
+        owner_id: selectedStore.owner_id,
         store_name: selectedStore.store_name,
-        slug: selectedStore.slug,
-        is_active: false,
-        tier: 'free'
+        store_url: selectedStore.store_url,
+        is_active: false
       });
       if (error) throw error;
       
-      // Update user role to store_owner
-      await supabase.from('users').update({ role: 'store_owner' }).eq('id', selectedStore.user_id);
+      // Update user role to store_owner and status to pending
+      await supabase.from('users').update({ role: 'store_owner', status: 'pending' }).eq('id', selectedStore.owner_id);
       
       toast.success('تم إنشاء المتجر بنجاح');
       setIsAddStoreOpen(false);
@@ -564,11 +613,13 @@ const AdminDashboard = () => {
   const activeStoresCount = storesList.filter(s => s.is_active).length;
   const pendingStoresCount = storesList.filter(s => !s.is_active).length;
   const filteredStores = storesList.filter(s => {
+    if (storeStatusFilter === 'active' && !s.is_active) return false;
+    if (storeStatusFilter === 'inactive' && s.is_active) return false;
     if (!storeSearch) return true;
     const term = storeSearch.toLowerCase();
     return s.store_name?.toLowerCase().includes(term) || 
            s.users?.name?.toLowerCase().includes(term) || 
-           s.slug?.toLowerCase().includes(term);
+           s.store_url?.toLowerCase().includes(term);
   });
 
   return (
@@ -1282,19 +1333,36 @@ const AdminDashboard = () => {
                   </div>
 
                   <div className="space-y-4">
-                    {[
-                      { title: 'تم إطلاق باقة الأعمال الجديدة!', target: 'الكل', date: 'منذ ساعتين' },
-                      { title: 'تذكير: تحديث سياسة المنصة', target: 'أصحاب المتاجر', date: 'امس' },
-                      { title: 'صيانة مجدولة للنظام', target: 'الكل', date: 'قبل 3 أيام' }
-                    ].map((n, i) => (
-                      <div key={i} className="flex gap-4 items-start pb-4 border-b border-gray-50 dark:border-white/5 last:border-0">
-                        <div className="w-2 h-2 rounded-full bg-orange-500 mt-2 shrink-0"></div>
-                        <div>
-                          <p className="font-bold text-gray-900 dark:text-white text-sm leading-snug">{n.title}</p>
-                          <p className="text-xs text-gray-400 mt-1 dark:text-slate-300">الاستهداف: {n.target} • {n.date}</p>
+                    {(() => {
+                      const events: any[] = [
+                        ...rechargeRequests.slice(0, 5).map(r => ({
+                          title: r.status === 'approved' ? `تمت الموافقة على شحن محفظة ${r.users?.name || 'مستخدم'}` : r.status === 'rejected' ? `تم رفض طلب شحن ${r.users?.name || 'مستخدم'}` : `طلب شحن جديد من ${r.users?.name || 'مستخدم'}`,
+                          detail: `${Number(r.amount).toLocaleString()} ر.ي • ${r.status === 'pending' ? 'قيد المراجعة' : r.status === 'approved' ? 'موافق عليه' : 'مرفوض'}`,
+                          date: r.created_at,
+                          color: r.status === 'approved' ? 'bg-green-500' : r.status === 'rejected' ? 'bg-red-500' : 'bg-orange-500'
+                        })),
+                        ...storesList.slice(0, 5).map(s => ({
+                          title: s.is_active ? `تم تفعيل متجر ${s.store_name || ''}` : `متجر ${s.store_name || ''} بانتظار التفعيل`,
+                          detail: s.users?.name || 'غير معروف',
+                          date: s.created_at,
+                          color: s.is_active ? 'bg-purple-500' : 'bg-gray-400'
+                        }))
+                      ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5);
+
+                      if (events.length === 0) return (
+                        <p className="text-sm text-gray-400 dark:text-slate-400 text-center py-4">لا توجد أحداث حديثة</p>
+                      );
+
+                      return events.map((n, i) => (
+                        <div key={i} className="flex gap-4 items-start pb-4 border-b border-gray-50 dark:border-white/5 last:border-0">
+                          <div className={`w-2 h-2 rounded-full ${n.color} mt-2 shrink-0`}></div>
+                          <div>
+                            <p className="font-bold text-gray-900 dark:text-white text-sm leading-snug">{n.title}</p>
+                            <p className="text-xs text-gray-400 mt-1 dark:text-slate-300">{n.detail} • {new Date(n.date).toLocaleDateString('ar-EG')}</p>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))
+                    })()}
                   </div>
                 </div>
 
@@ -1464,7 +1532,7 @@ const AdminDashboard = () => {
                   <p className="text-gray-500 text-sm font-medium dark:text-slate-300">مراقبة محتويات المتاجر والتحكم بحالاتها</p>
                 </div>
                 <div className="flex gap-3">
-                  <button onClick={() => setIsAddStoreOpen(true)} className="h-10 px-5 bg-purple-600 hover:bg-purple-700 text-white font-bold text-sm rounded-xl transition-all flex items-center gap-2 shadow-lg shadow-purple-600/20">
+                  <button onClick={() => { setSelectedStore(null); setIsAddStoreOpen(true); }} className="h-10 px-5 bg-purple-600 hover:bg-purple-700 text-white font-bold text-sm rounded-xl transition-all flex items-center gap-2 shadow-lg shadow-purple-600/20">
                     <Plus className="w-4 h-4" /> متجر جديد
                   </button>
                 </div>
@@ -1502,8 +1570,25 @@ const AdminDashboard = () => {
               </div>
 
               {/* SEARCH & FILTERS */}
-              <div className="flex flex-col md:flex-row gap-4 mb-6">
-                <div className="relative flex-1">
+              <div className="flex flex-col gap-4 mb-6">
+                {/* Status Filter Tabs */}
+                <div className="flex gap-2 bg-white dark:bg-[#1A1A24] border border-gray-100 dark:border-white/5 p-1.5 rounded-xl w-fit shadow-sm">
+                  {([
+                    { key: 'all', label: `الكل (${storesList.length})` },
+                    { key: 'active', label: `النشطة (${activeStoresCount})` },
+                    { key: 'inactive', label: `غير النشطة (${pendingStoresCount})` },
+                  ] as const).map(tab => (
+                    <button
+                      key={tab.key}
+                      onClick={() => setStoreStatusFilter(tab.key)}
+                      className={`px-4 py-2 rounded-lg text-xs font-black transition-all ${storeStatusFilter === tab.key ? 'bg-purple-600 text-white shadow-md shadow-purple-500/20' : 'text-gray-500 hover:text-gray-900 dark:text-slate-400 dark:hover:text-white'}`}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+                {/* Search */}
+                <div className="relative">
                   <Search className="w-5 h-5 text-gray-400 absolute right-4 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
@@ -1524,6 +1609,7 @@ const AdminDashboard = () => {
                       <th className="py-4 px-6">الرابط</th>
                       <th className="py-4 px-6">المالك</th>
                       <th className="py-4 px-6">المسوق (الإحالة)</th>
+                      <th className="py-4 px-6">صلاحية الباقة</th>
                       <th className="py-4 px-6">التاريخ</th>
                       <th className="py-4 px-6">الحالة</th>
                       <th className="py-4 px-6 rounded-tl-2xl text-center">إجراءات</th>
@@ -1544,7 +1630,7 @@ const AdminDashboard = () => {
                             </div>
                           </td>
                           <td className="py-4 px-6 text-sm">
-                            <a href={`https://${store.slug}.suriix.store`} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline font-bold" dir="ltr">{store.slug}.suriix.store</a>
+                            <a href={`https://${store.store_url}.suriix.store`} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline font-bold" dir="ltr">{store.store_url}.suriix.store</a>
                           </td>
                           <td className="py-4 px-6 text-sm">
                             <div className="flex flex-col">
@@ -1560,6 +1646,19 @@ const AdminDashboard = () => {
                             ) : (
                               <span className="text-gray-400 dark:text-gray-600 text-xs font-bold">—</span>
                             )}
+                          </td>
+                          <td className="py-4 px-6 text-sm">
+                            {(() => {
+                              if (!store.users?.subscription_ends_at) return <span className="text-gray-400 dark:text-gray-600 text-xs font-bold">لا توجد باقة</span>;
+                              const endDate = new Date(store.users.subscription_ends_at);
+                              const now = new Date();
+                              const diffTime = endDate.getTime() - now.getTime();
+                              const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                              
+                              if (diffDays < 0) return <span className="text-red-500 font-bold bg-red-50/50 px-2 py-1 rounded-lg text-xs">منتهية منذ {Math.abs(diffDays)} أيام</span>;
+                              if (diffDays === 0) return <span className="text-orange-500 font-bold bg-orange-50/50 px-2 py-1 rounded-lg text-xs">تنتهي اليوم</span>;
+                              return <span className="text-green-500 font-bold bg-green-50/50 px-2 py-1 rounded-lg text-xs">باقي {diffDays} يوماً</span>;
+                            })()}
                           </td>
                           <td className="py-4 px-6 text-sm text-gray-500 font-medium dark:text-slate-300">
                             {new Date(store.created_at).toLocaleDateString('ar-EG')}
@@ -1581,7 +1680,7 @@ const AdminDashboard = () => {
                       );
                     }) : (
                       <tr>
-                        <td colSpan={7} className="py-12 text-center text-gray-400 text-sm font-bold dark:text-slate-300">لا يوجد متاجر لعرضها</td>
+                        <td colSpan={8} className="py-12 text-center text-gray-400 text-sm font-bold dark:text-slate-300">لا يوجد متاجر لعرضها</td>
                       </tr>
                     )}
                   </tbody>
@@ -1906,10 +2005,11 @@ const AdminDashboard = () => {
             <h2 className="text-xl font-black mb-4">تفاصيل المتجر</h2>
             <div className="space-y-3 font-medium text-sm text-gray-700 dark:text-gray-300">
               <p><strong>اسم المتجر:</strong> {selectedStore.store_name || 'غير معروف'}</p>
-              <p><strong>رابط المتجر:</strong> <a href={`https://${selectedStore.slug}.suriix.store`} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline">{selectedStore.slug}.suriix.store</a></p>
+              <p><strong>رابط المتجر:</strong> <a href={`https://${selectedStore.store_url}.suriix.store`} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline">{selectedStore.store_url}.suriix.store</a></p>
               <p><strong>المالك:</strong> {selectedStore.users?.name || 'غير معروف'} ({selectedStore.users?.email})</p>
               <p><strong>حالة المتجر:</strong> <span className={selectedStore.is_active ? 'text-green-500' : 'text-red-500'}>{selectedStore.is_active ? 'نشط' : 'بانتظار الدفع أو موقوف'}</span></p>
               <p><strong>الباقة:</strong> {selectedStore.tier || 'غير محدد'}</p>
+              <p><strong>نهاية الباقة:</strong> {selectedStore.users?.subscription_ends_at ? <span dir="ltr">{new Date(selectedStore.users.subscription_ends_at).toLocaleDateString('ar-EG')}</span> : 'لا توجد باقة مفعلة'}</p>
               <p><strong>المسوق:</strong> {selectedStore.marketer_name || 'لا يوجد'}</p>
               <p><strong>تاريخ الإنشاء:</strong> <span dir="ltr">{new Date(selectedStore.created_at).toLocaleDateString('ar-EG')}</span></p>
             </div>
@@ -1931,7 +2031,7 @@ const AdminDashboard = () => {
               <div>
                 <label className="text-xs font-bold text-gray-500 block mb-1 dark:text-slate-300">رابط المتجر (slug)</label>
                 <div className="flex bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-white/10 rounded-lg overflow-hidden h-11">
-                  <input type="text" className="flex-1 bg-transparent px-3 outline-none focus:bg-white dark:focus:bg-[#1A1A24] text-sm font-medium transition-colors" value={selectedStore.slug} onChange={e => setSelectedStore({...selectedStore, slug: e.target.value})} dir="ltr" required/>
+                  <input type="text" className="flex-1 bg-transparent px-3 outline-none focus:bg-white dark:focus:bg-[#1A1A24] text-sm font-medium transition-colors" value={selectedStore.store_url || ''} onChange={e => setSelectedStore({...selectedStore, store_url: e.target.value})} dir="ltr" required/>
                   <span className="flex items-center px-3 bg-gray-100 dark:bg-white/5 border-r border-gray-200 dark:border-white/10 text-xs font-bold text-gray-500" dir="ltr">.suriix.store</span>
                 </div>
               </div>
@@ -1967,8 +2067,20 @@ const AdminDashboard = () => {
                 <label className="text-xs font-bold text-gray-500 block mb-1 dark:text-slate-300">مالك المتجر (مستخدم موجود)</label>
                 <select 
                   className="w-full h-11 border border-gray-200 dark:border-white/10 dark:bg-black/20 rounded-lg px-3 outline-none focus:border-purple-500 text-sm font-medium" 
-                  value={selectedStore?.user_id || ''} 
-                  onChange={e => setSelectedStore({...selectedStore, user_id: e.target.value})}
+                  value={selectedStore?.owner_id || ''} 
+                  onChange={e => {
+                    const selectedUserId = e.target.value;
+                    const selectedUser = usersList.find((u: any) => u.id === selectedUserId);
+                    const defaultStoreName = selectedUser ? (selectedUser.name || selectedUser.email.split('@')[0]) : '';
+                    const defaultStoreUrl = defaultStoreName.replace(/[^a-zA-Z0-9\u0600-\u06FF]/g, '-').replace(/-+/g, '-').toLowerCase();
+                    
+                    setSelectedStore({
+                      ...selectedStore, 
+                      owner_id: selectedUserId,
+                      store_name: selectedStore?.store_name || defaultStoreName,
+                      store_url: selectedStore?.store_url || defaultStoreUrl
+                    });
+                  }}
                   required
                 >
                   <option value="">اختر المستخدم...</option>
@@ -1986,7 +2098,7 @@ const AdminDashboard = () => {
                   onChange={e => {
                     const val = e.target.value;
                     const autoSlug = val.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
-                    setSelectedStore({...selectedStore, store_name: val, slug: selectedStore?.slug ? selectedStore.slug : autoSlug});
+                    setSelectedStore({...selectedStore, store_name: val, store_url: selectedStore?.store_url ? selectedStore.store_url : autoSlug});
                   }} 
                   placeholder="مثال: متجر الأناقة"
                   required
@@ -1995,7 +2107,7 @@ const AdminDashboard = () => {
               <div>
                 <label className="text-xs font-bold text-gray-500 block mb-1 dark:text-slate-300">رابط المتجر (slug)</label>
                 <div className="flex bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-white/10 rounded-lg overflow-hidden h-11">
-                  <input type="text" className="flex-1 bg-transparent px-3 outline-none focus:bg-white dark:focus:bg-[#1A1A24] text-sm font-medium transition-colors" value={selectedStore?.slug || ''} onChange={e => setSelectedStore({...selectedStore, slug: e.target.value})} dir="ltr" placeholder="my-store" required/>
+                  <input type="text" className="flex-1 bg-transparent px-3 outline-none focus:bg-white dark:focus:bg-[#1A1A24] text-sm font-medium transition-colors" value={selectedStore?.store_url || ''} onChange={e => setSelectedStore({...selectedStore, store_url: e.target.value})} dir="ltr" placeholder="my-store" required/>
                   <span className="flex items-center px-3 bg-gray-100 dark:bg-white/5 border-r border-gray-200 dark:border-white/10 text-xs font-bold text-gray-500" dir="ltr">.suriix.store</span>
                 </div>
               </div>
@@ -2212,6 +2324,64 @@ const AdminDashboard = () => {
               if (error) toast.error('وقع خطأ أثناء التحديث: ' + error.message);
               else { toast.success('تم تحديث الباقة بنجاح!'); fetchSubscriptionPlans(); setIsPlanEditOpen(false); }
             }} className="w-full mt-6 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-black transition-colors shadow-lg shadow-purple-600/20">حفظ تحديث الباقة</button>
+          </div>
+        </div>
+      )}
+
+      {/* Activate Store with Duration Modal */}
+      {isActivateModalOpen && selectedStore && (
+        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-white dark:bg-[#1A1A24] w-full max-w-md rounded-2xl shadow-2xl relative text-right overflow-hidden">
+            <div className="h-1.5 bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400" />
+            <div className="p-6">
+              <button onClick={() => setIsActivateModalOpen(false)} className="absolute top-4 left-4 text-gray-400 hover:text-gray-700 dark:text-slate-400 dark:hover:text-white transition-colors"><XCircle className="w-5 h-5" /></button>
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center text-emerald-600">
+                  <CheckCircle2 className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-black text-gray-900 dark:text-white leading-tight">تفعيل المتجر — {selectedStore.store_name}</h2>
+                  <p className="text-xs text-gray-500 dark:text-slate-400 font-medium">سيُفعَّل بباقة الانطلاقة مجاناً للمدة المحددة</p>
+                </div>
+              </div>
+
+              <p className="text-sm font-bold text-gray-600 dark:text-slate-300 mb-3">اختر مدة التفعيل التجريبي:</p>
+
+              <div className="grid grid-cols-2 gap-3 mb-5">
+                {[
+                  { days: 3, label: '3 أيام', sublabel: 'تجربة سريعة' },
+                  { days: 7, label: '7 أيام', sublabel: 'أسبوع كامل' },
+                  { days: 30, label: 'شهر كامل', sublabel: '30 يوم' },
+                  { days: 90, label: 'ثلاثة أشهر', sublabel: '90 يوم' },
+                ].map(opt => (
+                  <button
+                    key={opt.days}
+                    onClick={() => setActivateDurationDays(opt.days)}
+                    className={`flex flex-col items-center p-4 rounded-xl border-2 transition-all font-bold ${
+                      activateDurationDays === opt.days
+                        ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
+                        : 'border-gray-200 dark:border-white/10 text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-white/5'
+                    }`}
+                  >
+                    <span className="text-xl font-black">{opt.label}</span>
+                    <span className="text-xs font-medium opacity-70 mt-0.5">{opt.sublabel}</span>
+                  </button>
+                ))}
+              </div>
+
+              <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-500/20 rounded-xl p-3 mb-5">
+                <p className="text-xs font-bold text-amber-700 dark:text-amber-400">⚠️ ملاحظة: لن يتم إضافة أي رصيد للمحفظة. فقط سيتم تفعيل الحساب بباقة الانطلاقة تنتهي في <strong>{new Date(Date.now() + activateDurationDays * 86400000).toLocaleDateString('ar-EG')}</strong>. بعد الانتهاء، يعود الحساب مقفلاً حتى الاشتراك.</p>
+              </div>
+
+              <div className="flex gap-3">
+                <button onClick={handleActivateStore} className="flex-1 py-3 bg-gradient-to-l from-emerald-500 to-teal-500 text-white font-black rounded-xl shadow-lg shadow-emerald-500/20 hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+                  <CheckCircle2 className="w-4 h-4" /> تأكيد التفعيل
+                </button>
+                <button onClick={() => setIsActivateModalOpen(false)} className="flex-1 py-3 bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-slate-300 font-bold rounded-xl hover:bg-gray-200 dark:hover:bg-white/10 transition-colors">
+                  إلغاء
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

@@ -324,38 +324,33 @@ const StoreDashboard = () => {
               <Lock className="w-10 h-10 text-amber-500" />
             </div>
 
-            <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-4">متجرك قيد المراجعة</h2>
+            <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-4">تفعيل المتجر</h2>
 
             <p className="text-slate-600 dark:text-slate-300 font-bold leading-relaxed mb-4 text-sm px-2">
-              تم استلام طلبك بنجاح! يقوم فريق Suriix الآن بمراجعة حسابك وتفعيله.
-            </p>
-            <p className="text-amber-600 font-bold mb-8 text-sm">
-              ستتلقى إشعاراً فور تفعيل حسابك.
+              لقد تم إنشاء متجرك بنجاح وهو محمي الآن. يرجى شحن محفظتك والاشتراك في إحدى الباقات لتفعيل لوحة التحكم والبدء بالبيع.
             </p>
 
-            <div className="flex items-center gap-2 justify-center bg-amber-50 border border-amber-200 rounded-2xl p-4 text-xs text-amber-700 font-bold mb-6">
-              <span>متوسط وقت المراجعة: من دقائق إلى ساعة واحدة</span>
-              <span className="text-lg">⏳</span>
+            <div className="flex flex-col gap-3 mt-8">
+              <button
+                onClick={() => {
+                   const storeUrl = storeData.custom_domain ? `https://${storeData.custom_domain}` : `/store/${storeData.slug}`;
+                   window.open(storeUrl, '_blank');
+                }}
+                className="w-full py-4 rounded-xl bg-slate-50 dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-white font-bold text-sm transition flex items-center justify-center gap-2 shadow-sm"
+              >
+                <Eye className="w-5 h-5 text-slate-500 dark:text-slate-400" /> معاينة المتجر
+              </button>
+              
+              <button
+                onClick={() => {
+                  setActiveTab('wallet');
+                  setShowPendingModal(false);
+                }}
+                className="w-full py-4 rounded-xl bg-gradient-to-l from-amber-500 to-orange-500 hover:opacity-90 text-white font-black text-sm transition flex items-center justify-center gap-2 shadow-md shadow-amber-500/20"
+              >
+                <Wallet className="w-5 h-5" /> شحن المحفظة والتفعيل
+              </button>
             </div>
-
-            <button
-              onClick={async () => {
-                // Recheck status from localStorage
-                try {
-                  const raw = localStorage.getItem('suriix_added_stores');
-                  if (raw) {
-                    const list = JSON.parse(raw);
-                    if (list[0]?.status === 'active') {
-                      setIsPending(false);
-                      setShowPendingModal(false);
-                    }
-                  }
-                } catch (_) { }
-              }}
-              className="w-full py-4 rounded-xl bg-slate-50 dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-white font-bold text-sm transition flex items-center justify-center gap-2 shadow-sm"
-            >
-              تحديث الحالة <span className="text-blue-500 bg-blue-100 p-1 rounded-md ml-1"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /></svg></span>
-            </button>
           </div>
         </div>
       )}
@@ -412,7 +407,14 @@ const StoreDashboard = () => {
           {SidebarMenu.map((item) => (
             <button
               key={item.id}
-              onClick={() => { setActiveTab(item.id); setIsMobileMenuOpen(false); }}
+              onClick={() => { 
+                if (isPending && item.id !== 'wallet' && item.id !== 'subscription') {
+                   toast.error("صلاحية مقفلة: يرجى شحن المحفظة والاشتراك في باقة لتفعيل لوحة التحكم الخاصة بمتجرك.");
+                   return;
+                }
+                setActiveTab(item.id); 
+                setIsMobileMenuOpen(false); 
+              }}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 font-medium text-[15px]
                  ${activeTab === item.id
                   ? activeTabClass

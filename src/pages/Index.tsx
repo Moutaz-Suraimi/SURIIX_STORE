@@ -502,174 +502,146 @@ const Index = () => {
       </section>
 
 
-      {/* ===== FEATURES SECTION ===== */}
-      <section id="features" className="py-20 bg-[#f4f0ff] dark:bg-[#15151c] relative transition-colors overflow-hidden">
-        {/* Background blobs */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute top-0 left-0 w-[400px] h-[400px] bg-purple-200/50 dark:bg-purple-900/10 rounded-full blur-3xl -translate-x-1/3 -translate-y-1/3" />
-          <div className="absolute bottom-0 right-0 w-[350px] h-[350px] bg-purple-200/40 dark:bg-purple-900/10 rounded-full blur-3xl translate-x-1/3 translate-y-1/3" />
-        </div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-
-          {/* Heading */}
-          <div className="text-center mb-8">
-            <span className="text-purple-600 font-bold bg-white/80 dark:bg-purple-900/30 px-5 py-2 rounded-full text-sm inline-block mb-5 border border-purple-200 dark:border-purple-800/40 shadow-sm">لماذا Suriix ؟؟</span>
-            <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-4 leading-tight">
+      {/* ===== FEATURES SECTION (Bento Grid) ===== */}
+      <section id="features" className="py-24 bg-white dark:bg-[#0f0f13] relative transition-colors overflow-hidden">
+        {/* Background elements */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-purple-100/40 dark:bg-purple-900/10 rounded-full blur-3xl translate-x-1/3 -translate-y-1/3 pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-fuchsia-100/40 dark:bg-fuchsia-900/10 rounded-full blur-3xl -translate-x-1/3 translate-y-1/3 pointer-events-none" />
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center mb-16">
+            <span className="text-purple-600 font-extrabold bg-purple-50 dark:bg-purple-900/30 px-5 py-2 rounded-full text-sm inline-flex items-center justify-center gap-2 mb-5 border border-purple-100 dark:border-purple-800/40 shadow-sm">
+              <Sparkles className="w-4 h-4" /> لماذا Suriix ؟
+            </span>
+            <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white mb-6 leading-tight tracking-tight">
               كل ما تحتاجه لبناء<br />
-              <span className="text-purple-600">متجر ناجح</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-l from-purple-600 to-fuchsia-500">متجر ناجح باحترافية</span>
             </h2>
-            <p className="text-base text-gray-500 dark:text-gray-400 font-medium max-w-lg mx-auto leading-relaxed">
-              من الأدوات الذكية إلى التصاميم الاحترافية، نوفر لك كل ما تحتاجه للتركيز على ما يهم حقاً: نمو متجرك.
+            <p className="text-lg text-gray-500 dark:text-gray-400 font-medium max-w-2xl mx-auto leading-relaxed">
+              قمنا بتوفير كل الأدوات الذكية التي تساعدك على التركيز في نمو مبيعاتك وتوسيع قاعدة عملائك، بينما نتولى نحن الباقي.
             </p>
           </div>
 
-          {/* ====== MOBILE: Feature Cards Grid ====== */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:hidden mt-8 mb-8">
-            {[
-              { icon: <Zap className="w-6 h-6" />, color: "purple", title: "سرعة فائقة", desc: "متجرك يعمل بأعلى سرعة تحميل لضمان تجربة رائعة" },
-              { icon: <Palette className="w-6 h-6" />, color: "pink", title: "تصاميم احترافية", desc: "قوالب جاهزة بتصاميم عصرية وقابلة للتخصيص" },
-              { icon: <BarChart4 className="w-6 h-6" />, color: "violet", title: "تحليلات ذكية", desc: "تقارير مفصّلة عن أداء متجرك ومبيعاتك" },
-              { icon: <ShieldCheck className="w-6 h-6" />, color: "emerald", title: "أمان تام", desc: "حماية كاملة لبيانات متجرك وعملائك" },
-              { icon: <Smartphone className="w-6 h-6" />, color: "blue", title: "متوافق مع الجوال", desc: "متجرك يبدو رائعاً على جميع الأجهزة" },
-              { icon: <Headphones className="w-6 h-6" />, color: "orange", title: "دعم 24/7", desc: "فريق دعم متخصص لمساعدتك في أي وقت" },
-            ].map((f, i) => (
-              <div key={i} className="bg-white dark:bg-[#1a1a24] rounded-2xl p-5 border border-gray-100 dark:border-white/5 shadow-sm flex items-start gap-4 text-right">
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
-                  f.color === 'purple' ? 'bg-purple-50 text-purple-600 dark:bg-purple-900/30' :
-                  f.color === 'pink' ? 'bg-pink-50 text-pink-600 dark:bg-pink-900/30' :
-                  f.color === 'violet' ? 'bg-violet-50 text-violet-600 dark:bg-violet-900/30' :
-                  f.color === 'emerald' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30' :
-                  f.color === 'blue' ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30' :
-                  'bg-orange-50 text-orange-600 dark:bg-orange-900/30'
-                }`}>{f.icon}</div>
-                <div>
-                  <h3 className="font-extrabold text-gray-900 dark:text-white text-[15px] mb-1">{f.title}</h3>
-                  <p className="text-[13px] text-gray-500 dark:text-gray-400 font-medium leading-relaxed">{f.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* ====== DESKTOP: Circular wheel ====== */}
-          <div className="relative hidden lg:block mx-auto mt-8 mb-24" style={{ width: 900, height: 720 }}>
-
-              {/* Outer dashed ring */}
-              <div className="absolute rounded-full border-[2.5px] border-dashed border-purple-200 dark:border-purple-800/60"
-                style={{ width: 440, height: 440, left: 230, top: 140 }} />
-
-              {/* Inner soft ring */}
-              <div className="absolute rounded-full border border-purple-200/40 dark:border-purple-800/30"
-                style={{ width: 280, height: 280, left: 310, top: 220 }} />
-
-              {/* Connecting dots on the ring: Top, Right, Bottom, Left */}
-              <div className="absolute w-[16px] h-[16px] rounded-full bg-purple-500 ring-4 ring-white dark:ring-[#111118] shadow-sm z-10"
-                style={{ left: 442, top: 132 }} />
-              <div className="absolute w-[16px] h-[16px] rounded-full bg-pink-500 ring-4 ring-white dark:ring-[#111118] shadow-sm z-10"
-                style={{ left: 662, top: 352 }} />
-              <div className="absolute w-[16px] h-[16px] rounded-full bg-violet-500 ring-4 ring-white dark:ring-[#111118] shadow-sm z-10"
-                style={{ left: 442, top: 572 }} />
-              <div className="absolute w-[16px] h-[16px] rounded-full bg-emerald-500 ring-4 ring-white dark:ring-[#111118] shadow-sm z-10"
-                style={{ left: 222, top: 352 }} />
-
-              {/* CENTER: Suriix Logo */}
-              <div className="absolute flex items-center justify-center z-20 group cursor-pointer"
-                style={{ width: 140, height: 140, left: 380, top: 290 }}>
-                {/* Glowing Aura */}
-                <div className="absolute inset-0 rounded-full bg-purple-500/20 dark:bg-purple-900/40 blur-2xl group-hover:bg-purple-500/30 transition-all duration-500" />
-                {/* Center Circle */}
-                <div className="w-[110px] h-[110px] bg-white dark:bg-[#1a1a24] rounded-full shadow-[0_15px_30px_rgba(147,51,234,0.15)] dark:shadow-[0_15px_30px_rgba(0,0,0,0.5)] border border-purple-100 dark:border-purple-800/40 flex items-center justify-center relative group-hover:scale-105 transition-transform duration-500">
-                    <img src="/favicon.png" alt="Suriix Logo" className="w-[55px] h-[55px] object-contain drop-shadow-md group-hover:drop-shadow-lg transition-all duration-500" />
-                </div>
-              </div>
-
-              {/* FEATURE 01: TOP */}
-              <div className="absolute z-30 flex flex-col items-center text-center"
-                style={{ width: 240, left: 330, top: -10 }}>
-                <div className="w-14 h-14 rounded-[1.2rem] bg-purple-50 flex items-center justify-center mb-3">
-                  <Zap className="w-7 h-7 text-purple-600" fill="currentColor" />
-                </div>
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <span className="text-purple-600 font-extrabold text-[11px] font-mono bg-purple-100 px-2.5 py-0.5 rounded-full ring-2 ring-white dark:ring-[#111118]">01</span>
-                  <h3 className="font-extrabold text-gray-900 dark:text-white text-[16px]">إنشاء سريع وسهل</h3>
-                </div>
-                <p className="text-[13px] text-gray-500 dark:text-gray-400 font-bold block" style={{ maxWidth: 200 }}>
-                  أنشئ متجرك في دقائق بدون أي تعقيد أو خبرة برمجية سابقة.
-                </p>
-              </div>
-
-              {/* FEATURE 02: RIGHT */}
-              <div className="absolute z-30 flex flex-col items-end text-right"
-                style={{ width: 240, left: 690, top: 285 }}>
-                <div className="w-14 h-14 rounded-[1.2rem] bg-pink-50 flex items-center justify-center mb-3">
-                  <Palette className="w-7 h-7 text-pink-500" fill="currentColor" />
-                </div>
-                <div className="flex items-center justify-end gap-2 mb-2 w-full">
-                  <h3 className="font-extrabold text-gray-900 dark:text-white text-[16px]">تصاميم احترافية</h3>
-                  <span className="text-pink-600 font-extrabold text-[11px] font-mono bg-pink-100 px-2.5 py-0.5 rounded-full ring-2 ring-white dark:ring-[#111118]">02</span>
-                </div>
-                <p className="text-[13px] text-gray-500 dark:text-gray-400 font-bold block" style={{ maxWidth: 220 }}>
-                  قوالب حديثة ومتجاوبة تعكس هوية علامتك التجارية بشكل مميز.
-                </p>
-              </div>
-
-              {/* FEATURE 03: BOTTOM */}
-              <div className="absolute z-30 flex flex-col items-center text-center"
-                style={{ width: 240, left: 330, top: 600 }}>
-                <div className="w-14 h-14 rounded-[1.2rem] bg-violet-50 flex items-center justify-center mb-3">
-                  <LayoutDashboard className="w-7 h-7 text-violet-600" fill="currentColor" />
-                </div>
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <span className="text-violet-600 font-extrabold text-[11px] font-mono bg-violet-100 px-2.5 py-0.5 rounded-full ring-2 ring-white dark:ring-[#111118]">03</span>
-                  <h3 className="font-extrabold text-gray-900 dark:text-white text-[16px]">إدارة ذكية</h3>
-                </div>
-                <p className="text-[13px] text-gray-500 dark:text-gray-400 font-bold block" style={{ maxWidth: 220 }}>
-                  لوحة تحكم متكاملة لإدارة المنتجات، الطلبات والعملاء بسهولة تامة.
-                </p>
-              </div>
-
-              {/* FEATURE 04: LEFT */}
-              <div className="absolute z-30 flex flex-col items-start text-right"
-                style={{ width: 210, left: 0, top: 285 }}>
-                <div className="w-14 h-14 rounded-[1.2rem] bg-emerald-50 flex items-center justify-center mb-3">
-                  <BarChart4 className="w-7 h-7 text-emerald-500" fill="currentColor" />
-                </div>
-                <div className="flex items-center gap-2 mb-2 w-full justify-start">
-                  <h3 className="font-extrabold text-gray-900 dark:text-white text-[16px] text-right">تحليلات وتقارير</h3>
-                  <span className="text-emerald-600 font-extrabold text-[11px] font-mono bg-emerald-100 px-2.5 py-0.5 rounded-full ring-2 ring-white dark:ring-[#111118]">04</span>
-                </div>
-                <p className="text-[13px] text-gray-500 dark:text-gray-400 font-bold block text-right" style={{ maxWidth: 210 }}>
-                  تقارير دقيقة تساعدك على اتخاذ قرارات ذكية وتطوير متجرك.
-                </p>
-              </div>
-
-          </div>
-
-          {/* ====== MOBILE ====== */}
-          <div className="lg:hidden flex flex-col gap-8 max-w-md mx-auto pt-8 pb-4 px-2">
-            {[
-              { num: '01', icon: <Zap className="w-6 h-6 text-purple-600" style={{ fill: 'currentColor' }} />, border: 'border-purple-100 dark:border-purple-900', title: 'إنشاء سريع وسهل', desc: 'أنشئ متجرك في دقائق بدون أي تعقيد أو خبرة برمجية سابقة.' },
-              { num: '02', icon: <Palette className="w-6 h-6 text-pink-500" style={{ fill: 'currentColor' }} />, border: 'border-pink-100 dark:border-pink-900', title: 'تصاميم احترافية', desc: 'قوالب حديثة ومتجاوبة تعكس هوية علامتك التجارية بشكل مميز.' },
-              { num: '03', icon: <LayoutDashboard className="w-6 h-6 text-violet-600" style={{ fill: 'currentColor' }} />, border: 'border-violet-100 dark:border-violet-900', title: 'إدارة ذكية', desc: 'لوحة تحكم متكاملة لإدارة المنتجات، الطلبات والعملاء بسهولة تامة.' },
-              { num: '04', icon: <BarChart4 className="w-6 h-6 text-emerald-500" style={{ fill: 'currentColor' }} />, border: 'border-emerald-100 dark:border-emerald-900', title: 'تحليلات وتقارير', desc: 'تقارير دقيقة تساعدك على اتخاذ قرارات ذكية وتطوير متجرك.' },
-            ].map((f, i) => (
-              <div key={i} className="flex flex-row-reverse items-center gap-4 text-right">
-                <div className={`w-14 h-14 rounded-full bg-white dark:bg-[#1d1d2a] border-2 ${f.border} shadow-md flex items-center justify-center shrink-0`}>
-                  {f.icon}
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-end gap-2 mb-1">
-                    <h3 className="font-extrabold text-sm text-gray-900 dark:text-white">{f.title}</h3>
-                    <span className="text-gray-400 font-bold text-xs font-mono">{f.num}</span>
+          <div className="grid grid-cols-1 md:grid-cols-3 md:grid-rows-3 gap-5 max-w-6xl mx-auto auto-rows-[minmax(200px,auto)]" dir="rtl">
+            
+            {/* 1. Dashboard & Speed - Large */}
+            <div className="md:col-span-2 md:row-span-2 bg-gradient-to-br from-[#fafafc] to-[#f4f0ff] dark:from-[#1a1a24] dark:to-[#15151c] rounded-3xl border border-gray-100 dark:border-white/5 p-8 flex flex-col relative overflow-hidden group shadow-sm hover:shadow-xl transition-all duration-500">
+               <div className="absolute -left-20 -bottom-20 w-80 h-80 bg-purple-500/10 dark:bg-purple-500/20 rounded-full blur-3xl group-hover:bg-purple-500/30 transition-all duration-700" />
+               <div className="w-14 h-14 rounded-2xl bg-white dark:bg-purple-900/40 text-purple-600 dark:text-purple-400 flex items-center justify-center mb-6 shadow-sm border border-purple-100 dark:border-purple-700/30 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300 relative z-10">
+                 <LayoutDashboard className="w-7 h-7" />
+               </div>
+               <h3 className="font-extrabold text-2xl text-gray-900 dark:text-white mb-3 tracking-tight relative z-10">إدارة ذكية ومبسطة</h3>
+               <p className="text-gray-500 dark:text-gray-400 font-medium leading-relaxed max-w-md relative z-10 text-sm md:text-base">
+                 لوحة تحكم متكاملة تمنحك السيطرة الكاملة على منتجاتك، طلباتك، وعملائك. صُممت لتكون سهلة الاستخدام ومجهزة بكل الأدوات.
+               </p>
+               {/* Mockup decoration */}
+               <div className="mt-8 flex-1 relative w-full translate-y-8 group-hover:translate-y-4 transition-transform duration-700">
+                  <div className="w-full h-[200px] bg-white dark:bg-[#0f0f13] rounded-t-2xl shadow-[0_-10px_40px_rgba(0,0,0,0.05)] dark:shadow-[0_-10px_40px_rgba(0,0,0,0.4)] border border-gray-100 dark:border-white/10 p-4 border-b-0 overflow-hidden">
+                     <div className="flex items-center justify-between mb-4 border-b border-gray-50 dark:border-white/5 pb-3">
+                        <div className="flex items-center gap-2">
+                           <div className="w-3 h-3 bg-red-400 rounded-full" />
+                           <div className="w-3 h-3 bg-yellow-400 rounded-full" />
+                           <div className="w-3 h-3 bg-green-400 rounded-full" />
+                        </div>
+                        <div className="h-4 w-24 bg-gray-100 dark:bg-white/5 rounded-full" />
+                     </div>
+                     <div className="flex gap-4">
+                        <div className="flex-1 space-y-3">
+                           <div className="h-20 w-full bg-purple-50 dark:bg-purple-900/20 rounded-xl border border-purple-100 dark:border-purple-800/20" />
+                           <div className="h-10 w-full bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-100 dark:border-white/5" />
+                        </div>
+                        <div className="w-1/3 h-full bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-100 dark:border-white/5 p-3 flex flex-col gap-2">
+                           <div className="h-3 w-1/2 bg-gray-200 dark:bg-white/10 rounded-full" />
+                           <div className="h-3 w-3/4 bg-gray-200 dark:bg-white/10 rounded-full" />
+                           <div className="h-3 w-2/3 bg-gray-200 dark:bg-white/10 rounded-full" />
+                        </div>
+                     </div>
                   </div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed font-medium">{f.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+               </div>
+            </div>
 
+            {/* 2. Analytics */}
+            <div className="bg-gradient-to-br from-[#fafafc] to-[#f4f0ff] dark:from-[#1a1a24] dark:to-[#15151c] rounded-3xl border border-gray-100 dark:border-white/5 p-6 flex flex-col relative overflow-hidden group shadow-sm hover:shadow-xl transition-all duration-500">
+               <div className="w-12 h-12 rounded-2xl bg-white dark:bg-blue-900/40 text-blue-500 dark:text-blue-400 border border-blue-100 dark:border-blue-800/40 flex items-center justify-center mb-4 shrink-0 shadow-sm group-hover:-translate-y-1 transition-transform duration-300">
+                 <BarChart4 className="w-6 h-6" />
+               </div>
+               <h3 className="font-extrabold text-lg text-gray-900 dark:text-white mb-2 tracking-tight">تحليلات دقيقة</h3>
+               <p className="text-gray-500 dark:text-gray-400 font-medium leading-relaxed text-xs mb-6">
+                 تقارير مالية تضعك في قلب أرقام مبيعاتك وتساعدك على اتخاذ القرارات الصحيحة.
+               </p>
+               <div className="mt-auto h-20 w-full relative">
+                  <svg viewBox="0 0 100 40" className="w-full h-full overflow-visible" preserveAspectRatio="none">
+                     <path d="M0,40 L20,30 L40,35 L60,15 L80,20 L100,5" fill="none" stroke="#3b82f6" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                     <path d="M0,40 L20,30 L40,35 L60,15 L80,20 L100,5 L100,40 L0,40 Z" fill="url(#blue-gradient)" opacity="0.4" />
+                     <defs>
+                        <linearGradient id="blue-gradient" x1="0" y1="0" x2="0" y2="1">
+                           <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.5" />
+                           <stop offset="100%" stopColor="#3b82f6" stopOpacity="0" />
+                        </linearGradient>
+                     </defs>
+                  </svg>
+               </div>
+            </div>
+
+            {/* 3. Security */}
+            <div className="bg-gradient-to-br from-[#fafafc] to-[#f4f0ff] dark:from-[#1a1a24] dark:to-[#15151c] rounded-3xl border border-gray-100 dark:border-white/5 p-6 flex flex-col relative overflow-hidden group shadow-sm hover:shadow-xl transition-all duration-500 items-start text-right">
+               <div className="absolute inset-0 bg-emerald-500/5 dark:bg-emerald-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+               <div className="w-12 h-12 rounded-2xl bg-white dark:bg-emerald-900/40 text-emerald-500 border border-emerald-100 dark:border-emerald-800/40 flex items-center justify-center mb-4 group-hover:scale-110 shadow-sm transition-transform duration-500 relative z-10">
+                 <ShieldCheck className="w-6 h-6" />
+               </div>
+               <h3 className="font-extrabold text-lg text-gray-900 dark:text-white mb-2 tracking-tight relative z-10">حماية فائقة</h3>
+               <p className="text-gray-500 dark:text-gray-400 font-medium leading-relaxed text-xs relative z-10">
+                 معايير أمان موثوقة لحماية متجرك ومعلومات عملائك وبيانات الدفع بالكامل.
+               </p>
+            </div>
+
+            {/* 4. Speed & Mobile */}
+            <div className="bg-gradient-to-br from-fuchsia-600 to-purple-600 rounded-3xl p-6 flex flex-col justify-center relative overflow-hidden group shadow-[0_15px_30px_rgba(168,85,247,0.2)] md:col-start-1 text-white hover:shadow-[0_15px_40px_rgba(168,85,247,0.3)] transition-all duration-300">
+               <div className="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-2xl" />
+               <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center mb-4 shrink-0 border border-white/20 group-hover:scale-105 transition-transform">
+                 <Zap className="w-6 h-6 text-white" />
+               </div>
+               <h3 className="font-extrabold text-lg mb-2 tracking-tight shadow-sm drop-shadow-sm">سرعة من جيل آخر</h3>
+               <p className="text-white/80 font-medium leading-relaxed text-xs">
+                 بنية تحتية تضمن سرعة تصفح عالية جداً مما يطوّر من تجربة عملائك.
+               </p>
+            </div>
+
+            {/* 5. Marketing & Affiliate */}
+            <div className="md:col-span-2 bg-gradient-to-br from-[#fafafc] to-[#f4f0ff] dark:from-[#1a1a24] dark:to-[#15151c] rounded-3xl border border-gray-100 dark:border-white/5 p-6 flex flex-col md:flex-row items-center gap-6 relative overflow-hidden group shadow-sm hover:shadow-xl transition-all duration-500">
+               <div className="flex-1 text-center md:text-right w-full">
+                  <div className="w-12 h-12 rounded-2xl bg-white dark:bg-rose-900/40 text-rose-500 border border-rose-100 dark:border-rose-800/40 flex items-center justify-center mb-4 shrink-0 mx-auto md:mx-0 shadow-sm group-hover:rotate-12 group-hover:scale-110 transition-transform duration-300">
+                    <Rocket className="w-6 h-6" />
+                  </div>
+                  <h3 className="font-extrabold text-lg text-gray-900 dark:text-white mb-2 tracking-tight">نظام تسويق متكامل</h3>
+                  <p className="text-gray-500 dark:text-gray-400 font-medium leading-relaxed text-sm max-w-sm mx-auto md:mx-0">
+                    مدمج مع نظام مسوقين بالعمولة يتيح للمؤثرين جلب المبيعات لك بسهولة ومضاعفة دخل متجرك بشكل أوتوماتيكي وموثوق.
+                  </p>
+               </div>
+               <div className="w-full md:w-auto flex justify-center lg:justify-end relative mr-auto">
+                   <div className="absolute inset-0 bg-rose-500/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                   <div className="relative bg-white dark:bg-[#252533] p-4 rounded-2xl shadow-[0_15px_30px_rgba(0,0,0,0.06)] dark:shadow-[0_15px_30px_rgba(0,0,0,0.4)] border border-gray-100 dark:border-white/10 w-full md:w-[220px] transform group-hover:-translate-y-2 group-hover:-rotate-2 transition-all duration-500">
+                      <div className="flex justify-between items-center mb-4">
+                         <span className="font-bold text-xs text-gray-900 dark:text-white">أرباح مسوق</span>
+                         <span className="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-500 text-[10px] font-bold px-2 py-0.5 rounded-md border border-emerald-100 dark:border-emerald-800/30">+25%</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                         <div className="w-10 h-10 bg-gray-100 dark:bg-white/10 rounded-full overflow-hidden shrink-0 border border-gray-200 dark:border-gray-700">
+                            <img src="https://i.pravatar.cc/150?img=33" alt="Marketer" className="w-full h-full object-cover" />
+                         </div>
+                         <div className="text-right">
+                            <p className="font-extrabold text-xs text-gray-900 dark:text-white mb-0.5 whitespace-nowrap">سارة محمد</p>
+                            <p className="font-bold text-rose-500 text-[11px]">8,450 ريال</p>
+                         </div>
+                      </div>
+                   </div>
+               </div>
+            </div>
+
+          </div>
         </div>
       </section>
+
 
 
 

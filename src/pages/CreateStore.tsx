@@ -243,12 +243,16 @@ const CreateStore = () => {
       return;
     }
     try {
-      const { data: existingStore } = await supabase.from('stores').select('id').eq('store_url', storeLink).maybeSingle();
-      if (existingStore) {
+      const { data: isAvailable, error } = await supabase.rpc('check_store_url_available', { check_url: storeLink });
+      if (error) {
+        console.error("RPC Error:", error);
+      } else if (!isAvailable) {
         toast.error("عذراً، رابط المتجر (Store URL) مستخدم من قبل، يرجى اختيار رابط آخر.");
         return;
       }
-    } catch (err) { console.error("Domain check error:", err); }
+    } catch (err) { 
+      console.error("Domain check error:", err); 
+    }
     setStep(3);
   };
 
@@ -388,15 +392,24 @@ const CreateStore = () => {
         if (!userError && userData) {
           const { data: storeRow, error: storeError } = await supabase.from("stores").insert([{ owner_id: userData.id, store_name: storeName || "متجري الجديد", store_niche: "عام", store_url: storeSlug, theme_color: themeStyle, template_id: TEMPLATE_CARDS[0].name, is_active: false }]).select().single();
           if (storeRow) realStoreId = storeRow.id;
-          if (storeError) console.error("Store error:", storeError);
-        } else if (userError) { console.error("Error creating user:", userError); }
+          if (storeError) {
+             console.error("Store error:", storeError);
+             throw new Error(storeError.message || "فشل إنشاء المتجر");
+          }
+        } else if (userError) {
+           console.error("Error creating user:", userError);
+           throw new Error(userError.message || "فشل تسجيل بيانات المستخدم");
+        }
       } else {
         const SUPABASE_URL = "https://rajvyxdfibpamanmmkgf.supabase.co";
         // Passing isActive: false to edge function (if supported), else it defaults to what the edge function does
         const saveRes = await fetch(`${SUPABASE_URL}/functions/v1/save-store`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: ownerEmail, storeName: storeName || "متجري الجديد", storeSlug, merchantName: merchantName || "صاحب المتجر", phone: cleanPhone, themeStyle, templateId: TEMPLATE_CARDS[0].name, isActive: false }) });
         const saveResult = await saveRes.json();
         if (saveResult.storeId) realStoreId = saveResult.storeId;
-        if (saveResult.error) console.error("save-store error:", saveResult.error);
+        if (saveResult.error) {
+           console.error("save-store error:", saveResult.error);
+           throw new Error(saveResult.error || "فشل إنشاء المتجر عبر الدالة");
+        }
       }
 
       // Record referral if a referral is present and a store was created
@@ -426,17 +439,11 @@ const CreateStore = () => {
       localStorage.setItem("suriix_user_auth", "true");
       localStorage.setItem("suriix_user_role", "vendor");
       setStep(7);
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      const storeSlugFallback = storeLink || `store-${Date.now()}`;
-      const newStore = { id: Date.now(), name: storeName || "متجري الجديد", slug: storeSlugFallback, description: "متجر فاخر", phone: cleanPhone, niche: "عام", logo: logoFile, whatsapp, emailContact, instagram, facebook, tiktok, theme: themeStyle, cardStyle, template: TEMPLATE_CARDS[0].name, status: "pending", tier: "Basic", createdAt: new Date().toISOString().split("T")[0], owner: merchantName || "مستخدم جديد", email: authEmail || `owner_${Date.now()}@example.com` };
-      const existing = localStorage.getItem("suriix_added_stores");
-      const list = existing ? JSON.parse(existing) : [];
-      list.unshift(newStore);
-      localStorage.setItem("suriix_added_stores", JSON.stringify(list));
-      localStorage.setItem("suriix_user_auth", "true");
-      localStorage.setItem("suriix_user_role", "vendor");
-      setStep(7);
+      const msg = error.message || "حدث خطأ غير متوقع. قد يكون رابط المتجر مستخدماً من قبل.";
+      toast.error(msg);
+      // We don't advance the user to the success screen if this fails!
     }
   };
 
@@ -666,260 +673,268 @@ const CreateStore = () => {
                       )}
                     </label>
                     <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mt-6 flex items-start gap-2">
-                      <span className="text-amber-500">💡</span> في حال لم ترفع شعاراً، سنقوم بإنشاء شعار رمزي تلقائي لمتجرك باستخدام الحرف الأول من اسم متجرك بشكل مميز جداً.
+                       <span className="text-amber-500">💡</span> في حال لم ترفع شعاراً، سنقوم بإنشاء شعار رمزي تلقائي لمتجرك باستخدام الحرف الأول من اسم متجرك بشكل مميز جداً.
                     </p>
                   </div>
                 </>
               )}
 
               {/* Wizard Step 2: بيانات التواصل */}
-              {
-                (step as number) === 3 && (
-                  <div className="w-full flex flex-col items-center pb-8">
-                    <div className="text-center mb-8">
-                      <h2 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white mb-2">كيف يتواصل معك عملاؤك؟</h2>
-                      <p className="text-sm font-bold text-slate-600 dark:text-slate-400">أضف وسيلة تواصل واحدة على الأقل ليستطيع عملاؤك الطلب منك بسهولة</p>
-                    </div>
-
-                    <div className="w-full flex flex-col md:flex-row gap-6 max-w-5xl mx-auto">
-                      {/* Left Column: Settings */}
-                      <div className="flex-[1.8] flex flex-col relative w-full">
-                        <div className="bg-white dark:bg-[#111116] border border-slate-200 dark:border-white/5 rounded-[32px] p-8 shadow-xl shadow-slate-200/20 dark:shadow-none space-y-6">
-
-                          {/* WhatsApp Toggle */}
-                          <div className="pt-2">
-                            <div className="flex items-center justify-between mb-4">
-                              <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center">
-                                  <MessageSquare className="w-6 h-6 fill-emerald-500" />
-                                </div>
-                                <div className="flex flex-col gap-0.5">
-                                  <h3 className="font-bold text-slate-900 dark:text-white text-md flex items-center gap-2">رقم واتساب <span className="text-[10px] bg-purple-100 text-primary px-2 py-0.5 rounded-full font-bold">إلزامي</span></h3>
-                                  <p className="text-[11px] text-slate-500 font-medium dark:text-slate-300">سيظهر زر واتساب في متجرك ليتواصل معك العملاء مباشرة</p>
-                                </div>
-                              </div>
-                              <div className={`w-14 h-7 rounded-full p-1 cursor-pointer transition-colors ${whatsappEnabled ? 'bg-emerald-500' : 'bg-slate-200'}`} onClick={() => setWhatsappEnabled(!whatsappEnabled)}>
-                                <div className={`w-5 h-5 rounded-full bg-white transition-transform ${whatsappEnabled ? 'translate-x-[-28px]' : 'translate-x-0'}`} />
-                              </div>
-                            </div>
-                            {whatsappEnabled && (
-                              <div className="mt-4">
-                                <div className="relative flex" dir="ltr">
-                                  <select value={phoneCode} onChange={(e) => setPhoneCode(e.target.value)} className="bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 border-r-0 rounded-l-xl px-4 py-3.5 text-sm font-bold text-slate-900 dark:text-white focus:outline-none appearance-none cursor-pointer w-[120px] text-center z-10 transition-colors">
-                                    <option value="+966">+966</option>
-                                    <option value="+967">+967</option>
-                                  </select>
-                                  <input type="tel" value={whatsapp} onChange={e => setWhatsapp(e.target.value)} placeholder="مثال: 777 123 456" className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-r-xl px-4 py-3.5 text-sm font-bold text-slate-900 dark:text-white focus:outline-none pr-6 text-right transition-colors" dir="rtl" />
-                                </div>
-                                <p className="text-[10px] text-slate-500 mt-2 flex items-center gap-1.5 font-bold dark:text-slate-300"><CheckCircle className="w-3.5 h-3.5 text-slate-400 dark:text-slate-300" /> سيتم فتح محادثة واتساب تلقائياً عند الضغط على الزر</p>
-                              </div>
-                            )}
-                          </div>
-
-                          <div className="h-px bg-slate-100 dark:bg-white/5 w-full my-6" />
-
-                          {/* Email Toggle */}
-                          <div>
-                            <div className="flex items-center justify-between mb-4">
-                              <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-transparent text-slate-500 flex items-center justify-center dark:text-slate-300">
-                                  <Mail className="w-6 h-6" />
-                                </div>
-                                <div className="flex flex-col gap-0.5">
-                                  <h3 className="font-bold text-slate-900 dark:text-white text-md">البريد الإلكتروني</h3>
-                                  <p className="text-[11px] text-slate-500 font-medium dark:text-slate-300">سيظهر في متجرك ليتواصل معك العملاء عبر الإيميل</p>
-                                </div>
-                              </div>
-                              <div className={`w-14 h-7 rounded-full p-1 cursor-pointer transition-colors ${emailEnabled ? 'bg-emerald-500' : 'bg-slate-200'}`} onClick={() => setEmailEnabled(!emailEnabled)}>
-                                <div className={`w-5 h-5 rounded-full bg-white transition-transform ${emailEnabled ? 'translate-x-[-28px]' : 'translate-x-0'}`} />
-                              </div>
-                            </div>
-                            {emailEnabled && (
-                              <div className="mt-4" dir="ltr">
-                                <input type="email" value={emailContact} onChange={e => setEmailContact(e.target.value)} placeholder="مثال: store@brand.com" className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3.5 text-sm font-bold text-slate-900 dark:text-white focus:outline-none text-right transition-colors" dir="rtl" />
-                              </div>
-                            )}
-                          </div>
-
-                          <div className="h-px bg-slate-100 dark:bg-white/5 w-full my-6" />
-
-                          {/* Instagram Toggle */}
-                          <div>
-                            <div className="flex items-center justify-between mb-4">
-                              <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-2xl border border-slate-200 dark:border-white/10 bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-500 text-white flex items-center justify-center">
-                                  <Instagram className="w-6 h-6" />
-                                </div>
-                                <div className="flex flex-col gap-0.5">
-                                  <h3 className="font-bold text-slate-900 dark:text-white text-md">حساب إنستجرام</h3>
-                                  <p className="text-[11px] text-slate-500 font-medium dark:text-slate-300">أضف اسم المستخدم لربط حسابك بمتجرك</p>
-                                </div>
-                              </div>
-                              <div className={`w-14 h-7 rounded-full p-1 cursor-pointer transition-colors ${instagramEnabled ? 'bg-emerald-500' : 'bg-slate-200'}`} onClick={() => setInstagramEnabled(!instagramEnabled)}>
-                                <div className={`w-5 h-5 rounded-full bg-white transition-transform ${instagramEnabled ? 'translate-x-[-28px]' : 'translate-x-0'}`} />
-                              </div>
-                            </div>
-                            {instagramEnabled && (
-                              <div className="mt-4" dir="ltr">
-                                <input type="text" value={instagram} onChange={e => setInstagram(e.target.value)} placeholder="مثال: @yourstore" className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3.5 text-sm font-bold text-slate-900 dark:text-white focus:outline-none text-right transition-colors" dir="rtl" />
-                              </div>
-                            )}
-
-                            <div className="h-px bg-slate-100 dark:bg-white/5 w-full my-6" />
-
-                            {/* Facebook Toggle */}
-                            <div>
-                              <div className="flex items-center justify-between mb-4">
-                                <div className="flex items-center gap-4">
-                                  <div className="w-12 h-12 rounded-2xl border border-slate-200 dark:border-white/10 bg-[#1877F2] text-white flex items-center justify-center">
-                                    <Facebook className="w-6 h-6" />
-                                  </div>
-                                  <div className="flex flex-col gap-0.5">
-                                    <h3 className="font-bold text-slate-900 dark:text-white text-md">حساب فيسبوك</h3>
-                                    <p className="text-[11px] text-slate-500 font-medium dark:text-slate-300">أضف رابط أو اسم صفحة الفيسبوك</p>
-                                  </div>
-                                </div>
-                                <div className={`w-14 h-7 rounded-full p-1 cursor-pointer transition-colors ${facebookEnabled ? 'bg-emerald-500' : 'bg-slate-200'}`} onClick={() => setFacebookEnabled(!facebookEnabled)}>
-                                  <div className={`w-5 h-5 rounded-full bg-white transition-transform ${facebookEnabled ? 'translate-x-[-28px]' : 'translate-x-0'}`} />
-                                </div>
-                              </div>
-                              {facebookEnabled && (
-                                <div className="mt-4" dir="ltr">
-                                  <input type="text" value={facebook} onChange={e => setFacebook(e.target.value)} placeholder="مثال: yourstore" className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3.5 text-sm font-bold text-slate-900 dark:text-white focus:outline-none text-right transition-colors" dir="rtl" />
-                                </div>
-                              )}
-                            </div>
-
-                            <div className="h-px bg-slate-100 dark:bg-white/5 w-full my-6" />
-
-                            {/* TikTok Toggle */}
-                            <div>
-                              <div className="flex items-center justify-between mb-4">
-                                <div className="flex items-center gap-4">
-                                  <div className="w-12 h-12 rounded-2xl border border-slate-200 dark:border-white/10 bg-black text-white flex items-center justify-center">
-                                    <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" /></svg>
-                                  </div>
-                                  <div className="flex flex-col gap-0.5">
-                                    <h3 className="font-bold text-slate-900 dark:text-white text-md">حساب تيك توك</h3>
-                                    <p className="text-[11px] text-slate-500 font-medium dark:text-slate-300">أضف رابط أو اسم حساب تيك توك</p>
-                                  </div>
-                                </div>
-                                <div className={`w-14 h-7 rounded-full p-1 cursor-pointer transition-colors ${tiktokEnabled ? 'bg-emerald-500' : 'bg-slate-200'}`} onClick={() => setTiktokEnabled(!tiktokEnabled)}>
-                                  <div className={`w-5 h-5 rounded-full bg-white transition-transform ${tiktokEnabled ? 'translate-x-[-28px]' : 'translate-x-0'}`} />
-                                </div>
-                              </div>
-                              {tiktokEnabled && (
-                                <div className="mt-4" dir="ltr">
-                                  <input type="text" value={tiktok} onChange={e => setTiktok(e.target.value)} placeholder="مثال: @yourstore" className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3.5 text-sm font-bold text-slate-900 dark:text-white focus:outline-none text-right transition-colors" dir="rtl" />
-                                </div>
-                              )}
-                            </div>
-                          </div>
-
-                          {/* Auto Message Box */}
-                          <div className="bg-primary/10 dark:bg-primary/100/5 rounded-[24px] p-6 border border-indigo-100 dark:border-indigo-500/10 mt-6 relative overflow-hidden">
-                            <div className="flex items-center justify-between mb-4">
-                              <div className="flex gap-3">
-                                <div className="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center shadow-lg shadow-indigo-500/20">
-                                  <MessageSquare className="w-5 h-5" />
-                                </div>
-                                <div className="flex flex-col gap-0.5 mt-1">
-                                  <h3 className="font-bold text-slate-900 dark:text-white text-sm flex items-center gap-2">رسالة واتساب تلقائية <span className="text-[10px] bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full font-bold dark:text-slate-300">اختياري</span></h3>
-                                  <p className="text-[11px] text-slate-500 font-medium dark:text-slate-300">اكتب رسالة جاهزة سيتم إرسالها عند تواصل العملاء معك</p>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="relative">
-                              <textarea value={autoMessage} onChange={e => setAutoMessage(e.target.value)} maxLength={100} className="w-full h-24 bg-white dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl p-4 text-sm font-bold text-slate-900 dark:text-white focus:outline-none resize-none shadow-sm" />
-                              <span className="absolute bottom-3 right-3 text-[10px] text-slate-400 font-bold dark:text-slate-300">{autoMessage.length}/100</span>
-                            </div>
-                          </div>
-
-                          <div className="flex bg-slate-50 dark:bg-white/5 rounded-2xl py-4 px-4 mt-6 items-center justify-center gap-2 text-xs font-bold text-slate-500 border border-slate-200 dark:border-white/5 dark:text-slate-300">
-                            <Lock className="w-4 h-4" /> لن يتم نشر بياناتك، وستبقى آمنة وسرية
-                          </div>
-                        </div>
-
-                        <div className="flex justify-between items-center mt-6 px-2">
-                          <button onClick={() => setStep(2)} className="bg-white dark:bg-[#111116] border border-slate-200 dark:border-white/10 px-6 py-3.5 rounded-2xl text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 font-bold flex items-center gap-2 cursor-pointer transition-colors shadow-sm text-sm">
-                            <ArrowRight className="w-4 h-4" /> السابق
-                          </button>
-                          <button onClick={handleNextStep2} className="bg-primary hover:bg-primary/100 text-white px-10 py-3.5 rounded-2xl font-bold flex items-center gap-2 shadow-xl shadow-indigo-500/20 cursor-pointer transition-all text-sm">
-                            التالي <ArrowLeft className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Right Column: Live Preview & Tip */}
-                      <div className="flex-[1.2] flex flex-col gap-6 w-full max-w-[340px]">
-                        {/* Live Preview Card */}
-                        <div className="bg-slate-50 dark:bg-[#111116] border border-slate-200 dark:border-white/5 rounded-[32px] p-6 shadow-xl shadow-slate-200/20 dark:shadow-none flex flex-col items-center">
-                          <div className="flex items-center gap-2 text-indigo-900 dark:text-indigo-400 font-extrabold text-sm mb-6 w-full justify-center">
-                            <Eye className="w-4 h-4" /> معاينة ما سيراه عملاؤك
-                          </div>
-
-                          <div className="w-full bg-white dark:bg-black/30 border border-slate-200 dark:border-white/10 rounded-[32px] p-6 shadow-md relative pt-12 mt-4 flex flex-col items-center">
-                            <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center text-white absolute -top-8 border-[6px] border-white dark:border-[#111116] shadow-md overflow-hidden">
-                              {logoFile ? <img src={logoFile} alt="logo" className="w-full h-full object-cover" /> : <Store className="w-7 h-7" />}
-                            </div>
-
-                            <h3 className="font-black text-lg text-slate-900 dark:text-white mt-2">{storeName || 'متجري'}</h3>
-                            <p className="text-[11px] text-slate-500 font-bold mb-6 dark:text-slate-300">متجر إلكتروني</p>
-
-                            <div className="w-full flex items-center gap-3 mb-6">
-                              <div className="h-px bg-slate-100 dark:bg-white/10 flex-1" />
-                              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-300">تواصل معنا</span>
-                              <div className="h-px bg-slate-100 dark:bg-white/10 flex-1" />
-                            </div>
-
-                            <div className="w-full space-y-3">
-                              {whatsappEnabled && (
-                                <button className="w-full bg-emerald-500 text-white rounded-2xl py-3.5 text-sm font-bold flex items-center justify-between px-4 shadow-md shadow-emerald-500/20">
-                                  <span>تواصل عبر واتساب</span>
-                                  <MessageSquare className="w-4 h-4" />
-                                </button>
-                              )}
-                              {emailEnabled && (
-                                <button className="w-full bg-white dark:bg-[#111116] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 rounded-2xl py-3.5 text-sm font-bold flex items-center justify-between px-4 shadow-sm">
-                                  <span>راسلنا عبر البريد</span>
-                                  <Mail className="w-4 h-4 text-slate-400 dark:text-slate-300" />
-                                </button>
-                              )}
-                              {instagramEnabled && (
-                                <button className="w-full bg-white dark:bg-[#111116] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 rounded-2xl py-3.5 text-sm font-bold flex items-center justify-between px-4 shadow-sm">
-                                  <span>تابعنا على إنستجرام</span>
-                                  <Instagram className="w-4 h-4 text-pink-500" />
-                                </button>
-                              )}
-                              {facebookEnabled && (
-                                <button className="w-full bg-[#1877F2]/10 dark:bg-[#1877F2]/20 border border-[#1877F2]/20 text-[#1877F2] rounded-2xl py-3.5 text-sm font-bold flex items-center justify-between px-4 shadow-sm">
-                                  <span>تابعنا على فيسبوك</span>
-                                  <Facebook className="w-4 h-4 text-[#1877F2]" />
-                                </button>
-                              )}
-                            </div>
-
-                            <div className="mt-8 flex items-center justify-center gap-1.5 text-[10px] text-slate-400 font-bold bg-slate-50 dark:bg-white/5 py-2 px-4 rounded-full dark:text-slate-300">
-                              <Lock className="w-3 h-3" /> تجربتك آمنة ومشفرة
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Tip Card */}
-                        <div className="bg-primary/10 dark:bg-primary/100/10 border border-indigo-100 dark:border-primary/20 rounded-[28px] p-6 text-center shadow-lg shadow-indigo-500/5">
-                          <div className="inline-flex items-center gap-2 text-primary dark:text-indigo-400 font-black text-sm mb-3">
-                            نصيحة <Sparkles className="w-4 h-4" />
-                          </div>
-                          <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-bold">
-                            كلما أضفت وسائل تواصل أكثر، زادت فرص تواصل العملاء معك وزيادة مبيعاتك
-                          </p>
-                        </div>
-                      </div>
-
-                    </div>
+              {step === 3 && (
+                <div className="w-full flex flex-col pb-8">
+                  <div className="text-center mb-8">
+                    <h2 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white mb-2">كيف يتواصل معك عملاؤك؟</h2>
+                    <p className="text-sm font-bold text-slate-600 dark:text-slate-400">أضف وسيلة تواصل واحدة على الأقل ليستطيع عملاؤك الطلب منك بسهولة</p>
                   </div>
-                )
-              }
+
+                  <div className="w-full flex gap-6 max-w-5xl mx-auto flex-col lg:flex-row">
+                    {/* Left Column: Settings */}
+                    <div className="flex-[1.8] flex flex-col relative w-full h-fit">
+                      <div className="bg-white dark:bg-[#111116] border border-slate-200 dark:border-white/5 rounded-[32px] p-6 sm:p-8 shadow-xl shadow-slate-200/20 dark:shadow-none space-y-6">
+
+                        {/* WhatsApp Toggle */}
+                        <div className="pt-2">
+                          <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-4">
+                              <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center shrink-0">
+                                <MessageSquare className="w-6 h-6 fill-emerald-500" />
+                              </div>
+                              <div className="flex flex-col gap-0.5">
+                                <h3 className="font-bold text-slate-900 dark:text-white text-md flex items-center gap-2">رقم واتساب <span className="text-[10px] bg-purple-100 text-primary px-2 py-0.5 rounded-full font-bold">إلزامي</span></h3>
+                                <p className="text-[11px] text-slate-500 font-medium dark:text-slate-300">سيظهر زر واتساب في متجرك ليتواصل معك العملاء مباشرة</p>
+                              </div>
+                            </div>
+                            <div className={`w-14 h-7 shrink-0 rounded-full p-1 cursor-pointer transition-colors ${whatsappEnabled ? 'bg-emerald-500' : 'bg-slate-200'}`} onClick={() => setWhatsappEnabled(!whatsappEnabled)}>
+                              <div className={`w-5 h-5 rounded-full bg-white transition-transform ${whatsappEnabled ? 'translate-x-[-28px]' : 'translate-x-0'}`} />
+                            </div>
+                          </div>
+                          {whatsappEnabled && (
+                            <div className="mt-4">
+                              <div className="relative flex" dir="ltr">
+                                <select value={phoneCode} onChange={(e) => setPhoneCode(e.target.value)} className="bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 border-r-0 rounded-l-xl px-2 sm:px-4 py-3.5 text-sm font-bold text-slate-900 dark:text-white focus:outline-none appearance-none cursor-pointer w-[90px] sm:w-[120px] text-center z-10 transition-colors">
+                                  <option value="+966">+966</option>
+                                  <option value="+967">+967</option>
+                                </select>
+                                <input type="tel" value={whatsapp} onChange={e => setWhatsapp(e.target.value)} placeholder="مثال: 777 123 456" className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-r-xl px-4 py-3.5 text-sm font-bold text-slate-900 dark:text-white focus:outline-none pr-6 text-right transition-colors" dir="rtl" />
+                              </div>
+                              <p className="text-[10px] text-slate-500 mt-2 flex items-center gap-1.5 font-bold dark:text-slate-300"><CheckCircle className="w-3.5 h-3.5 text-slate-400 dark:text-slate-300 shrink-0" /> سيتم فتح محادثة واتساب تلقائياً عند الضغط على الزر</p>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="h-px bg-slate-100 dark:bg-white/5 w-full my-6" />
+
+                        {/* Email Toggle */}
+                        <div>
+                          <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-4">
+                              <div className="w-12 h-12 rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-transparent text-slate-500 flex items-center justify-center dark:text-slate-300 shrink-0">
+                                <Mail className="w-6 h-6" />
+                              </div>
+                              <div className="flex flex-col gap-0.5">
+                                <h3 className="font-bold text-slate-900 dark:text-white text-md">البريد الإلكتروني</h3>
+                                <p className="text-[11px] text-slate-500 font-medium dark:text-slate-300">سيظهر في متجرك ليتواصل معك العملاء عبر الإيميل</p>
+                              </div>
+                            </div>
+                            <div className={`w-14 h-7 shrink-0 rounded-full p-1 cursor-pointer transition-colors ${emailEnabled ? 'bg-emerald-500' : 'bg-slate-200'}`} onClick={() => setEmailEnabled(!emailEnabled)}>
+                              <div className={`w-5 h-5 rounded-full bg-white transition-transform ${emailEnabled ? 'translate-x-[-28px]' : 'translate-x-0'}`} />
+                            </div>
+                          </div>
+                          {emailEnabled && (
+                            <div className="mt-4" dir="ltr">
+                              <input type="email" value={emailContact} onChange={e => setEmailContact(e.target.value)} placeholder="مثال: store@brand.com" className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3.5 text-sm font-bold text-slate-900 dark:text-white focus:outline-none text-right transition-colors" dir="rtl" />
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="h-px bg-slate-100 dark:bg-white/5 w-full my-6" />
+
+                        {/* Instagram Toggle */}
+                        <div>
+                          <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-4">
+                              <div className="w-12 h-12 rounded-2xl border border-slate-200 dark:border-white/10 bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-500 text-white flex items-center justify-center shrink-0">
+                                <Instagram className="w-6 h-6" />
+                              </div>
+                              <div className="flex flex-col gap-0.5">
+                                <h3 className="font-bold text-slate-900 dark:text-white text-md">حساب إنستجرام</h3>
+                                <p className="text-[11px] text-slate-500 font-medium dark:text-slate-300">أضف اسم المستخدم لربط حسابك بمتجرك</p>
+                              </div>
+                            </div>
+                            <div className={`w-14 h-7 shrink-0 rounded-full p-1 cursor-pointer transition-colors ${instagramEnabled ? 'bg-emerald-500' : 'bg-slate-200'}`} onClick={() => setInstagramEnabled(!instagramEnabled)}>
+                              <div className={`w-5 h-5 rounded-full bg-white transition-transform ${instagramEnabled ? 'translate-x-[-28px]' : 'translate-x-0'}`} />
+                            </div>
+                          </div>
+                          {instagramEnabled && (
+                            <div className="mt-4" dir="ltr">
+                              <input type="text" value={instagram} onChange={e => setInstagram(e.target.value)} placeholder="مثال: @yourstore" className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3.5 text-sm font-bold text-slate-900 dark:text-white focus:outline-none text-right transition-colors" dir="rtl" />
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="h-px bg-slate-100 dark:bg-white/5 w-full my-6" />
+
+                        {/* Facebook Toggle */}
+                        <div>
+                          <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-4">
+                              <div className="w-12 h-12 rounded-2xl border border-slate-200 dark:border-white/10 bg-[#1877F2] text-white flex items-center justify-center shrink-0">
+                                <Facebook className="w-6 h-6" />
+                              </div>
+                              <div className="flex flex-col gap-0.5">
+                                <h3 className="font-bold text-slate-900 dark:text-white text-md">حساب فيسبوك</h3>
+                                <p className="text-[11px] text-slate-500 font-medium dark:text-slate-300">أضف رابط أو اسم صفحة الفيسبوك</p>
+                              </div>
+                            </div>
+                            <div className={`w-14 h-7 shrink-0 rounded-full p-1 cursor-pointer transition-colors ${facebookEnabled ? 'bg-emerald-500' : 'bg-slate-200'}`} onClick={() => setFacebookEnabled(!facebookEnabled)}>
+                              <div className={`w-5 h-5 rounded-full bg-white transition-transform ${facebookEnabled ? 'translate-x-[-28px]' : 'translate-x-0'}`} />
+                            </div>
+                          </div>
+                          {facebookEnabled && (
+                            <div className="mt-4" dir="ltr">
+                              <input type="text" value={facebook} onChange={e => setFacebook(e.target.value)} placeholder="مثال: yourstore" className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3.5 text-sm font-bold text-slate-900 dark:text-white focus:outline-none text-right transition-colors" dir="rtl" />
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="h-px bg-slate-100 dark:bg-white/5 w-full my-6" />
+
+                        {/* TikTok Toggle */}
+                        <div>
+                          <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-4">
+                              <div className="w-12 h-12 rounded-2xl border border-slate-200 dark:border-white/10 bg-black text-white flex items-center justify-center shrink-0">
+                                <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" /></svg>
+                              </div>
+                              <div className="flex flex-col gap-0.5">
+                                <h3 className="font-bold text-slate-900 dark:text-white text-md">حساب تيك توك</h3>
+                                <p className="text-[11px] text-slate-500 font-medium dark:text-slate-300">أضف رابط أو اسم حساب تيك توك</p>
+                              </div>
+                            </div>
+                            <div className={`w-14 h-7 shrink-0 rounded-full p-1 cursor-pointer transition-colors ${tiktokEnabled ? 'bg-emerald-500' : 'bg-slate-200'}`} onClick={() => setTiktokEnabled(!tiktokEnabled)}>
+                              <div className={`w-5 h-5 rounded-full bg-white transition-transform ${tiktokEnabled ? 'translate-x-[-28px]' : 'translate-x-0'}`} />
+                            </div>
+                          </div>
+                          {tiktokEnabled && (
+                            <div className="mt-4" dir="ltr">
+                              <input type="text" value={tiktok} onChange={e => setTiktok(e.target.value)} placeholder="مثال: @yourstore" className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3.5 text-sm font-bold text-slate-900 dark:text-white focus:outline-none text-right transition-colors" dir="rtl" />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Auto Message Box */}
+                      <div className="bg-primary/5 dark:bg-primary/100/5 rounded-[24px] p-6 border border-indigo-100 dark:border-indigo-500/10 mt-6 relative overflow-hidden">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex gap-3">
+                            <div className="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center shadow-lg shadow-indigo-500/20 shrink-0">
+                              <MessageSquare className="w-5 h-5" />
+                            </div>
+                            <div className="flex flex-col gap-0.5 mt-1">
+                              <h3 className="font-bold text-slate-900 dark:text-white text-sm flex items-center gap-2">رسالة واتساب تلقائية <span className="text-[10px] bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full font-bold dark:text-slate-300">اختياري</span></h3>
+                              <p className="text-[11px] text-slate-500 font-medium dark:text-slate-300">اكتب رسالة جاهزة سيتم إرسالها عند تواصل العملاء معك</p>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="relative">
+                          <textarea value={autoMessage} onChange={e => setAutoMessage(e.target.value)} maxLength={100} className="w-full h-24 bg-white dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl p-4 text-sm font-bold text-slate-900 dark:text-white focus:outline-none resize-none shadow-sm" />
+                          <span className="absolute bottom-3 right-3 text-[10px] text-slate-400 font-bold dark:text-slate-300">{autoMessage.length}/100</span>
+                        </div>
+                      </div>
+
+                      <div className="flex bg-slate-50 dark:bg-white/5 rounded-2xl py-4 px-4 mt-6 items-center justify-center gap-2 text-xs font-bold text-slate-500 border border-slate-200 dark:border-white/5 dark:text-slate-300">
+                        <Lock className="w-4 h-4 shrink-0" /> لن يتم نشر بياناتك، وستبقى آمنة وسرية
+                      </div>
+
+                      {/* Mobile Preview Button */}
+                      <div className="lg:hidden mt-6">
+                          <button
+                             onClick={() => (window as any).mobilePreviewModal?.showModal()}
+                             className="w-full bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 text-white rounded-2xl py-4 flex items-center justify-center gap-2 font-bold shadow-md transition-colors"
+                          >
+                             <Eye className="w-5 h-5" /> معاينة المتجر
+                          </button>
+                      </div>
+
+                      <div className="flex justify-between items-center mt-6 px-1">
+                        <button onClick={() => setStep(2)} className="bg-white dark:bg-[#111116] border border-slate-200 dark:border-white/10 px-5 sm:px-6 py-3.5 rounded-2xl text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 font-bold flex items-center gap-2 cursor-pointer transition-colors shadow-sm text-sm">
+                          <ArrowRight className="w-4 h-4" /> السابق
+                        </button>
+                        <button onClick={handleNextStep2} className="bg-primary hover:bg-primary/100 text-white px-8 sm:px-10 py-3.5 rounded-2xl font-bold flex items-center gap-2 shadow-xl shadow-indigo-500/20 cursor-pointer transition-all text-sm">
+                          التالي <ArrowLeft className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Right Column: Live Preview & Tip (Desktop Only) */}
+                    <div className="hidden lg:flex flex-[1.2] flex-col gap-6 w-full max-w-[340px] sticky top-6 self-start">
+                      {/* Live Preview Card */}
+                      <div className="bg-slate-50 dark:bg-[#111116] border border-slate-200 dark:border-white/5 rounded-[32px] p-6 shadow-xl shadow-slate-200/20 dark:shadow-none flex flex-col items-center">
+                        <div className="flex items-center gap-2 text-indigo-900 dark:text-indigo-400 font-extrabold text-sm mb-6 w-full justify-center">
+                          <Eye className="w-4 h-4" /> معاينة ما سيراه عملاؤك
+                        </div>
+
+                        <div className="w-full bg-white dark:bg-black/30 border border-slate-200 dark:border-white/10 rounded-[32px] p-6 shadow-md relative pt-12 mt-4 flex flex-col items-center">
+                          <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center text-white absolute -top-8 border-[6px] border-white dark:border-[#111116] shadow-md overflow-hidden shrink-0">
+                            {logoFile ? <img src={logoFile} alt="logo" className="w-full h-full object-cover" /> : <Store className="w-7 h-7" />}
+                          </div>
+
+                          <h3 className="font-black text-lg text-slate-900 dark:text-white mt-2 text-center">{storeName || 'متجري'}</h3>
+                          <p className="text-[11px] text-slate-500 font-bold mb-6 dark:text-slate-300">متجر إلكتروني</p>
+
+                          <div className="w-full flex items-center gap-3 mb-6">
+                            <div className="h-px bg-slate-100 dark:bg-white/10 flex-1" />
+                            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-300">تواصل معنا</span>
+                            <div className="h-px bg-slate-100 dark:bg-white/10 flex-1" />
+                          </div>
+
+                          <div className="w-full space-y-3">
+                            {whatsappEnabled && (
+                              <button className="w-full bg-emerald-500 text-white rounded-2xl py-3.5 text-sm font-bold flex items-center justify-between px-4 shadow-md shadow-emerald-500/20">
+                                <span>تواصل عبر واتساب</span>
+                                <MessageSquare className="w-4 h-4 shrink-0" />
+                              </button>
+                            )}
+                            {emailEnabled && (
+                              <button className="w-full bg-white dark:bg-[#111116] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 rounded-2xl py-3.5 text-sm font-bold flex items-center justify-between px-4 shadow-sm">
+                                <span>راسلنا عبر البريد</span>
+                                <Mail className="w-4 h-4 text-slate-400 dark:text-slate-300 shrink-0" />
+                              </button>
+                            )}
+                            {instagramEnabled && (
+                              <button className="w-full bg-white dark:bg-[#111116] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 rounded-2xl py-3.5 text-sm font-bold flex items-center justify-between px-4 shadow-sm">
+                                <span>تابعنا على إنستجرام</span>
+                                <Instagram className="w-4 h-4 text-pink-500 shrink-0" />
+                              </button>
+                            )}
+                            {facebookEnabled && (
+                              <button className="w-full bg-[#1877F2]/10 dark:bg-[#1877F2]/20 border border-[#1877F2]/20 text-[#1877F2] rounded-2xl py-3.5 text-sm font-bold flex items-center justify-between px-4 shadow-sm">
+                                <span>تابعنا على فيسبوك</span>
+                                <Facebook className="w-4 h-4 text-[#1877F2] shrink-0" />
+                              </button>
+                            )}
+                          </div>
+
+                          <div className="mt-8 flex items-center justify-center gap-1.5 text-[10px] text-slate-400 font-bold bg-slate-50 dark:bg-white/5 py-2 px-4 rounded-full dark:text-slate-300">
+                            <Lock className="w-3 h-3" /> تجربتك آمنة ومشفرة
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Tip Card */}
+                      <div className="bg-primary/10 dark:bg-primary/100/10 border border-indigo-100 dark:border-primary/20 rounded-[28px] p-6 text-center shadow-lg shadow-indigo-500/5">
+                        <div className="inline-flex items-center gap-2 text-primary dark:text-indigo-400 font-black text-sm mb-3">
+                          نصيحة <Sparkles className="w-4 h-4" />
+                        </div>
+                        <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-bold">
+                          كلما أضفت وسائل تواصل أكثر، زادت فرص تواصل العملاء معك وزيادة مبيعاتك
+                        </p>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              )}
 
               {/* Wizard Step 3 (hidden - skipped) */}
               {
@@ -1053,6 +1068,14 @@ const CreateStore = () => {
                         </div>
                       </div>
 
+                      <div className="lg:hidden w-full mb-4">
+                          <button
+                             onClick={() => (window as any).mobilePreviewModal?.showModal()}
+                             className="w-full bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 text-white rounded-2xl py-4 flex items-center justify-center gap-2 font-bold shadow-md transition-colors"
+                          >
+                             <Eye className="w-5 h-5" /> معاينة المتجر
+                          </button>
+                      </div>
                       <div className="flex flex-col md:flex-row w-full gap-4">
                         <button onClick={() => setStep(4)} className="px-6 py-4 rounded-xl text-slate-500 bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 dark:text-slate-300 font-bold transition-colors cursor-pointer w-full md:w-auto">
                           تعديل البيانات
@@ -1083,14 +1106,77 @@ const CreateStore = () => {
               <CheckCircle className="w-12 h-12" />
             </div>
             <h1 className="text-2xl font-black text-slate-900 dark:text-white mb-2">🚀 متجرك أصبح جاهزًا!</h1>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mb-8">تم إنشاء متجرك بنجاح وتأمينه سحابياً، يمكنك البدء الآن بإدارة منتجاتك.</p>
-            <button onClick={() => navigate("/dashboard")} className="w-full py-4 rounded-xl bg-gradient-to-l from-emerald-500 to-teal-500 text-white font-black text-sm shadow-xl shadow-emerald-500/25 hover:opacity-95 transition-all cursor-pointer">
-              الدخول إلى لوحة التحكم
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-8">تم إنشاء متجرك بنجاح وتأمينه سحابياً. يمكنك معاينة واجهة متجرك الآن، يرجى ملاحظة أن لوحة التحكم مقفلة حتى تفعيل إحدى باقات الاشتراك عبر شحن المحفظة.</p>
+            <button onClick={() => navigate(`/store/${storeLink}`)} className="w-full py-4 rounded-xl bg-gradient-to-l from-emerald-500 to-teal-500 text-white font-black text-sm shadow-xl shadow-emerald-500/25 hover:opacity-95 transition-all cursor-pointer flex items-center justify-center gap-2">
+              <Eye className="w-5 h-5" /> معاينة المتجر
+            </button>
+            <button onClick={() => navigate("/dashboard")} className="mt-4 text-xs font-bold text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 uppercase tracking-wide">
+               الانتقال إلى تفعيل المتجر (لوحة التحكم) &rarr;
             </button>
           </motion.div>
         )
       }
 
+    {/* Mobile Preview Modal (Native Dialog) */}
+    <dialog id="mobilePreviewModal" className="bg-transparent m-auto p-0 backdrop:bg-slate-900/60 backdrop:backdrop-blur-sm open:flex flex-col items-center justify-center rounded-[32px] w-[90%] max-w-[400px] z-[9999] relative">
+      <div className="bg-slate-50 dark:bg-[#111116] border border-slate-200 dark:border-white/10 rounded-[32px] p-6 shadow-2xl flex flex-col items-center w-full relative">
+         <button 
+           onClick={(e) => { e.preventDefault(); (window as any).mobilePreviewModal?.close(); }}
+           className="absolute top-4 right-4 w-8 h-8 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center shadow-sm text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white cursor-pointer"
+         >
+           ✕
+         </button>
+         
+         <div className="flex items-center gap-2 text-indigo-900 dark:text-indigo-400 font-extrabold text-sm mb-4 w-full justify-center">
+           <Eye className="w-4 h-4" /> معاينة ما سيراه عملاؤك
+         </div>
+
+         <div className={`w-full ${themeStyle === 'Dark' || themeStyle === 'Neon' ? 'bg-[#0a0a0d]' : 'bg-white dark:bg-[#0a0a0d]'} border border-slate-200 dark:border-white/10 rounded-[32px] p-6 shadow-md relative pt-12 mt-4 flex flex-col items-center transition-colors duration-500 overflow-hidden`}>
+           {themeStyle === 'Neon' && (
+             <div className="absolute top-0 right-1/2 translate-x-1/2 -mt-10 w-32 h-32 bg-cyan-400/20 blur-3xl rounded-full" />
+           )}
+           <div className={`w-16 h-16 rounded-full flex items-center justify-center text-white absolute -top-8 border-[6px] border-white dark:border-[#111116] shadow-md overflow-hidden shrink-0 ${themeStyle === 'Modern' ? 'bg-primary/100' : themeStyle === 'Luxury' ? 'bg-amber-400' : themeStyle === 'Neon' ? 'bg-cyan-400 shadow-cyan-500/50' : 'bg-slate-800 dark:bg-slate-200'}`}>
+             {logoFile ? <img src={logoFile} alt="logo" className="w-full h-full object-cover" /> : <Store className="w-7 h-7" />}
+           </div>
+
+           <h3 className={`font-black text-lg mt-2 text-center ${themeStyle === 'Dark' || themeStyle === 'Neon' ? 'text-white' : 'text-slate-900 dark:text-white'}`}>{storeName || 'متجري'}</h3>
+           <p className="text-[11px] text-slate-500 font-bold mb-6 dark:text-slate-400">متجر إلكتروني</p>
+
+           <div className="w-full flex items-center gap-3 mb-6">
+             <div className="h-px bg-slate-100 dark:bg-white/10 flex-1" />
+             <span className="text-[10px] font-bold text-slate-400 dark:text-slate-300">تواصل معنا</span>
+             <div className="h-px bg-slate-100 dark:bg-white/10 flex-1" />
+           </div>
+
+           <div className="w-full space-y-3 relative z-10">
+             {whatsappEnabled && (
+               <button className="w-full bg-emerald-500 text-white rounded-2xl py-3.5 text-sm font-bold flex items-center justify-between px-4 shadow-md shadow-emerald-500/20">
+                 <span>تواصل عبر واتساب</span>
+                 <MessageSquare className="w-4 h-4 shrink-0" />
+               </button>
+             )}
+             {emailEnabled && (
+               <button className={`w-full ${themeStyle === 'Dark' || themeStyle === 'Neon' ? 'bg-white/5 border-white/10 text-white' : 'bg-white dark:bg-[#111116] text-slate-700 dark:text-slate-300'} border border-slate-200 dark:border-white/10 rounded-2xl py-3.5 text-sm font-bold flex items-center justify-between px-4 shadow-sm backdrop-blur-sm`}>
+                 <span>راسلنا عبر البريد</span>
+                 <Mail className="w-4 h-4 text-slate-400 dark:text-slate-300 shrink-0" />
+               </button>
+             )}
+             {instagramEnabled && (
+               <button className={`w-full ${themeStyle === 'Dark' || themeStyle === 'Neon' ? 'bg-white/5 border-white/10 text-white' : 'bg-white dark:bg-[#111116] text-slate-700 dark:text-slate-300'} border border-slate-200 dark:border-white/10 rounded-2xl py-3.5 text-sm font-bold flex items-center justify-between px-4 shadow-sm backdrop-blur-sm`}>
+                 <span>تابعنا على إنستجرام</span>
+                 <Instagram className="w-4 h-4 text-pink-500 shrink-0" />
+               </button>
+             )}
+             {facebookEnabled && (
+               <button className="w-full bg-[#1877F2]/10 dark:bg-[#1877F2]/20 border border-[#1877F2]/20 text-[#1877F2] rounded-2xl py-3.5 text-sm font-bold flex items-center justify-between px-4 shadow-sm">
+                 <span>تابعنا على فيسبوك</span>
+                 <Facebook className="w-4 h-4 text-[#1877F2] shrink-0" />
+               </button>
+             )}
+           </div>
+         </div>
+      </div>
+    </dialog>
     </div>
   );
 };

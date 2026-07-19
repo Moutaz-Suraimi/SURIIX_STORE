@@ -704,11 +704,11 @@ const PublicStore = () => {
   // Auto-login removed
   // Customers must now explicitly register or log in via the store's authentication flow
   React.useEffect(() => {
-    // Force clear auto-created customers from previous buggy behaviour once
-    if (localStorage.getItem('suriix_cleaned_store_customer') !== 'true') {
+    // Force clear auto-created customers from previous buggy behaviour once PER STORE
+    if (localStorage.getItem(`suriix_cleaned_customer_${slug}`) !== 'true') {
       localStorage.removeItem(`suriix_customer_${slug}`);
       setCustomer(null);
-      localStorage.setItem('suriix_cleaned_store_customer', 'true');
+      localStorage.setItem(`suriix_cleaned_customer_${slug}`, 'true');
     }
   }, [slug]);
 
