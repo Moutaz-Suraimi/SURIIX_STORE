@@ -1,67 +1,79 @@
 import { useState, useEffect } from 'react';
 
-export type PlanPackage = 'Basic' | 'Professional' | 'Business' | string;
+export type PlanPackage = 'Starter' | 'Basic' | 'Professional' | string;
 
 export interface PlanLimits {
   maxProducts: number;
   customDomain: boolean;
-  loyaltyPoints: boolean;
-  maxStaff: number;
+  coupons: boolean;
+  offers: boolean;
   advancedReports: boolean;
   prioritySupport: boolean;
   whiteLabel: boolean;
   pwa: boolean;
   apiAccess: boolean;
+  loyaltyPoints: boolean;
+  maxStaff: number;
 }
 
 const PLAN_LIMITS: Record<string, PlanLimits> = {
-  Basic: {
+  Starter: {
     maxProducts: 100,
     customDomain: false,
-    loyaltyPoints: false,
-    maxStaff: 1, // Only the owner
+    coupons: false,
+    offers: false,
     advancedReports: false,
     prioritySupport: false,
     whiteLabel: false,
     pwa: false,
     apiAccess: false,
+    loyaltyPoints: false,
+    maxStaff: 1, 
   },
-  Professional: {
-    maxProducts: 1000,
-    customDomain: true,
-    loyaltyPoints: true,
-    maxStaff: 3,
+  Basic: {
+    maxProducts: 500,
+    customDomain: false,
+    coupons: true,
+    offers: true,
     advancedReports: true,
-    prioritySupport: true,
+    prioritySupport: false,
     whiteLabel: false,
     pwa: false,
     apiAccess: false,
+    loyaltyPoints: false,
+    maxStaff: 3,
   },
-  Business: {
-    maxProducts: Infinity, // Unlimited
+  Professional: {
+    maxProducts: Infinity, 
     customDomain: true,
-    loyaltyPoints: true,
-    maxStaff: Infinity, // Unlimited
+    coupons: true,
+    offers: true,
     advancedReports: true,
     prioritySupport: true,
     whiteLabel: true,
     pwa: true,
     apiAccess: true,
+    loyaltyPoints: true,
+    maxStaff: Infinity, 
   }
 };
 
-export const useFeatureAccess = (userPackage: PlanPackage = 'Basic') => {
+export const useFeatureAccess = (userPackage: PlanPackage = 'Starter') => {
   const lowerPackage = (userPackage || '').toLowerCase();
   
-  let mappedPackage = 'Basic';
-  if (lowerPackage.includes('احترافي') || lowerPackage.includes('professional')) {
+  let mappedPackage = 'Starter';
+  // Check for Pro
+  if (lowerPackage.includes('احترافي') || lowerPackage.includes('professional') || lowerPackage.includes('vip') || lowerPackage.includes('pro')) {
     mappedPackage = 'Professional';
-  } else if (lowerPackage.includes('بيزنس') || lowerPackage.includes('business') || lowerPackage.includes('أعمال') || lowerPackage.includes('اعمال')) {
-    mappedPackage = 'Business';
+  } 
+  // Check for Basic
+  else if (lowerPackage.includes('اساسي') || lowerPackage.includes('أساسي') || lowerPackage.includes('basic')) {
+    mappedPackage = 'Basic';
   }
+  // Otherwise Starter
 
-  // Gracefully fallback to basic if the package is not recognized
-  const limits = PLAN_LIMITS[mappedPackage] || PLAN_LIMITS['Basic'];
+  // Gracefully fallback to Starter if the package is not recognized
+  const limits = PLAN_LIMITS[mappedPackage] || PLAN_LIMITS['Starter'];
 
   return {
     package: userPackage,

@@ -100,6 +100,12 @@ const CreateStore = () => {
   const [showCreateConfirm, setShowCreateConfirm] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
+  // OTP Verification (New)
+  const [showOTPVerification, setShowOTPVerification] = useState(false);
+  const [otpCode, setOtpCode] = useState("");
+  const [registeredEmail, setRegisteredEmail] = useState("");
+
+
   // Store Info (Step 2)
   const [storeName, setStoreName] = useState("");
   const [storeLink, setStoreLink] = useState("");
@@ -189,7 +195,7 @@ const CreateStore = () => {
             const list = [{
               id: fullStore.id, owner_id: user.id, name: fullStore.store_name,
               slug: fullStore.store_url, url: fullStore.store_url,
-              status: fullStore.is_active ? 'active' : 'pending', tier: 'Basic',
+              status: fullStore.is_active ? 'active' : 'pending', tier: '',
               products: products || [], theme: fullStore.theme_color, cardStyle: fullStore.template_id
             }];
             localStorage.setItem('suriix_added_stores', JSON.stringify(list));
@@ -284,9 +290,49 @@ const CreateStore = () => {
     setShowCreateConfirm(true);
   };
 
+
+  const handleVerifyOTP = async () => {
+    if (!otpCode || otpCode.length < 6) {
+      toast.error("يرجى إدخال الرمز المكون من 6 أرقام بشكل صحيح");
+      return;
+    }
+    setIsAuthLoading(true);
+    try {
+      const cleanEmail = registeredEmail.trim().toLowerCase();
+      const { data, error } = await supabase.auth.verifyOtp({
+        email: cleanEmail,
+        token: otpCode,
+        type: 'signup'
+      });
+
+      if (error || !data?.session) {
+        toast.error("الرمز غير صحيح أو غير متطابق. تأكد من بريدك الإلكتروني.");
+        setIsAuthLoading(false);
+        return;
+      }
+      
+      const userId = data.session.user.id;
+      // create user logic
+      await supabase.from("users").upsert([{ id: userId, email: cleanEmail, role: "store_owner", status: "pending" }]);
+      import("@/lib/notifications").then(({ notificationEvents, notification }) => {
+        notification.send({ user_id: userId, role: 'store_owner', type: 'system', title: 'مرحباً بك في سريكس', message: 'تهانينا! تم التحقق من بريدك بنجاح.' });
+        notificationEvents.adminAlert(`تم تسجيل عضو جديد (بعد تأكيد البريد): ${cleanEmail}`);
+      }).catch(console.error);
+      
+      toast.success("تم إنشاء حسابك وتأكيد البريد بنجاح ✅");
+      setIsAuthLoading(false);
+      setShowOTPVerification(false);
+      setStep(2);
+
+    } catch (err) {
+      console.error(err);
+      toast.error("حدث خطأ أثناء تأكيد الرمز.");
+      setIsAuthLoading(false);
+    }
+  };
+
   const handleAuthSubmit = async () => {
-    if (!authEmail.trim()) { toast.error("الرجاء إدخال البريد الإلكتروني"); return; }
-    if (!authPassword) { toast.error("الرجاء إدخال كلمة المرور"); return; }
+    if (!authEmail || !authPassword) { toast.error("يرجى إدخال البريد الإلكتروني وكلمة المرور"); return; }
     setIsAuthLoading(true);
     try {
       if (authMode === "register") {
@@ -294,53 +340,46 @@ const CreateStore = () => {
         if (!passwordProps.valid) { toast.error("كلمة المرور لا تستوفي كافة شروط الأمان. يرجى تصحيحها."); setIsAuthLoading(false); return; }
         if (authPassword !== authConfirmPassword) { toast.error("كلمة المرور غير متطابقة"); setIsAuthLoading(false); return; }
         const cleanEmail = authEmail.trim().toLowerCase();
-        const SUPABASE_URL = "https://rajvyxdfibpamanmmkgf.supabase.co";
-        const fnResponse = await fetch(`${SUPABASE_URL}/functions/v1/create-user`, {
-          method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: cleanEmail, password: authPassword }),
+        
+        const { data, error } = await supabase.auth.signUp({ 
+          email: cleanEmail, 
+          password: authPassword 
         });
-        const fnResult = await fnResponse.json();
-        if (fnResult.error) {
-          const errorMsg = typeof fnResult.error === 'object' ? JSON.stringify(fnResult.error) : fnResult.error;
-          if (errorMsg.includes('already been registered') || errorMsg.includes('already registered')) {
+
+        if (error) {
+          if (error.message.includes('already registered')) {
             toast.error("هذا البريد الإلكتروني مسجل مسبقاً. يرجى تسجيل الدخول أو استخدام بريد مختلف.");
+          } else if (error.message === "{}" || error.status === 504 || error.message.includes("Failed to fetch") || error.message.includes("timeout")) {
+            toast.error("انتهت مهلة الاتصال بالخادم أثناء إرسال البريد. يرجى المحاولة بعد قليل.");
           } else {
-            toast.error("حدث خطأ أثناء التسجيل: " + errorMsg);
+            toast.error("حدث خطأ أثناء التسجيل: " + error.message);
           }
           setIsAuthLoading(false); return;
         }
-        if (fnResult.session?.access_token) {
-          await supabase.auth.setSession({ access_token: fnResult.session.access_token, refresh_token: fnResult.session.refresh_token });
-          const userId = fnResult.session.user?.id;
-          if (userId) {
-            await supabase.from("users").upsert([{ id: userId, email: cleanEmail, role: "store_owner", status: "pending" }]);
-            import("@/lib/notifications").then(({ notificationEvents, notification }) => {
-              notification.send({ user_id: userId, role: 'store_owner', type: 'system', title: 'مرحباً بك في سريكس', message: 'تهانينا! تم إنشاء حسابك بنجاح. يمكنك الآن استكمال إعداد متجرك.' });
-              notificationEvents.adminAlert(`تم تسجيل عضو جديد: ${authEmail}`);
-            }).catch(console.error);
-          }
+
+        if (data.user && !data.session) {
+          // Email confirmation is required
+          setRegisteredEmail(cleanEmail);
+          setShowOTPVerification(true);
+          toast.success("تم إرسال رمز التحقق (OTP) إلى بريدك الإلكتروني! يرجى إدخاله لإكمال التسجيل. تأكد من مجلد الرسائل المزعجة (Spam).");
+          setIsAuthLoading(false);
+          return;
+        }
+
+        if (data.session) {
+          const userId = data.session.user.id;
+          await supabase.from("users").upsert([{ id: userId, email: cleanEmail, role: "store_owner", status: "pending" }]);
+          import("@/lib/notifications").then(({ notificationEvents, notification }) => {
+            notification.send({ user_id: userId, role: 'store_owner', type: 'system', title: 'مرحباً بك في سريكس', message: 'تهانينا! تم إنشاء حسابك بنجاح.' });
+            notificationEvents.adminAlert(`تم تسجيل عضو جديد: ${cleanEmail}`);
+          }).catch(console.error);
           setIsAuthLoading(false);
           setStep(2);
           return;
         }
-        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email: cleanEmail, password: authPassword });
-        if (signInError || !signInData?.user) {
-          toast.error("تم إنشاء حسابك بنجاح ✅\nالآن قم بتسجيل الدخول بنفس البريد وكلمة المرور.");
-          setAuthMode("login");
-          setIsAuthLoading(false); return;
-        }
-        await supabase.from("users").upsert([{ id: signInData.user.id, email: cleanEmail, role: "store_owner", status: "pending" }]);
-        import("@/lib/notifications").then(({ notificationEvents, notification }) => {
-          notification.send({ user_id: signInData.user.id, role: 'store_owner', type: 'system', title: 'مرحباً بك في سريكس', message: 'تهانينا! تم إنشاء حسابك بنجاح. يمكنك الآن استكمال إعداد متجرك.' });
-          notificationEvents.adminAlert(`تم تسجيل عضو جديد: ${authEmail}`);
-        }).catch(console.error);
-        setIsAuthLoading(false);
-        setStep(2);
+
       } else {
         // ─── LOGIN FLOW ───
-        // signInWithPassword will fire onAuthStateChange(SIGNED_IN),
-        // which calls handleSession(true). handleSession has retry logic,
-        // upserts public.users, and redirects to /dashboard if store exists.
         const cleanEmail = authEmail.trim().toLowerCase();
         const { data, error } = await supabase.auth.signInWithPassword({ email: cleanEmail, password: authPassword });
         if (error) {
@@ -348,20 +387,12 @@ const CreateStore = () => {
           setIsAuthLoading(false); return;
         }
         if (data?.user) {
-          // Show full-screen loading while handleSession processes the redirect
           setIsSessionLoading(true);
-          // handleSession(true) will be called by onAuthStateChange automatically.
-          // As a fallback, also call it directly here with a small delay.
           setTimeout(async () => {
             const { data: { session } } = await supabase.auth.getSession();
-            if (session?.user) {
-              // Re-trigger by dispatching session manually if needed
-              // (onAuthStateChange should already handle this)
-            }
           }, 300);
           return;
         }
-
       }
     } catch (err) {
       console.error('handleAuthSubmit error:', err);
@@ -523,56 +554,109 @@ const CreateStore = () => {
             <button onClick={() => setAuthMode("login")} className={`flex-1 pb-3 text-sm font-bold flex items-center justify-center gap-2 border-b-[3px] transition-all cursor-pointer flex-row-reverse ${authMode === 'login' ? 'border-purple-600 text-purple-700 dark:text-purple-400' : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700'}`}>تسجيل الدخول <LogIn className="w-4 h-4" /></button>
           </div>
 
-          <div className="w-full space-y-5 z-10">
-            <div>
-              <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300 block mb-2 text-start">البريد الإلكتروني</label>
-              <div className="relative">
-                <input type="email" value={authEmail} onChange={e => setAuthEmail(e.target.value)} placeholder="example@email.com" className="w-full bg-white dark:bg-black/30 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3.5 pr-11 text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:border-purple-500 transition-all text-left" dir="ltr" />
-                <Mail className="w-5 h-5 text-purple-600 absolute right-3.5 top-3.5" />
+          {!showOTPVerification ? (
+            <div className="w-full space-y-5 z-10">
+              <div>
+                <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300 block mb-2 text-start">البريد الإلكتروني</label>
+                <div className="relative">
+                  <input type="email" value={authEmail} onChange={e => setAuthEmail(e.target.value)} placeholder="example@email.com" className="w-full bg-white dark:bg-black/30 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3.5 pr-11 text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:border-purple-500 transition-all text-left" dir="ltr" />
+                  <Mail className="w-5 h-5 text-purple-600 absolute right-3.5 top-3.5" />
+                </div>
               </div>
-            </div>
-            <div>
-              <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300 block mb-2 text-start">كلمة المرور</label>
-              <div className="relative">
-                <input type={showCreatePassword ? 'text' : 'password'} value={authPassword} onChange={e => setAuthPassword(e.target.value)} placeholder="••••••••" className="w-full bg-white dark:bg-black/30 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3.5 pr-20 pl-11 text-sm font-extrabold text-slate-900 dark:text-white focus:outline-none focus:border-purple-500 tracking-widest transition-all text-left" dir="ltr" />
-                <Lock className="w-5 h-5 text-purple-600 absolute right-3.5 top-3.5" />
-                {authMode === "register" && (<button type="button" onClick={handleGeneratePassword} title="اقتراح كلمة مرور قوية" className="absolute right-11 top-3.5 text-[#5B5EE5] hover:text-[#4a4ec4] transition-colors" tabIndex={-1}><Wand2 className="w-5 h-5" /></button>)}
-                <button type="button" onClick={() => setShowCreatePassword(v => !v)} className="absolute left-3.5 top-3.5 text-purple-400 hover:text-purple-700 dark:hover:text-white transition-colors" tabIndex={-1}>{showCreatePassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}</button>
+              <div>
+                <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300 block mb-2 text-start">كلمة المرور</label>
+                <div className="relative">
+                  <input type={showCreatePassword ? 'text' : 'password'} value={authPassword} onChange={e => setAuthPassword(e.target.value)} placeholder="••••••••" className="w-full bg-white dark:bg-black/30 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3.5 pr-20 pl-11 text-sm font-extrabold text-slate-900 dark:text-white focus:outline-none focus:border-purple-500 tracking-widest transition-all text-left" dir="ltr" />
+                  <Lock className="w-5 h-5 text-purple-600 absolute right-3.5 top-3.5" />
+                  {authMode === "register" && (<button type="button" onClick={handleGeneratePassword} title="اقتراح كلمة مرور قوية" className="absolute right-11 top-3.5 text-[#5B5EE5] hover:text-[#4a4ec4] transition-colors" tabIndex={-1}><Wand2 className="w-5 h-5" /></button>)}
+                  <button type="button" onClick={() => setShowCreatePassword(v => !v)} className="absolute left-3.5 top-3.5 text-purple-400 hover:text-purple-700 dark:hover:text-white transition-colors" tabIndex={-1}>{showCreatePassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}</button>
+                </div>
+                {authMode === "register" && (
+                  <div className="mt-4 text-[11px] text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-black/20 rounded-xl p-4 border border-slate-100">
+                    <p className="font-bold text-slate-900 dark:text-white mb-2.5 flex items-center justify-between">قوة كلمة المرور: <span className={`${checkPasswordStrength(authPassword).valid ? 'text-emerald-500' : 'text-rose-500'} font-extrabold text-xs`}>{checkPasswordStrength(authPassword).label}</span></p>
+                    <ul className="space-y-2 pr-1 font-semibold flex flex-col items-start gap-0.5">
+                      {[['hasMinLength', '8 أحرف على الأقل'], ['hasUpperCase', 'حرف كبير (Uppercase)'], ['hasLowerCase', 'حرف صغير (Lowercase)'], ['hasNumber', 'رقم واحد على الأقل'], ['hasSpecialChar', 'رمز خاص (!@#$%)']].map(([key, label]) => (
+                        <li key={key} className={`flex items-center gap-2 ${(checkPasswordStrength(authPassword).checks as any)[key] ? "text-slate-400 dark:text-slate-300" : ""}`}>
+                          <div className={`w-3 h-3 rounded-full border flex items-center justify-center ${(checkPasswordStrength(authPassword).checks as any)[key] ? "bg-purple-600 border-purple-600 text-white" : "border-slate-300 dark:border-slate-800"}`}>{(checkPasswordStrength(authPassword).checks as any)[key] && <Check className="w-2.5 h-2.5" />}</div>
+                          {label}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
               {authMode === "register" && (
-                <div className="mt-4 text-[11px] text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-black/20 rounded-xl p-4 border border-slate-100">
-                  <p className="font-bold text-slate-900 dark:text-white mb-2.5 flex items-center justify-between">قوة كلمة المرور: <span className={`${checkPasswordStrength(authPassword).valid ? 'text-emerald-500' : 'text-rose-500'} font-extrabold text-xs`}>{checkPasswordStrength(authPassword).label}</span></p>
-                  <ul className="space-y-2 pr-1 font-semibold flex flex-col items-start gap-0.5">
-                    {[['hasMinLength', '8 أحرف على الأقل'], ['hasUpperCase', 'حرف كبير (Uppercase)'], ['hasLowerCase', 'حرف صغير (Lowercase)'], ['hasNumber', 'رقم واحد على الأقل'], ['hasSpecialChar', 'رمز خاص (!@#$%)']].map(([key, label]) => (
-                      <li key={key} className={`flex items-center gap-2 ${(checkPasswordStrength(authPassword).checks as any)[key] ? "text-slate-400 dark:text-slate-300" : ""}`}>
-                        <div className={`w-3 h-3 rounded-full border flex items-center justify-center ${(checkPasswordStrength(authPassword).checks as any)[key] ? "bg-purple-600 border-purple-600 text-white" : "border-slate-300 dark:border-slate-800"}`}>{(checkPasswordStrength(authPassword).checks as any)[key] && <Check className="w-2.5 h-2.5" />}</div>
-                        {label}
-                      </li>
-                    ))}
-                  </ul>
+                <div className="pt-2">
+                  <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300 block mb-2 text-start">تأكيد كلمة المرور</label>
+                  <div className="relative">
+                    <input type="password" value={authConfirmPassword} onChange={e => setAuthConfirmPassword(e.target.value)} placeholder="••••••••" className="w-full bg-white dark:bg-black/30 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3.5 pr-11 text-sm font-extrabold text-slate-900 dark:text-white focus:outline-none focus:border-purple-500 tracking-widest transition-all text-left" dir="ltr" />
+                    <Lock className="w-5 h-5 text-purple-600 absolute right-3.5 top-3.5" />
+                  </div>
                 </div>
               )}
+              <button onClick={handleAuthSubmit} disabled={isAuthLoading} className="w-full bg-primary hover:bg-primary/90 disabled:opacity-70 disabled:cursor-not-allowed text-white rounded-xl py-4 font-black flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/20 cursor-pointer mt-4 transition-all">
+                {isAuthLoading ? (
+                  <><svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>{authMode === 'register' ? 'جاري الإنشاء...' : 'جاري الدخول...'}</>
+                ) : (
+                  authMode === 'register' ? 'إنشاء حساب 🚀' : 'تسجيل الدخول'
+                )}
+              </button>
             </div>
-            {authMode === "register" && (
-              <div className="pt-2">
-                <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300 block mb-2 text-start">تأكيد كلمة المرور</label>
-                <div className="relative">
-                  <input type="password" value={authConfirmPassword} onChange={e => setAuthConfirmPassword(e.target.value)} placeholder="••••••••" className="w-full bg-white dark:bg-black/30 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3.5 pr-11 text-sm font-extrabold text-slate-900 dark:text-white focus:outline-none focus:border-purple-500 tracking-widest transition-all text-left" dir="ltr" />
-                  <Lock className="w-5 h-5 text-purple-600 absolute right-3.5 top-3.5" />
+          ) : (
+            <div className="w-full space-y-5 z-10 animate-fade-in">
+              <div className="text-center mb-6">
+                <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-purple-50 dark:border-purple-900/10">
+                  <Mail className="w-8 h-8 text-purple-600 dark:text-purple-400" />
+                </div>
+                <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2">تأكيد البريد الإلكتروني</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400 px-4">أرسلنا رمز تحقق مكون من 6 أرقام إلى بريدك <strong className="text-purple-600 dark:text-purple-400" dir="ltr">{registeredEmail}</strong></p>
+                <p className="text-[11px] text-amber-600 mt-2 font-bold px-4">يرجى تفقد مجلد الرسائل غير المرغوب فيها (Spam) إذا لم تجد الرسالة.</p>
+              </div>
+              
+              <div>
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-3 text-center">أدخل الرمز هنا:</label>
+                <div className="relative max-w-[280px] mx-auto">
+                  <input 
+                    type="text" 
+                    value={otpCode} 
+                    onChange={e => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    placeholder="123456" 
+                    className="w-full bg-white dark:bg-black/30 border-2 border-slate-200 dark:border-white/10 rounded-2xl px-4 py-4 text-3xl text-center font-black text-slate-900 dark:text-white tracking-[0.5em] focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 transition-all font-mono" 
+                    dir="ltr" 
+                  />
                 </div>
               </div>
-            )}
-            <button onClick={handleAuthSubmit} disabled={isAuthLoading} className="w-full bg-primary hover:bg-primary/90 disabled:opacity-70 disabled:cursor-not-allowed text-white rounded-xl py-4 font-black flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/20 cursor-pointer mt-4 transition-all">
-              {isAuthLoading ? (
-                <><svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>{authMode === 'register' ? 'جاري الإنشاء...' : 'جاري الدخول...'}</>
-              ) : (
-                authMode === 'register' ? 'إنشاء حساب 🚀' : 'تسجيل الدخول'
-              )}
-            </button>
-          </div>
 
-          <button onClick={handleGuestLogin} className="w-full bg-transparent hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl py-3 font-bold text-sm text-primary dark:text-indigo-400 mt-4 transition-colors cursor-pointer z-10 flex items-center justify-center gap-2 dark:bg-[#0f172a]"><UserPlus className="w-4 h-4" /> الدخول كضيف</button>
-          <p className="mt-6 text-[10px] text-slate-400 text-center z-10 dark:text-slate-300">بإنشائك حساباً، فإنك توافق على <a href="#" className="text-primary hover:underline">شروط الاستخدام</a> و <a href="#" className="text-primary hover:underline">سياسة الخصوصية</a></p>
+              <div className="flex flex-col gap-3 max-w-[280px] mx-auto mt-6">
+                <button 
+                  onClick={handleVerifyOTP} 
+                  disabled={isAuthLoading || otpCode.length < 6} 
+                  className="w-full bg-primary hover:bg-primary/90 disabled:opacity-70 disabled:cursor-not-allowed text-white rounded-xl py-3.5 font-black flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/20 transition-all"
+                >
+                  {isAuthLoading ? (
+                    <><svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>جاري التحقق...</>
+                  ) : (
+                    'تأكيد الحساب ✅'
+                  )}
+                </button>
+                <button 
+                  onClick={() => setShowOTPVerification(false)} 
+                  disabled={isAuthLoading} 
+                  className="w-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl py-3 font-bold flex items-center justify-center text-sm transition-all"
+                >
+                  تعديل البريد الإلكتروني أو إعادة المحاولة
+                </button>
+              </div>
+            </div>
+          )}
+
+          {!showOTPVerification && (
+            <>
+              <button onClick={handleGuestLogin} className="w-full bg-transparent hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl py-3 font-bold text-sm text-primary dark:text-indigo-400 mt-4 transition-colors cursor-pointer z-10 flex items-center justify-center gap-2 dark:bg-[#0f172a]"><UserPlus className="w-4 h-4" /> الدخول كضيف</button>
+              <p className="mt-6 text-[10px] text-slate-400 text-center z-10 dark:text-slate-300">بإنشائك حساباً، فإنك توافق على <a href="#" className="text-primary hover:underline">شروط الاستخدام</a> و <a href="#" className="text-primary hover:underline">سياسة الخصوصية</a></p>
+            </>
+          )}
+
         </motion.div>
       )}
 

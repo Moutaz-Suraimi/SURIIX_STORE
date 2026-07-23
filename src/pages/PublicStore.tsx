@@ -691,6 +691,7 @@ const PublicStore = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activePage, setActivePage] = useState('home');
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
   const [cartCouponCode, setCartCouponCode] = useState('');
   const [checkoutStep, setCheckoutStep] = useState(1);

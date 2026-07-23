@@ -404,27 +404,68 @@ const StoreDashboard = () => {
 
         {/* Nav Items */}
         <div className="flex-1 overflow-y-auto px-3 py-4 space-y-0.5 custom-scrollbar">
-          {SidebarMenu.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => { 
-                if (isPending && item.id !== 'wallet' && item.id !== 'subscription') {
-                   toast.error("صلاحية مقفلة: يرجى شحن المحفظة والاشتراك في باقة لتفعيل لوحة التحكم الخاصة بمتجرك.");
-                   return;
+          {(() => {
+            // Determine current plan tier from stored data
+            const currentPkg = (() => {
+              try {
+                const ls = localStorage.getItem('suriix_added_stores');
+                if (ls) {
+                  const list = JSON.parse(ls);
+                  return list[0]?.tier || list[0]?.subscription_name || '';
                 }
-                setActiveTab(item.id); 
-                setIsMobileMenuOpen(false); 
-              }}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 font-medium text-[15px]
-                 ${activeTab === item.id
-                  ? activeTabClass
-                  : 'text-muted-foreground hover:bg-muted/80 hover:text-foreground'
-                }`}
-            >
-              <item.icon className="w-5 h-5 shrink-0" />
-              <span className="flex-1 text-right">{item.label}</span>
-            </button>
-          ))}
+              } catch { }
+              return storeData?.package || '';
+            })();
+            const planLevel = currentPkg.includes('احترافي') || currentPkg.includes('pro') ? 3
+              : currentPkg.includes('الأساسية') || currentPkg.includes('أساسي') || currentPkg.includes('basic') ? 2
+              : currentPkg.includes('مبتدئ') || currentPkg.includes('starter') ? 1 : 0;
+
+            // Features that are plan-gated
+            const gatedFeatures: Record<string, number> = {
+              coupons: 2,
+              offers: 2,
+              analytics: 2,
+              domain: 3,
+            };
+
+            return SidebarMenu.map((item) => {
+              const requiredLevel = gatedFeatures[item.id] || 0;
+              const isLocked = !isPending && requiredLevel > 0 && planLevel < requiredLevel;
+              const isBanned = isPending && item.id !== 'wallet' && item.id !== 'subscription';
+
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    if (isBanned) {
+                      toast.error('صلاحية مقفلة: يرجى شحن المحفظة والاشتراك في باقة لتفعيل لوحة التحكم.');
+                      return;
+                    }
+                    if (isLocked) {
+                      const planNeeded = requiredLevel === 2 ? 'الباقة الأساسية' : 'الباقة الاحترافية';
+                      toast.error(`🔒 ${item.label} متاح في ${planNeeded} فأعلى. قم بالترقية من تبويب الاشتراك.`);
+                      setActiveTab('subscription');
+                      setIsMobileMenuOpen(false);
+                      return;
+                    }
+                    setActiveTab(item.id);
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 font-medium text-[15px]
+                    ${activeTab === item.id
+                      ? activeTabClass
+                      : isLocked
+                      ? 'text-muted-foreground/50 hover:bg-amber-50 dark:hover:bg-amber-900/20 hover:text-amber-600'
+                      : 'text-muted-foreground hover:bg-muted/80 hover:text-foreground'
+                    }`}
+                >
+                  <item.icon className={`w-5 h-5 shrink-0 ${isLocked ? 'opacity-50' : ''}`} />
+                  <span className="flex-1 text-right">{item.label}</span>
+                  {isLocked && <Lock className="w-3.5 h-3.5 text-amber-500 shrink-0" />}
+                </button>
+              );
+            });
+          })()}
         </div>
 
         {/* Logout Button */}
@@ -803,6 +844,7 @@ const StoreDashboard = () => {
             {activeTab === 'coupons' && <CouponsTab coupons={storeData.coupons || []} categories={storeData.categories || []} onUpdate={(c) => updateGlobalStoreField('coupons', c)} />}
             {activeTab === 'banners' && <BannersTab storeData={storeData} banners={storeData.banners || []} categories={storeData.categories || []} onUpdate={(b) => updateGlobalStoreField('banners', b)} />}
             {activeTab === 'pages' && <StorePagesTab storeData={storeData} onUpdateField={updateGlobalStoreField} />}
+            {activeTab === 'appearance' && <AppearanceTab storeData={storeData} onUpdateField={updateGlobalStoreField} />}
             {activeTab === 'payment' && <PaymentTab storeData={storeData} onUpdateField={updateGlobalStoreField} />}
             {activeTab === 'subscription' && <SubscriptionTab subscriptionPlans={subscriptionPlans} storeData={storeData} onUpgrade={async (pkg, cost) => {
               const currentBalance = storeData.wallet_yer ?? storeData.wallet ?? 0;
@@ -2535,68 +2577,194 @@ const WalletTabV2 = React.memo(({ storeData }: { storeData: any }) => {
 });
 
 const SubscriptionTab = React.memo(({ storeData, subscriptionPlans, onUpgrade }: { storeData: any, subscriptionPlans: any[], onUpgrade: (pkg: string, cost: number) => void }) => {
-  const parseWallet = (val: any) => {
-    const n = parseFloat(val);
-    return isNaN(n) ? 0 : n;
-  };
+  const parseWallet = (val: any) => { const n = parseFloat(val); return isNaN(n) ? 0 : n; };
   const currentBalance = parseWallet(storeData?.wallet_yer) || parseWallet(storeData?.wallet) || 0;
-  const subEndsAt = (() => { try { const s = localStorage.getItem('suriix_added_stores'); if (s) { const list = JSON.parse(s); return list[0]?.subscription_ends_at || list[0]?.subEndsAt || null; } } catch { }; return null; })();
+
+  const subEndsAt = (() => { try { const s = localStorage.getItem('suriix_added_stores'); if (s) { const list = JSON.parse(s); return list[0]?.subscription_ends_at || list[0]?.subEndsAt || null; } } catch { } return storeData?.subscription_ends_at || null; })();
   const daysLeft = subEndsAt ? Math.ceil((new Date(subEndsAt).getTime() - Date.now()) / 86400000) : null;
 
+  const currentPlanName = (() => { try { const ls = localStorage.getItem('suriix_added_stores'); if (ls) { const list = JSON.parse(ls); return list[0]?.tier || list[0]?.subscription_name || ''; } } catch { } return storeData?.package || ''; })();
+
+  // Plan level: 0=none, 1=starter, 2=basic, 3=pro
+  const planLevel = currentPlanName.includes('احترافي') ? 3
+    : currentPlanName.includes('الأساسية') || currentPlanName.includes('أساسي') ? 2
+    : currentPlanName.includes('مبتدئ') ? 1 : 0;
+
+  // Feature unlocking per plan
+  const planFeatureMap: Record<string, string[]> = {
+    'الباقة المبتدئة':   ['✅ 100 منتج', '✅ لوحة تحكم أساسية', '✅ إدارة الطلبات', '✅ دعم بريد إلكتروني', '❌ الكوبونات والعروض', '❌ التحليلات المتقدمة', '❌ ربط نطاق خاص'],
+    'الباقة الأساسية':   ['✅ 500 منتج', '✅ لوحة تحكم كاملة', '✅ إدارة الطلبات', '✅ الكوبونات والعروض', '✅ التحليلات المتقدمة', '✅ ربط واتساب وتواصل', '❌ ربط نطاق خاص'],
+    'الباقة الاحترافية': ['✅ منتجات غير محدودة', '✅ كل مزايا الأساسية', '✅ دعم VIP 24/7', '✅ ربط نطاق مخصص', '✅ تحليل بالذكاء الاصطناعي', '✅ تخصيص كامل للألوان', '✅ أولوية في الدعم الفني'],
+  };
+
+  const plansOrdered = [...subscriptionPlans].sort((a, b) => Number(a.price) - Number(b.price));
+
   return (
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 max-w-5xl mx-auto pt-4 pb-12 w-full px-4 md:px-0">
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 max-w-5xl mx-auto pt-4 pb-12 w-full px-4 md:px-0" dir="rtl">
+
+      {/* Header Banner */}
+      <div className="bg-gradient-to-r from-indigo-600 to-violet-600 rounded-2xl p-6 text-white flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden shadow-xl shadow-primary/20">
+        <div className="absolute inset-0 bg-white/5 pointer-events-none" />
+        <div className="z-10">
+          <h2 className="text-2xl font-black mb-1">باقات الاشتراك</h2>
+          <p className="text-white/80 text-sm font-medium">فعّل متجرك واختر الباقة المناسبة - يُخصم من رصيدك تلقائياً</p>
+        </div>
+        <div className="z-10 bg-white/15 backdrop-blur rounded-2xl px-5 py-3 shrink-0 text-center">
+          <div className="text-xs text-white/70 font-bold mb-1">رصيدك الحالي</div>
+          <div className="text-2xl font-black">{Number(currentBalance).toLocaleString()} <span className="text-base">ر.ي</span></div>
+        </div>
+      </div>
+
+      {/* Expiry Timer */}
       {daysLeft !== null && (
-        <div className={`flex items-center gap-3 p-4 rounded-2xl border font-bold text-sm ${daysLeft <= 3 ? 'bg-red-50 border-red-200 text-red-700' : daysLeft <= 7 ? 'bg-amber-50 border-amber-200 text-amber-700' : 'bg-green-50 border-green-200 text-green-700'}`}>
-          <Clock className={`w-5 h-5 shrink-0 ${daysLeft <= 3 ? 'text-red-500' : daysLeft <= 7 ? 'text-amber-500' : 'text-green-500'}`} />
+        <div className={`flex items-center gap-3 p-4 rounded-2xl border font-bold text-sm ${
+          daysLeft <= 0 ? 'bg-red-50 border-red-200 text-red-700 dark:bg-red-900/20 dark:border-red-800'
+          : daysLeft <= 3 ? 'bg-orange-50 border-orange-200 text-orange-700 dark:bg-orange-900/20 dark:border-orange-800'
+          : daysLeft <= 7 ? 'bg-amber-50 border-amber-200 text-amber-700 dark:bg-amber-900/20 dark:border-amber-800'
+          : 'bg-green-50 border-green-200 text-green-700 dark:bg-green-900/20 dark:border-green-800'
+        }`}>
+          <Clock className="w-5 h-5 shrink-0" />
           {daysLeft > 0 ? (
-            <span>باقتك النشطة تنتهي بعد <strong>{daysLeft}</strong> يوم — تاريخ الانتهاء: {new Date(subEndsAt).toLocaleDateString('ar-SA')}</span>
+            <span>باقتك النشطة <strong className="mx-1">{currentPlanName}</strong> تنتهي بعد <strong className="mx-1 text-lg">{daysLeft}</strong> يوم — {new Date(subEndsAt).toLocaleDateString('ar-SA', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
           ) : (
-            <span>⚠️ انتهت صلاحية اشتراكك! يرجى تجديد الباقة لإعادة تفعيل متجرك.</span>
+            <span>⚠️ انتهت صلاحية اشتراكك! قم بالتجديد الآن لإعادة تفعيل متجرك.</span>
           )}
         </div>
       )}
-      <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h3 className="text-2xl font-bold text-foreground">باقات الاشتراك والتفعيل</h3>
-          <p className="text-sm text-muted-foreground mt-1">قم بتفعيل متجرك مباشرة عبر اختيار إحدى الباقات وسيتم استقطاع المبلغ من رصيدك.</p>
-        </div>
-        <div className="bg-indigo-50 border border-indigo-100 rounded-xl px-4 py-2 flex flex-col items-center gap-2">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
-            <span className="text-xs font-bold text-primary">رصيدك الحالي: {Number(currentBalance).toLocaleString()} ر.ي</span>
-          </div>
-        </div>
-      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-        {subscriptionPlans.length > 0 ? subscriptionPlans.map(plan => {
+      {/* Plan Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {plansOrdered.length > 0 ? plansOrdered.map((plan, idx) => {
           const isAffordable = currentBalance >= Number(plan.price);
-          const isHighest = plan.price == Math.max(...subscriptionPlans.map(p => p.price));
+          const isMid = idx === 1;
+          const isCurrentPlan = currentPlanName === plan.name && daysLeft !== null && daysLeft > 0;
+          const featuresForPlan = planFeatureMap[plan.name] || (Array.isArray(plan.features) ? plan.features.map((f: string) => `✅ ${f}`) : []);
+          
           return (
-            <div key={plan.id} className={`${isHighest ? 'bg-gradient-to-b from-[#6b6eed] to-[#4b4ed6] text-white shadow-xl shadow-primary/20 transform scale-105 z-10 dark:from-primary dark:to-[#4143a3]' : 'bg-white text-foreground border border-border/60 shadow-sm transition dark:bg-slate-800 dark:border-slate-700'} rounded-[24px] p-6 flex flex-col items-center relative hover:-translate-y-1 hover:shadow-lg`}>
-              {isHighest && <span className="absolute -top-3 bg-amber-500 text-white text-[10px] font-black px-4 py-1 rounded-full uppercase tracking-wider shadow-sm">الأكثر طلباً ومبيعاً</span>}
-              <span className={`text-sm font-bold mb-4 ${isHighest ? 'text-white/90 mt-2' : ''}`}>{plan.name}</span>
-              <h4 className={`text-3xl font-black mb-6 ${isHighest ? 'text-white' : 'text-primary'}`} dir="ltr">{Number(plan.price).toLocaleString()} <span className={`text-base font-bold ${isHighest ? 'text-white/70' : 'text-muted-foreground'}`}>ر.ي</span></h4>
-              <ul className={`text-xs space-y-3 mb-8 w-full text-right font-medium ${isHighest ? 'text-white/90' : 'text-muted-foreground'}`}>
-                {Array.isArray(plan.features) && plan.features.map((feat: string, idx: number) => (
-                  <li key={idx} className="flex gap-2 items-center">
-                    <CheckCircle2 className={`w-3.5 h-3.5 shrink-0 ${isHighest ? 'text-white' : 'text-primary'}`} /> {feat}
-                  </li>
-                ))}
-              </ul>
-              <button
-                onClick={() => { if (confirm(`تأكيد اختيار ${plan.name} بقيمة ${Number(plan.price).toLocaleString()} ر.ي؟`)) onUpgrade(plan.name, Number(plan.price)); }}
-                className={`w-full font-bold py-3.5 rounded-xl transition mt-auto ${isAffordable ? (isHighest ? 'bg-white text-primary hover:bg-gray-100 shadow-lg dark:bg-[#0f172a]' : 'bg-primary hover:bg-[#4b4ed6] text-white shadow-lg shadow-primary/20') : (isHighest ? 'bg-white/20 text-white/50 cursor-not-allowed dark:bg-[#0f172a]' : 'bg-muted text-muted-foreground cursor-not-allowed dark:bg-slate-700')}`}
-                disabled={!isAffordable}
-              >
-                {isAffordable ? 'اشتراك الآن' : 'رصيد غير كافٍ'}
-              </button>
+            <div
+              key={plan.id}
+              className={`relative rounded-[24px] flex flex-col overflow-hidden transition-all duration-300 hover:-translate-y-1 ${
+                isMid
+                  ? 'bg-gradient-to-b from-indigo-600 to-violet-700 text-white shadow-2xl shadow-indigo-500/30 md:scale-[1.04] z-10'
+                  : 'bg-white dark:bg-slate-800 border border-border/60 dark:border-slate-700 shadow-md'
+              }`}
+            >
+              {isMid && <div className="absolute top-0 inset-x-0 h-1 bg-amber-400" />}
+              {isCurrentPlan && (
+                <div className="absolute top-3 left-3 bg-emerald-500 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-sm flex items-center gap-1">
+                  <BadgeCheck className="w-3 h-3" /> باقتك الحالية
+                </div>
+              )}
+              {isMid && !isCurrentPlan && (
+                <div className="absolute top-3 left-3 bg-amber-400 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-sm">الأكثر مبيعاً ⭐</div>
+              )}
+              <div className="p-6 flex flex-col flex-1">
+                <div className={`text-3xl mb-3 ${isMid ? 'text-center' : ''}`}>
+                  {idx === 0 ? '🚀' : idx === 1 ? '⭐' : '👑'}
+                </div>
+                <h3 className={`text-lg font-black mb-1 ${isMid ? 'text-white text-center' : 'text-slate-800 dark:text-white'}`}>{plan.name}</h3>
+                <div className={`text-xs font-medium mb-4 ${ isMid ? 'text-white/70 text-center' : 'text-muted-foreground' }`}>
+                  {idx === 0 ? 'للمتاجر الناشئة والصغيرة' : idx === 1 ? 'الأمثل للنمو والتوسع' : 'حل احترافي متكامل'}
+                </div>
+                <div className={`text-4xl font-black mb-1 text-center ${isMid ? 'text-white' : 'text-primary'}`}>
+                  {Number(plan.price).toLocaleString()}
+                  <span className={`text-sm font-bold mr-1 ${isMid ? 'text-white/70' : 'text-muted-foreground'}`}>ر.ي</span>
+                </div>
+                <div className={`text-xs text-center mb-6 ${isMid ? 'text-white/50' : 'text-muted-foreground'}`}>/ شهر</div>
+
+                <ul className={`space-y-2.5 mb-6 flex-1 text-sm font-medium ${isMid ? 'text-white/90' : 'text-slate-600 dark:text-slate-300'}`}>
+                  {featuresForPlan.map((feat: string, i: number) => {
+                    const isUnlocked = feat.startsWith('✅');
+                    const label = feat.replace(/^[✅❌]\s*/, '');
+                    return (
+                      <li key={i} className={`flex items-center gap-2.5 ${ !isUnlocked ? 'opacity-45' : '' }`}>
+                        <span className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 text-[10px] font-black ${
+                          isUnlocked
+                            ? (isMid ? 'bg-white/25 text-white' : 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400')
+                            : (isMid ? 'bg-white/10 text-white/40' : 'bg-slate-100 text-slate-400 dark:bg-slate-700')
+                        }`}>{isUnlocked ? '✓' : '✕'}</span>
+                        {label}
+                      </li>
+                    );
+                  })}
+                </ul>
+
+                <button
+                  onClick={() => {
+                    if (isCurrentPlan) { toast('هذه هي باقتك الحالية النشطة.', { icon: '📌' }); return; }
+                    if (confirm(`تأكيد الاشتراك في "${plan.name}" بقيمة ${Number(plan.price).toLocaleString()} ر.ي لمدة 30 يوماً؟`)) {
+                      onUpgrade(plan.name, Number(plan.price));
+                    }
+                  }}
+                  disabled={!isAffordable && !isCurrentPlan}
+                  className={`w-full py-3.5 rounded-2xl font-bold text-sm transition-all ${
+                    isCurrentPlan ? 'bg-emerald-500 text-white cursor-default'
+                    : isAffordable
+                      ? isMid ? 'bg-white text-indigo-700 hover:bg-gray-100 shadow-lg dark:bg-white/90'
+                               : 'bg-primary text-white hover:bg-indigo-700 shadow-md shadow-primary/30'
+                      : 'bg-muted text-muted-foreground cursor-not-allowed dark:bg-slate-700'
+                  }`}
+                >
+                  {isCurrentPlan ? '✓ باقتك الحالية' : isAffordable ? 'اشترك الآن' : 'رصيد غير كافٍ'}
+                </button>
+              </div>
             </div>
           );
         }) : (
-          <div className="col-span-3 text-center py-20 text-muted-foreground font-bold font-display animate-pulse">جاري تحميل الباقات المتاحة...</div>
+          <div className="col-span-3 text-center py-20 text-muted-foreground font-bold animate-pulse">جاري تحميل الباقات المتاحة...</div>
         )}
       </div>
+
+      {/* Feature Comparison Note */}
+      <div className="bg-slate-50 dark:bg-slate-800/50 border border-border/40 dark:border-slate-700 rounded-2xl p-5">
+        <h4 className="font-bold text-sm text-slate-700 dark:text-white mb-3 flex items-center gap-2">
+          <ShieldCheck className="w-4 h-4 text-primary" /> مقارنة مزايا الباقات
+        </h4>
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs font-medium">
+            <thead>
+              <tr className="text-muted-foreground border-b border-border/40">
+                <th className="text-right py-2 pb-3 font-bold text-slate-600 dark:text-slate-300">الميزة</th>
+                <th className="text-center py-2 pb-3 w-20">مبتدئة</th>
+                <th className="text-center py-2 pb-3 w-20 text-primary font-black">أساسية</th>
+                <th className="text-center py-2 pb-3 w-20">احترافية</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border/30">
+              {[
+                ['حد المنتجات', '100', '500', 'غير محدود'],
+                ['إدارة الطلبات', '✅', '✅', '✅'],
+                ['الكوبونات', '❌', '✅', '✅'],
+                ['العروض والخصومات', '❌', '✅', '✅'],
+                ['التحليلات المتقدمة', '❌', '✅', '✅'],
+                ['ربط نطاق خاص', '❌', '❌', '✅'],
+                ['دعم فني VIP', '❌', '❌', '✅'],
+              ].map(([feature, v1, v2, v3], i) => (
+                <tr key={i} className="hover:bg-muted/30 transition">
+                  <td className="py-2.5 text-slate-700 dark:text-slate-200 font-semibold">{feature}</td>
+                  <td className="text-center py-2.5">{v1 === '✅' ? <span className="text-green-500 font-black">✓</span> : v1 === '❌' ? <span className="text-slate-300">—</span> : <span className="text-slate-600 dark:text-slate-300 font-bold">{v1}</span>}</td>
+                  <td className="text-center py-2.5 bg-primary/5">{v2 === '✅' ? <span className="text-green-500 font-black">✓</span> : v2 === '❌' ? <span className="text-slate-300">—</span> : <span className="text-primary font-black">{v2}</span>}</td>
+                  <td className="text-center py-2.5">{v3 === '✅' ? <span className="text-green-500 font-black">✓</span> : v3 === '❌' ? <span className="text-slate-300">—</span> : <span className="text-violet-600 font-black">{v3}</span>}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Balance hint */}
+      {currentBalance < 9000 && (
+        <div className="flex items-center gap-3 p-4 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+          <Wallet className="w-5 h-5 text-amber-500 shrink-0" />
+          <div>
+            <p className="text-sm font-bold text-amber-700 dark:text-amber-300">رصيدك الحالي غير كافٍ لأي باقة</p>
+            <p className="text-xs text-amber-600/80 dark:text-amber-400/80 mt-0.5">قم بشحن محفظتك أولاً ثم اختر الباقة المناسبة لتفعيل متجرك.</p>
+          </div>
+          <button onClick={() => window.dispatchEvent(new CustomEvent('suriix_switch_tab', { detail: 'wallet' }))} className="mr-auto bg-amber-500 hover:bg-amber-600 text-white font-bold px-4 py-2 rounded-xl text-xs transition shrink-0">
+            شحن الرصيد
+          </button>
+        </div>
+      )}
     </motion.div>
   );
 });
@@ -3496,6 +3664,105 @@ const DomainTab = React.memo(({ storeData, onUpdateField }: { storeData: any, on
                  </motion.div>
               )}
            </div>
+       </div>
+    </motion.div>
+  );
+});
+
+const AppearanceTab = React.memo(({ storeData, onUpdateField }: { storeData: any, onUpdateField: (field: string, val: any) => void }) => {
+  const [themeColor, setThemeColor] = useState(storeData?.theme_color || '#4F46E5');
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Predefined palette colors
+  const presetColors = [
+    { name: 'بنفسجي داكن', value: '#4F46E5' },
+    { name: 'أزرق', value: '#3B82F6' },
+    { name: 'أخضر', value: '#10B981' },
+    { name: 'أحمر داكن', value: '#E11D48' },
+    { name: 'برتقالي', value: '#F97316' },
+    { name: 'أسود', value: '#0F172A' },
+  ];
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    onUpdateField('theme_color', themeColor);
+    
+    if (storeData.id && !String(storeData.id).startsWith("local-")) {
+      const { error } = await supabase.from('stores').update({ theme_color: themeColor }).eq('id', storeData.id);
+      if (error) {
+        toast.error('حدث خطأ أثناء حفظ الألوان في قاعدة البيانات');
+      } else {
+        toast.success('تم حفظ مظهر المتجر بنجاح!');
+      }
+    } else {
+      toast.success('تم حفظ المظهر محلياً');
+    }
+    setIsSaving(false);
+  };
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 max-w-4xl mx-auto pt-6 pb-20 text-right" dir="rtl">
+       <div className="bg-white dark:bg-slate-800 rounded-3xl border border-border/40 shadow-sm p-8 flex flex-col md:flex-row items-center justify-between gap-6 dark:border-slate-800">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 bg-pink-50 text-pink-600 rounded-2xl flex items-center justify-center shrink-0">
+              <Palette className="w-7 h-7" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-black text-slate-800 dark:text-white">المظهر والتصميم</h2>
+              <p className="text-sm text-slate-500 mt-1 font-medium max-w-md leading-relaxed dark:text-slate-300">قم باختيار الألوان التي تعبر عن هوية علامتك التجارية لتطبيقها في متجرك للعملاء.</p>
+            </div>
+          </div>
+          <button onClick={handleSave} disabled={isSaving} className="bg-primary text-white font-bold py-3 px-8 rounded-2xl hover:opacity-90 shadow-xl shadow-primary/20 transition flex items-center justify-center gap-2 w-full md:w-auto shrink-0 disabled:opacity-50">
+             {isSaving ? 'يتم الحفظ...' : <><Save className="w-5 h-5 inline-block ml-2"/>حفظ التغييرات</>}
+          </button>
+       </div>
+
+       <div className="bg-white rounded-3xl border border-border/40 shadow-sm p-6 md:p-8 dark:bg-[#0f172a] dark:border-slate-800">
+         <h3 className="font-bold text-lg mb-6 text-slate-800 dark:text-white border-b pb-4 dark:border-slate-800">تخصيص ألوان المتجر</h3>
+         
+         <div className="mb-6">
+            <label className="block text-slate-700 dark:text-slate-200 mb-3 font-bold text-sm">اللون الأساسي (Primary Color)</label>
+            <p className="text-xs text-slate-500 font-medium mb-4 dark:text-slate-400">هذا اللون سيطبق على الأزرار والشريط العلوي والروابط الأساسية في واجهة العملاء.</p>
+            
+            <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 mb-6">
+               {presetColors.map((color, i) => (
+                  <button 
+                     key={i} 
+                     onClick={() => setThemeColor(color.value)}
+                     className={`h-16 w-full rounded-2xl border-2 transition-all cursor-pointer ${themeColor === color.value ? 'border-slate-800 dark:border-white scale-105 shadow-md' : 'border-transparent hover:scale-105'}`}
+                     style={{ backgroundColor: color.value }}
+                     title={color.name}
+                  >
+                     {themeColor === color.value && <BadgeCheck className="w-6 h-6 text-white m-auto shadow-sm rounded-full" />}
+                  </button>
+               ))}
+            </div>
+
+            <div className="flex items-center gap-4 p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl">
+               <input 
+                  type="color" 
+                  value={themeColor} 
+                  onChange={(e) => setThemeColor(e.target.value)}
+                  className="w-12 h-12 rounded-xl cursor-pointer bg-transparent border-0 p-0"
+               />
+               <div className="flex-1">
+                  <p className="text-sm font-bold text-slate-800 dark:text-white mb-1">لون مخصص</p>
+                  <p className="text-xs text-slate-500 font-medium font-mono" dir="ltr">{themeColor}</p>
+               </div>
+            </div>
+         </div>
+
+         <div className="mt-8 border-t border-slate-100 dark:border-slate-800 pt-8">
+            <h4 className="font-bold text-sm mb-4 text-slate-600 dark:text-slate-300">معاينة حية لشكل زر متجرك:</h4>
+            <div className="p-10 border border-slate-200 rounded-3xl flex items-center justify-center bg-slate-50 dark:bg-slate-950 dark:border-slate-800">
+               <button 
+                 className="px-8 py-3.5 rounded-2xl text-white font-bold shadow-lg transition-transform hover:-translate-y-1"
+                 style={{ backgroundColor: themeColor, boxShadow: `0 10px 25px -5px ${themeColor}60` }}
+               >
+                 أضف إلى السلة
+               </button>
+            </div>
+         </div>
        </div>
     </motion.div>
   );

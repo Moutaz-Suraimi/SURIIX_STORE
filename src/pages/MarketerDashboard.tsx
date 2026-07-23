@@ -72,7 +72,7 @@ const MarketerDashboard = () => {
   const handleCopy = () => {
     const nameEn = marketer?.name_en?.replace(/\s+/g, '-').toLowerCase() || "marketer";
     const code = marketer?.referral_code || "XXXX";
-    const link = `https://suriix.store/ref/${nameEn}-${code}`;
+    const link = `${window.location.origin}/ref/${nameEn}-${code}`;
     navigator.clipboard.writeText(link);
     toast.success("تم نسخ رابط الإحالة بنجاح");
   };
@@ -122,7 +122,7 @@ const MarketerDashboard = () => {
 
   const displayName = marketer?.name_ar || marketer?.name_en || "مسوق";
   const nameEn = marketer?.name_en?.replace(/\s+/g, '-').toLowerCase() || "marketer";
-  const referralLink = `https://suriix.store/ref/${nameEn}-${marketer?.referral_code || "..."}`;
+  const referralLink = `${window.location.origin}/ref/${nameEn}-${marketer?.referral_code || "..."}`;
 
   const navItems: { key: Tab; label: string; icon: any }[] = [
     { key: "home", label: "الرئيسية", icon: Home },
@@ -384,9 +384,9 @@ const MarketerDashboard = () => {
             <div className="space-y-6">
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {[
-                  { label: "إجمالي الأرباح", value: `$${(marketer?.total_profits || 0).toFixed(2)}`, color: "purple" },
-                  { label: "الأرباح المعلقة", value: `$${(marketer?.pending_profits || 0).toFixed(2)}`, color: "orange" },
-                  { label: "الرصيد المتاح", value: `$${(marketer?.available_balance || 0).toFixed(2)}`, color: "emerald" },
+                  { label: "إجمالي الأرباح", value: `${(marketer?.total_profits || 0).toLocaleString()} ر.ي`, color: "purple" },
+                  { label: "الأرباح المعلقة", value: `${(marketer?.pending_profits || 0).toLocaleString()} ر.ي`, color: "orange" },
+                  { label: "الرصيد المتاح", value: `${(marketer?.available_balance || 0).toLocaleString()} ر.ي`, color: "emerald" },
                   { label: "عدد الإحالات", value: referrals.length, color: "blue" },
                 ].map((s, i) => (
                   <div key={i} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 dark:bg-[#0f172a]">
@@ -469,7 +469,7 @@ const MarketerDashboard = () => {
             <div className="max-w-xl space-y-6">
               <div className="bg-gradient-to-br from-purple-600 to-fuchsia-600 rounded-2xl p-6 text-white shadow-lg">
                 <p className="text-sm font-bold opacity-80 mb-1">الرصيد المتاح للسحب</p>
-                <p className="text-4xl font-black mb-4">${(marketer?.available_balance || 0).toFixed(2)}</p>
+                <p className="text-4xl font-black mb-4">{(marketer?.available_balance || 0).toLocaleString()} ر.ي</p>
                 <button onClick={() => setActiveTab("withdrawals")}
                   className="bg-white text-purple-700 px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-purple-50 transition dark:bg-[#0f172a]">
                   طلب سحب
@@ -478,10 +478,10 @@ const MarketerDashboard = () => {
 
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4 dark:bg-[#0f172a]">
                 {[
-                  { label: "إجمالي الأرباح المكتسبة", value: `$${(marketer?.total_profits || 0).toFixed(2)}`, color: "text-gray-900 dark:text-white" },
-                  { label: "الأرباح المعلقة", value: `$${(marketer?.pending_profits || 0).toFixed(2)}`, color: "text-orange-500" },
-                  { label: "إجمالي ما تم سحبه", value: `-$${(marketer?.total_withdrawals || 0).toFixed(2)}`, color: "text-red-500" },
-                  { label: "الرصيد المتاح", value: `$${(marketer?.available_balance || 0).toFixed(2)}`, color: "text-emerald-600" },
+                  { label: "إجمالي الأرباح المكتسبة", value: `${(marketer?.total_profits || 0).toLocaleString()} ر.ي`, color: "text-gray-900 dark:text-white" },
+                  { label: "الأرباح المعلقة", value: `${(marketer?.pending_profits || 0).toLocaleString()} ر.ي`, color: "text-orange-500" },
+                  { label: "إجمالي ما تم سحبه", value: `-${(marketer?.total_withdrawals || 0).toLocaleString()} ر.ي`, color: "text-red-500" },
+                  { label: "الرصيد المتاح", value: `${(marketer?.available_balance || 0).toLocaleString()} ر.ي`, color: "text-emerald-600" },
                 ].map((row, i) => (
                   <div key={i} className="flex justify-between items-center py-3 border-b border-gray-50 border-dashed last:border-0">
                     <span className="text-gray-500 font-medium text-sm dark:text-slate-300">{row.label}</span>

@@ -43,6 +43,17 @@ const RefForwarder = () => {
         console.error("Error looking up referral code:", err);
       }
 
+      // تسجيل الخروج لتفادي مشكلة الدخول التلقائي عند اختبار الروابط أو تسجيل متجر كزائر جديد
+      try {
+        await supabase.auth.signOut();
+        localStorage.removeItem('suriix_added_stores');
+        localStorage.removeItem('suriix_user_auth');
+        localStorage.removeItem('suriix_user_role');
+        localStorage.removeItem('suriix_oauth_intent');
+      } catch (e) {
+        console.error("Error signing out:", e);
+      }
+
       // توجيه الزائر إلى صفحة إنشاء المتجر
       navigate("/create-store", { replace: true });
     };

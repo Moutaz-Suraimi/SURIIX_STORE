@@ -18,7 +18,6 @@ const MarketerSignup = () => {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // التحقق من اكتمال جميع الحقول
     if (!nameAr.trim() || !nameEn.trim() || !email.trim() || !phone.trim() || !password.trim()) {
       toast.error("يرجى تعبئة جميع الحقول قبل المتابعة");
       return;
@@ -32,7 +31,7 @@ const MarketerSignup = () => {
     const phoneClean = phone.trim();
     const emailClean = email.trim().toLowerCase();
 
-    // التحقق من عدم تكرار رقم الهاتف أو الإيميل محلياً قبل الإرسال
+    // التحقق من عدم تكرار رقم الهاتف أو الإيميل
     try {
       const [{ data: existingPhone }, { data: existingEmail }] = await Promise.all([
         supabase.from('marketers').select('id').eq('phone', phoneClean).maybeSingle(),
@@ -46,97 +45,85 @@ const MarketerSignup = () => {
         toast.error("البريد الإلكتروني مسجل بالفعل لحساب مسوق آخر");
         return;
       }
-    } catch (_) { /* ignored - the edge function will still validate */ }
+    } catch (_) {}
 
     setIsLoading(true);
     try {
-      const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "https://rajvyxdfibpamanmmkgf.supabase.co";
-      const referralCode = Math.random().toString(36).substring(2, 10).toUpperCase();
+      const { data, error } = await supabase.auth.signUp({
+        email: emailClean,
+        password: password
+      });
 
-      const fnResponse = await fetch(`${SUPABASE_URL}/functions/v1/create-user`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: emailClean,
-          password: password,
-          marketerData: {
+      if (error) {
+        const errorMsg = error.message;
+        // إذا كان المستخدم موجوداً في auth لكن بدون سجل مسوق، نحاول تسجيل الدخول
+        if (errorMsg.includes("already registered") || errorMsg.includes("User already exists")) {
+          const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+            email: emailClean,
+            password: password
+          });
+          if (signInError || !signInData.session) {
+            toast.error("هذا البريد الإلكتروني مسجل بكلمة مرور مختلفة. يرجى تسجيل الدخول.");
+            setIsLoading(false);
+            return;
+          }
+          // تابع تسجيل بيانات المسوق بعد تسجيل الدخول الناجح
+          const existingUserId = signInData.session.user.id;
+          const referralCodeFallback = Math.random().toString(36).substring(2, 10).toUpperCase();
+          const { error: mErr } = await supabase.from('marketers').upsert({
+            id: existingUserId,
+            email: emailClean,
             name_ar: nameAr.trim(),
             name_en: nameEn.trim(),
             phone: phoneClean,
-            referral_code: referralCode,
+            referral_code: referralCodeFallback,
+          });
+          if (mErr) {
+            console.error("Marketer save error:", mErr);
+            toast.error("حدث خطأ أثناء حفظ بيانات المسوق: " + mErr.message);
+            setIsLoading(false);
+            return;
           }
-        }),
+          toast.success("تم إنشاء حسابك كمسوق بنجاح! 🎉", { duration: 5000 });
+          navigate("/marketer/dashboard");
+          return;
+        } else {
+          toast.error("حدث خطأ أثناء إنشاء الحساب: " + errorMsg);
+        }
+        setIsLoading(false);
+        return;
+      }
+
+      const userId = data.user?.id || data.session?.user?.id;
+      if (!userId) {
+        toast.error("حدث خطأ أثناء إنشاء الحساب. يرجى المحاولة مرة أخرى.");
+        setIsLoading(false);
+        return;
+      }
+
+      const referralCode = Math.random().toString(36).substring(2, 10).toUpperCase();
+
+      const { error: marketerError } = await supabase.from('marketers').upsert({
+        id: userId,
+        email: emailClean,
+        name_ar: nameAr.trim(),
+        name_en: nameEn.trim(),
+        phone: phoneClean,
+        referral_code: referralCode,
       });
 
-      if (!fnResponse.ok && fnResponse.status !== 200) {
-        // محاولة قراءة الخطأ من Response
-        let errMsg = "حدث خطأ في الخادم. يرجى المحاولة لاحقاً.";
-        try {
-          const errData = await fnResponse.json();
-          if (errData?.error) errMsg = String(errData.error);
-        } catch (_) {}
-        throw new Error(errMsg);
+      if (marketerError) {
+        console.error("Marketer save error:", marketerError);
+        toast.error("حدث خطأ أثناء حفظ بيانات المسوق: " + marketerError.message);
+        setIsLoading(false);
+        return;
       }
 
-      const fnResult = await fnResponse.json();
-
-      if (fnResult.error) {
-        const errorMsg = String(fnResult.error);
-        // معالجة أخطاء محددة بشكل واضح
-        if (errorMsg.includes("already registered") || errorMsg.includes("User already exists") || errorMsg.includes("مسجل بالفعل")) {
-          toast.error(errorMsg.includes("مسوق") ? errorMsg : "هذا البريد الإلكتروني مسجل بالفعل. يرجى استخدام بريد آخر أو تسجيل الدخول.");
-          return;
-        }
-        if (errorMsg.includes("متجر") || errorMsg.includes("store")) {
-          toast.error("هذا البريد الإلكتروني مستخدم لحساب متجر. يرجى استخدام بريد إلكتروني مختلف.");
-          return;
-        }
-        throw new Error(errorMsg);
-      }
-
-      if (fnResult.marketerError) {
-        const mErr = String(fnResult.marketerError);
-        if (mErr.includes("duplicate") || mErr.includes("unique")) {
-          toast.error("البريد الإلكتروني أو رقم الهاتف مسجل بالفعل.");
-          return;
-        }
-        throw new Error("خطأ في حفظ بيانات المسوق: " + mErr);
-      }
-
-      // تفعيل الجلسة المُعادة من الـ Edge Function
-      if (fnResult.session?.access_token) {
-        await supabase.auth.setSession({
-          access_token: fnResult.session.access_token,
-          refresh_token: fnResult.session.refresh_token
-        });
-      } else {
-        // إذا لم تُعد الجلسة، نُحاول تسجيل الدخول مباشرة
-        const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({
-          email: emailClean,
-          password: password
-        });
-        if (signInErr) throw new Error("تعذر تسجيل الدخول: " + signInErr.message);
-        if (signInData?.session) {
-          await supabase.auth.setSession({
-            access_token: signInData.session.access_token,
-            refresh_token: signInData.session.refresh_token
-          });
-        }
-      }
-
-      toast.success("تم إنشاء حسابك كمسوق بنجاح! 🎉 جاري توجيهك إلى لوحة التحكم...", { duration: 5000 });
+      toast.success("تم إنشاء حسابك كمسوق بنجاح! 🎉", { duration: 5000 });
       navigate("/marketer/dashboard");
     } catch (error: any) {
       console.error("Signup Error:", error);
-      const msg = typeof error?.message === 'string' ? error.message : '';
-      if (msg.includes("25 seconds") || msg.includes("security purposes")) {
-        toast.error("تم رفض الطلب بسبب المحاولات المتكررة. انتظر 30 ثانية ثم حاول مرة أخرى.", { duration: 6000 });
-      } else if (msg.includes("Failed to fetch") || msg.includes("NetworkError")) {
-        toast.error("تعذر الاتصال بالخادم. تحقق من اتصال الإنترنت وحاول مرة أخرى.");
-      } else {
-        toast.error(msg || "حدث خطأ أثناء إنشاء الحساب. يرجى المحاولة مرة أخرى.");
-      }
-    } finally {
+      toast.error("حدث خطأ أثناء إنشاء الحساب. يرجى المحاولة مرة أخرى.");
       setIsLoading(false);
     }
   };
@@ -163,110 +150,110 @@ const MarketerSignup = () => {
           </div>
 
           <form onSubmit={handleSignup} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5">الاسم بالعربية</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                        <User className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                      </div>
+                      <input
+                        type="text"
+                        value={nameAr}
+                        onChange={(e) => setNameAr(e.target.value)}
+                        className="block w-full pl-3 pr-10 py-3 border border-gray-200 dark:border-white/10 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-600 bg-gray-50 dark:bg-white/5 focus:bg-white dark:focus:bg-white/10 transition-all"
+                        placeholder="محمد أحمد"
+                        required
+                      />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5">الاسم بالإنجليزية</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                        <User className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                      </div>
+                      <input
+                        type="text"
+                        value={nameEn}
+                        onChange={(e) => setNameEn(e.target.value)}
+                        className="block w-full pl-3 pr-10 py-3 border border-gray-200 dark:border-white/10 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-600 bg-gray-50 dark:bg-white/5 focus:bg-white dark:focus:bg-white/10 transition-all"
+                        placeholder="Mohammed Ahmed"
+                        dir="ltr"
+                        required
+                      />
+                  </div>
+                </div>
+              </div>
+
               <div>
-                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5">الاسم بالعربية</label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                      <User className="h-5 w-5 text-gray-400 dark:text-gray-500" />
-                    </div>
-                    <input
-                      type="text"
-                      value={nameAr}
-                      onChange={(e) => setNameAr(e.target.value)}
-                      className="block w-full pl-3 pr-10 py-3 border border-gray-200 dark:border-white/10 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-600 bg-gray-50 dark:bg-white/5 focus:bg-white dark:focus:bg-white/10 transition-all"
-                      placeholder="محمد أحمد"
-                      required
-                    />
+                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5">البريد الإلكتروني</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                    <Mail className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                  </div>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="block w-full pl-3 pr-10 py-3 border border-gray-200 dark:border-white/10 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-600 bg-gray-50 dark:bg-white/5 focus:bg-white dark:focus:bg-white/10 transition-all"
+                    placeholder="name@example.com"
+                    dir="ltr"
+                    required
+                  />
                 </div>
               </div>
+
               <div>
-                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5">الاسم بالإنجليزية</label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                      <User className="h-5 w-5 text-gray-400 dark:text-gray-500" />
-                    </div>
-                    <input
-                      type="text"
-                      value={nameEn}
-                      onChange={(e) => setNameEn(e.target.value)}
-                      className="block w-full pl-3 pr-10 py-3 border border-gray-200 dark:border-white/10 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-600 bg-gray-50 dark:bg-white/5 focus:bg-white dark:focus:bg-white/10 transition-all"
-                      placeholder="Mohammed Ahmed"
-                      dir="ltr"
-                      required
-                    />
+                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5">رقم الهاتف</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                    <Phone className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                  </div>
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="block w-full pl-3 pr-10 py-3 border border-gray-200 dark:border-white/10 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-600 bg-gray-50 dark:bg-white/5 focus:bg-white dark:focus:bg-white/10 transition-all"
+                    placeholder="+966 50 000 0000"
+                    dir="ltr"
+                    required
+                  />
                 </div>
               </div>
-            </div>
 
-            <div>
-              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5">البريد الإلكتروني</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+              <div>
+                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5">كلمة المرور</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                    <Lock className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                  </div>
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="block w-full pl-3 pr-10 py-3 border border-gray-200 dark:border-white/10 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-600 bg-gray-50 dark:bg-white/5 focus:bg-white dark:focus:bg-white/10 transition-all"
+                    placeholder="••••••••  (6 أحرف على الأقل)"
+                    required
+                  />
                 </div>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="block w-full pl-3 pr-10 py-3 border border-gray-200 dark:border-white/10 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-600 bg-gray-50 dark:bg-white/5 focus:bg-white dark:focus:bg-white/10 transition-all"
-                  placeholder="name@example.com"
-                  dir="ltr"
-                  required
-                />
               </div>
-            </div>
 
-            <div>
-              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5">رقم الهاتف</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                  <Phone className="h-5 w-5 text-gray-400 dark:text-gray-500" />
-                </div>
-                <input
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="block w-full pl-3 pr-10 py-3 border border-gray-200 dark:border-white/10 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-600 bg-gray-50 dark:bg-white/5 focus:bg-white dark:focus:bg-white/10 transition-all"
-                  placeholder="+966 50 000 0000"
-                  dir="ltr"
-                  required
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5">كلمة المرور</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-400 dark:text-gray-500" />
-                </div>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full pl-3 pr-10 py-3 border border-gray-200 dark:border-white/10 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-600 bg-gray-50 dark:bg-white/5 focus:bg-white dark:focus:bg-white/10 transition-all"
-                  placeholder="••••••••  (6 أحرف على الأقل)"
-                  required
-                />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full flex justify-center items-center gap-2 py-3.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-700 hover:to-fuchsia-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all disabled:opacity-70 disabled:cursor-not-allowed mt-4"
-            >
-              {isLoading ? (
-                <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-              ) : (
-                <>
-                  إنشاء الحساب
-                  <ArrowRight className="w-4 h-4 rotate-180" />
-                </>
-              )}
-            </button>
-          </form>
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full flex justify-center items-center gap-2 py-3.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-700 hover:to-fuchsia-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all disabled:opacity-70 disabled:cursor-not-allowed mt-4"
+              >
+                {isLoading ? (
+                  <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                ) : (
+                  <>
+                    إنشاء الحساب
+                    <ArrowRight className="w-4 h-4 rotate-180" />
+                  </>
+                )}
+              </button>
+            </form>
         </div>
         <div className="px-8 py-5 bg-gray-50 dark:bg-white/3 border-t border-gray-100 dark:border-white/5 text-center">
           <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">

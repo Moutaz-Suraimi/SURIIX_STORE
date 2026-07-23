@@ -130,7 +130,7 @@ const AdminDashboard = () => {
   const fetchStores = async () => {
     const { data: storesData, error } = await supabase
       .from('stores')
-      .select('*, users!stores_owner_id_fkey(name, email, phone, status, subscription_ends_at)')
+      .select('*, users!stores_owner_id_fkey(name, email, phone, status, subscription_ends_at, wallet_yer)')
       .order('created_at', { ascending: false });
       
     if (storesData) {
@@ -483,12 +483,22 @@ const AdminDashboard = () => {
         .update({
           store_name: selectedStore.store_name,
           store_url: selectedStore.store_url,
-          is_active: selectedStore.is_active
+          is_active: selectedStore.is_active,
+          tier: selectedStore.tier
         })
         .eq('id', selectedStore.id);
       
       if (error) throw error;
-      toast.success('تم تحديث بيانات المتجر بنجاح');
+
+      if (selectedStore.owner_id && selectedStore.users) {
+        await supabase.from('users').update({
+           name: selectedStore.users.name,
+           email: selectedStore.users.email,
+           wallet_yer: selectedStore.users.wallet_yer
+        }).eq('id', selectedStore.owner_id);
+      }
+
+      toast.success('تم تحديث بيانات المتجر والمالك بنجاح');
       setIsStoreEditOpen(false);
       fetchStores();
     } catch (e: any) {
@@ -572,7 +582,6 @@ const AdminDashboard = () => {
     { id: 'admin_wallet', label: 'محفظة الإدارة', icon: Wallet },
     { id: 'marketing', label: 'إدارة التسويق', icon: Gift },
     { id: 'marketers', label: 'المسوقون', icon: Users },
-    { id: 'users', label: 'المستخدمون', icon: Users },
     { id: 'templates', label: 'القوالب', icon: LayoutTemplate },
   ];
 
@@ -767,6 +776,114 @@ const AdminDashboard = () => {
 
         {/* PAGE CONTENT */}
         <div className="flex-1 p-6 lg:p-10">
+          {/* ===== MARKETERS SECTION ===== */}
+          {activeSection === 'marketers' && (
+            <div className="max-w-[1400px] mx-auto space-y-6">
+              <div>
+                <h1 className="text-[28px] font-black text-gray-900 dark:text-white mb-2">إدارة المسوقين</h1>
+                <p className="text-gray-500 text-sm font-medium dark:text-slate-300">عرض وإدارة حسابات المسوقين وأرباحهم وأرصدتهم</p>
+              </div>
+
+              {/* Stats */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[
+                  { label: 'إجمالي المسوقين', value: marketersList.length, color: 'purple', icon: Users },
+                  { label: 'إجمالي الأرباح', value: `${marketersList.reduce((s, m) => s + (m.total_profits || 0), 0).toLocaleString()} ر.ي`, color: 'emerald', icon: TrendingUp },
+                  { label: 'أرباح معلقة', value: `${marketersList.reduce((s, m) => s + (m.pending_profits || 0), 0).toLocaleString()} ر.ي`, color: 'orange', icon: Clock },
+                  { label: 'أرصدة متاحة', value: `${marketersList.reduce((s, m) => s + (m.available_balance || 0), 0).toLocaleString()} ر.ي`, color: 'blue', icon: Wallet },
+                ].map((s, i) => (
+                  <div key={i} className="bg-white dark:bg-[#1A1A24] border border-gray-100 dark:border-white/5 rounded-2xl p-5 shadow-sm flex items-center justify-between">
+                    <div>
+                      <p className="text-gray-500 text-xs font-bold mb-2 dark:text-slate-300">{s.label}</p>
+                      <p className={`text-2xl font-black text-${s.color}-600`}>{s.value}</p>
+                    </div>
+                    <div className={`w-12 h-12 rounded-xl bg-${s.color}-50 dark:bg-${s.color}-500/10 flex items-center justify-center`}>
+                      <s.icon className={`w-5 h-5 text-${s.color}-600`} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Table */}
+              <div className="bg-white dark:bg-[#1A1A24] border border-gray-100 dark:border-white/5 rounded-3xl shadow-sm overflow-hidden">
+                <div className="p-6 border-b border-gray-50 dark:border-white/5 flex items-center justify-between">
+                  <h2 className="font-black text-gray-900 dark:text-white">قائمة المسوقين ({marketersList.length})</h2>
+                  <button onClick={fetchMarketers} className="text-sm text-purple-600 font-bold hover:underline">تحديث</button>
+                </div>
+                {marketersList.length === 0 ? (
+                  <div className="py-20 text-center text-gray-400 font-bold dark:text-slate-300">
+                    <Users className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                    <p>لا يوجد مسوقون مسجلون بعد</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm text-right">
+                      <thead>
+                        <tr className="text-gray-400 border-b border-gray-50 dark:border-white/5 text-xs uppercase dark:text-slate-300">
+                          <th className="px-6 py-4 font-semibold">المسوق</th>
+                          <th className="px-4 py-4 font-semibold text-center">كود الإحالة</th>
+                          <th className="px-4 py-4 font-semibold text-center">إجمالي الأرباح</th>
+                          <th className="px-4 py-4 font-semibold text-center">معلق</th>
+                          <th className="px-4 py-4 font-semibold text-center">الرصيد المتاح</th>
+                          <th className="px-4 py-4 font-semibold text-center">إجمالي السحوبات</th>
+                          <th className="px-4 py-4 font-semibold text-center">إجراءات</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-50 dark:divide-white/5">
+                        {marketersList.map((m: any) => (
+                          <tr key={m.id} className="hover:bg-gray-50/50 dark:hover:bg-white/[0.02] transition-colors">
+                            <td className="px-6 py-4">
+                              <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-700 dark:text-purple-400 font-black text-sm">
+                                  {(m.name_ar || m.name_en || 'م').charAt(0)}
+                                </div>
+                                <div>
+                                  <p className="font-bold text-gray-900 dark:text-white">{m.name_ar || '—'}</p>
+                                  <p className="text-xs text-gray-400 dark:text-slate-400" dir="ltr">{m.email}</p>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-4 py-4 text-center">
+                              <span className="font-mono bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400 px-2 py-1 rounded-lg text-xs font-black">{m.referral_code}</span>
+                            </td>
+                            <td className="px-4 py-4 text-center font-black text-emerald-600">{(m.total_profits || 0).toLocaleString()} ر.ي</td>
+                            <td className="px-4 py-4 text-center font-bold text-orange-500">{(m.pending_profits || 0).toLocaleString()} ر.ي</td>
+                            <td className="px-4 py-4 text-center font-black text-blue-600">{(m.available_balance || 0).toLocaleString()} ر.ي</td>
+                            <td className="px-4 py-4 text-center text-gray-500 dark:text-slate-400">{(m.total_withdrawals || 0).toLocaleString()} ر.ي</td>
+                            <td className="px-4 py-4 text-center">
+                              <div className="flex items-center justify-center gap-2">
+                                <button
+                                  onClick={() => { setSelectedMarketer(m); setIsMarketerViewOpen(true); }}
+                                  className="w-8 h-8 rounded-lg bg-purple-50 dark:bg-purple-500/10 text-purple-600 flex items-center justify-center hover:bg-purple-100 transition-colors"
+                                  title="عرض"
+                                >
+                                  <Eye className="w-4 h-4" />
+                                </button>
+                                <button
+                                  onClick={() => { setSelectedMarketer({...m}); setIsMarketerEditOpen(true); }}
+                                  className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-500/10 text-blue-600 flex items-center justify-center hover:bg-blue-100 transition-colors"
+                                  title="تعديل"
+                                >
+                                  <Edit className="w-4 h-4" />
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteMarketer(m.id)}
+                                  className="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-500/10 text-red-500 flex items-center justify-center hover:bg-red-100 transition-colors"
+                                  title="حذف"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {activeSection === 'recharge' && (
             <div className="max-w-[1400px] mx-auto space-y-6">
@@ -1919,67 +2036,70 @@ const AdminDashboard = () => {
             </div>
           )}
 
-          {activeSection === 'users' && (
+
+
+          {activeSection === 'subscriptions' && (
             <div className="max-w-[1400px] mx-auto space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h1 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight mb-1">إدارة المستخدمين</h1>
-                  <p className="text-gray-500 text-sm font-medium dark:text-slate-300">عرض جميع المسجلين في منصة سريكس</p>
+                  <h1 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight mb-1">باقات الاشتراك</h1>
+                  <p className="text-gray-500 text-sm font-medium dark:text-slate-300">إدارة الباقات والتسعير للتجار في المنصة</p>
                 </div>
               </div>
 
-              <div className="bg-white dark:bg-[#1A1A24] rounded-2xl border border-gray-100 dark:border-white/5 shadow-sm overflow-hidden min-h-[500px]">
-                <table className="w-full text-right border-collapse">
-                  <thead>
-                    <tr className="bg-gray-50/80 dark:bg-white/[0.02] border-b border-gray-100 dark:border-white/5 text-[11px] font-black text-gray-400 uppercase tracking-wider dark:text-slate-300">
-                      <th className="py-4 px-6">الاسم</th>
-                      <th className="py-4 px-6">البريد الإلكتروني</th>
-                      <th className="py-4 px-6">الحالة</th>
-                      <th className="py-4 px-6">تاريخ الانضمام</th>
-                      <th className="py-4 px-6">الصلاحية</th>
-                      <th className="py-4 px-6 text-center">إجراءات</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-50 dark:divide-white/5">
-                    {usersList.length > 0 ? usersList.map((user) => (
-                      <tr key={user.id} className="hover:bg-gray-50/50 dark:hover:bg-white/[0.02] transition-colors dark:bg-[#0f172a]">
-                        <td className="py-4 px-6">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs shrink-0">
-                              {user.name ? user.name.charAt(0) : 'U'}
-                            </div>
-                            <p className="font-bold text-gray-900 text-sm dark:text-white">{user.name || 'مستخدم جديد'}</p>
-                          </div>
-                        </td>
-                        <td className="py-4 px-6 text-sm text-gray-500 font-bold dark:text-slate-300" dir="ltr">{user.email}</td>
-                        <td className="py-4 px-6">
-                          <span className={`px-2 py-1 rounded text-xs font-bold ${user.status === 'active' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
-                            {user.status === 'active' ? 'نشط' : 'بانتظار التفعيل'}
-                          </span>
-                        </td>
-                        <td className="py-4 px-6 text-sm text-gray-500 dark:text-slate-300">
-                          {new Date(user.created_at).toLocaleDateString('ar-EG')}
-                        </td>
-                        <td className="py-4 px-6">
-                          <span className={`px-2 py-1 rounded text-xs font-bold ${user.role === 'admin' ? 'bg-purple-50 text-purple-600' : 'bg-gray-100 text-gray-600 dark:text-slate-300'}`}>
-                            {user.role === 'admin' ? 'مدير' : 'مستخدم'}
-                          </span>
-                        </td>
-                        <td className="py-4 px-6 flex items-center justify-center gap-2">
-                          <button onClick={() => { setSelectedUser(user); setIsUserViewOpen(true); }} className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors" title="تفاصيل"><Eye className="w-4 h-4" /></button>
-                          <button onClick={() => { setSelectedUser(user); setIsUserEditOpen(true); }} className="w-8 h-8 rounded-full border border-blue-200 flex items-center justify-center text-blue-500 hover:bg-blue-50 transition-colors" title="تعديل"><Edit className="w-4 h-4" /></button>
-                          <button onClick={() => handleToggleUserStatus(user.id, user.status)} className={`w-8 h-8 rounded-full border flex items-center justify-center transition-colors ${user.status === 'active' ? 'border-red-200 text-red-500 hover:bg-red-50' : 'border-green-200 text-green-500 hover:bg-green-50'}`} title={user.status === 'active' ? 'حظر المستخدم وتعليق المتجر' : 'تفعيل المستخدم والمتجر'}>
-                            {user.status === 'active' ? <XCircle className="w-4 h-4" /> : <CheckCircle2 className="w-4 h-4" />}
-                          </button>
-                        </td>
-                      </tr>
-                    )) : (
-                      <tr>
-                        <td colSpan={5} className="py-12 text-center text-gray-400 text-sm font-bold dark:text-slate-300">لا يوجد مستخدمين لعرضهم</td>
-                      </tr>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {subscriptionPlans.length > 0 ? subscriptionPlans.map((plan) => (
+                  <div key={plan.id} className={`bg-white dark:bg-[#1A1A24] rounded-3xl p-6 border relative transition-all duration-300 hover:shadow-xl ${plan.is_active ? 'border-purple-200 dark:border-purple-500/30 hover:border-purple-400' : 'border-gray-200 dark:border-white/10 opacity-75'}`}>
+                    
+                    {!plan.is_active && (
+                      <div className="absolute inset-0 bg-gray-50/50 dark:bg-black/40 backdrop-blur-[1px] rounded-3xl z-10 flex items-center justify-center">
+                        <span className="px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-black rounded-lg font-black text-sm shadow-xl flex items-center gap-2">
+                          <Lock className="w-4 h-4"/> الباقة متوقفة
+                        </span>
+                      </div>
                     )}
-                  </tbody>
-                </table>
+
+                    <div className="relative z-20">
+                      <div className="flex justify-between items-start mb-6">
+                        <div className="w-12 h-12 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center dark:bg-purple-900/40 dark:text-purple-400">
+                          <CreditCard className="w-6 h-6" />
+                        </div>
+                        <div className="flex gap-2">
+                          <button onClick={() => { setSelectedPlan(plan); setIsPlanEditOpen(true); }} className="w-8 h-8 rounded-xl border border-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors shadow-sm bg-white dark:bg-[#0f172a] dark:border-slate-700 dark:text-slate-300"><Edit className="w-4 h-4" /></button>
+                          <button onClick={() => handleTogglePlanStatus(plan.id, plan.is_active)} className={`w-8 h-8 rounded-xl border flex items-center justify-center transition-colors shadow-sm ${plan.is_active ? 'border-red-100 text-red-500 hover:bg-red-50 bg-white dark:bg-[#0f172a] dark:border-red-900/50' : 'border-green-100 text-green-500 hover:bg-green-50 bg-white dark:bg-[#0f172a] dark:border-green-900/50'}`}>
+                            {plan.is_active ? <XCircle className="w-4 h-4" /> : <CheckCircle2 className="w-4 h-4" />}
+                          </button>
+                        </div>
+                      </div>
+
+                      <h3 className="text-xl font-black text-gray-900 dark:text-white mb-2">{plan.name}</h3>
+                      
+                      <div className="flex items-end gap-1 mb-6">
+                        <span className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-l from-purple-600 to-indigo-600">{(plan.monthly_price || 0).toLocaleString()}</span>
+                        <span className="text-sm font-bold text-gray-400 dark:text-slate-400 mb-1">ر.ي / شهرياً</span>
+                      </div>
+                      
+                      <div className="flex items-center gap-2 mb-6">
+                        <span className="text-xl font-bold text-gray-700 dark:text-slate-300">{(plan.yearly_price || 0).toLocaleString()}</span>
+                        <span className="text-xs font-bold text-gray-400 dark:text-slate-400">ر.ي / سنوياً</span>
+                      </div>
+
+                      <div className="space-y-3 pt-6 border-t border-gray-100 dark:border-white/5">
+                        <p className="text-sm text-gray-500 font-bold dark:text-slate-400">المعلومات الإضافية:</p>
+                        <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-slate-300">
+                          <Check className="w-4 h-4 text-purple-500"/>
+                          حالة الباقة: {plan.is_active ? 'نشطة للمشتركين' : 'مخفية'}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )) : (
+                  <div className="col-span-full py-20 flex flex-col items-center justify-center text-center">
+                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center text-gray-400 mb-4 dark:bg-white/5 dark:text-slate-500"><CreditCard className="w-8 h-8"/></div>
+                    <h3 className="text-lg font-black text-gray-900 dark:text-white mb-2">لا توجد باقات حالياً</h3>
+                    <p className="text-sm text-gray-500 dark:text-slate-400 max-w-sm">لم يتم العثور على أي باقات من قاعدة البيانات. تأكد من إعداد جدول subscription_plans.</p>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -2022,8 +2142,24 @@ const AdminDashboard = () => {
         <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 p-4 overflow-y-auto">
           <div className="bg-white dark:bg-[#1A1A24] w-full max-w-md rounded-2xl p-6 shadow-2xl relative text-right mt-12 mb-12">
             <button onClick={() => setIsStoreEditOpen(false)} className="absolute top-4 left-4 text-gray-500 hover:text-gray-900 dark:text-white"><XCircle className="w-6 h-6"/></button>
-            <h2 className="text-xl font-black mb-6">تعديل بيانات المتجر</h2>
+            <h2 className="text-xl font-black mb-6">تعديل بيانات المتجر والمالك</h2>
             <form onSubmit={handleSaveStore} className="space-y-4">
+              <div className="grid grid-cols-2 gap-3 mb-4 p-4 bg-gray-50 dark:bg-black/10 rounded-xl border border-gray-100 dark:border-white/5">
+                <div className="col-span-2"><h3 className="text-sm font-bold text-gray-700 dark:text-white mb-2 pb-2 border-b border-gray-200 dark:border-white/10">بيانات المالك</h3></div>
+                <div>
+                  <label className="text-xs font-bold text-gray-500 block mb-1 dark:text-slate-300">الاسم</label>
+                  <input type="text" className="w-full h-10 border border-gray-200 dark:border-white/10 dark:bg-black/20 rounded-lg px-3 outline-none focus:border-purple-500 text-sm" value={selectedStore.users?.name || ''} onChange={e => setSelectedStore({...selectedStore, users: {...selectedStore.users, name: e.target.value}})}/>
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-gray-500 block mb-1 dark:text-slate-300">البريد الإلكتروني</label>
+                  <input type="email" className="w-full h-10 border border-gray-200 dark:border-white/10 dark:bg-black/20 rounded-lg px-3 outline-none focus:border-purple-500 text-sm" value={selectedStore.users?.email || ''} onChange={e => setSelectedStore({...selectedStore, users: {...selectedStore.users, email: e.target.value}})} dir="ltr"/>
+                </div>
+                <div className="col-span-2">
+                  <label className="text-xs font-bold text-gray-500 block mb-1 dark:text-slate-300">رصيد المحفظة (ر.ي)</label>
+                  <input type="number" className="w-full h-10 border border-gray-200 dark:border-white/10 dark:bg-black/20 rounded-lg px-3 outline-none focus:border-purple-500 text-sm font-bold" value={selectedStore.users?.wallet_yer || 0} onChange={e => setSelectedStore({...selectedStore, users: {...selectedStore.users, wallet_yer: parseInt(e.target.value)||0}})}/>
+                </div>
+              </div>
+
               <div>
                 <label className="text-xs font-bold text-gray-500 block mb-1 dark:text-slate-300">اسم المتجر</label>
                 <input type="text" className="w-full h-11 border border-gray-200 dark:border-white/10 dark:bg-black/20 rounded-lg px-3 outline-none focus:border-purple-500 text-sm font-medium" value={selectedStore.store_name} onChange={e => setSelectedStore({...selectedStore, store_name: e.target.value})} required/>
@@ -2038,10 +2174,11 @@ const AdminDashboard = () => {
               <div>
                 <label className="text-xs font-bold text-gray-500 block mb-1 dark:text-slate-300">الباقة</label>
                 <select className="w-full h-11 border border-gray-200 dark:border-white/10 dark:bg-black/20 rounded-lg px-3 outline-none focus:border-purple-500 text-sm font-medium" value={selectedStore.tier} onChange={e => setSelectedStore({...selectedStore, tier: e.target.value})}>
-                  <option value="free">مجانية (تأسيس)</option>
-                  <option value="basic">الأساسية</option>
-                  <option value="pro">الاحترافية</option>
-                  <option value="business">للأعمال</option>
+                  <option value="الاحترافية">الاحترافية (مفتوح)</option>
+                  <option value="الأساسية">الأساسية (500 منتج)</option>
+                  <option value="الانطلاقة">الانطلاقة (100 منتج)</option>
+                  <option value="مجانية">مجانية</option>
+                  <option value="pro">Pro (القديمة)</option>
                 </select>
               </div>
               <div className="flex items-center gap-3">
@@ -2121,99 +2258,7 @@ const AdminDashboard = () => {
         </div>
       )}
 
-      {isUserViewOpen && selectedUser && (
-        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white dark:bg-[#1A1A24] w-full max-w-md rounded-2xl p-6 shadow-2xl relative text-right">
-            <button onClick={() => setIsUserViewOpen(false)} className="absolute top-4 left-4 text-gray-500 hover:text-gray-900 dark:text-white"><XCircle className="w-6 h-6"/></button>
-            <h2 className="text-xl font-black mb-4">تفاصيل المستخدم</h2>
-            <div className="space-y-3 font-medium text-sm text-gray-700 dark:text-gray-300">
-              <p><strong>اسم المستخدم:</strong> {selectedUser.name || 'غير معروف'}</p>
-              <p><strong>البريد الإلكتروني:</strong> {selectedUser.email}</p>
-              <p><strong>الصلاحية (Role):</strong> {selectedUser.role === 'admin' ? 'مدير' : selectedUser.role === 'store_owner' ? 'صاحب متجر' : 'عميل'}</p>
-              <p><strong>حالة الحساب:</strong> <span className={selectedUser.status === 'banned' ? 'text-red-500' : 'text-green-500'}>{selectedUser.status === 'active' ? 'نشط' : selectedUser.status === 'banned' ? 'محظور' : 'بانتظار التفعيل'}</span></p>
-              <p><strong>تاريخ الانضمام:</strong> <span dir="ltr">{new Date(selectedUser.created_at).toLocaleDateString('ar-EG')}</span></p>
-              <p><strong>رصيد المحفظة:</strong> {(selectedUser.wallet_yer || 0).toLocaleString()} ر.ي</p>
-            </div>
-            <button onClick={() => setIsUserViewOpen(false)} className="w-full mt-6 py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 rounded-xl font-black transition-colors text-gray-700 dark:text-gray-300">إغلاق</button>
-          </div>
-        </div>
-      )}
 
-      {isUserEditOpen && selectedUser && (
-        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 p-4 overflow-y-auto">
-          <div className="bg-white dark:bg-[#1A1A24] w-full max-w-md rounded-2xl p-6 shadow-2xl relative text-right mt-12 mb-12">
-            <button onClick={() => setIsUserEditOpen(false)} className="absolute top-4 left-4 text-gray-500 hover:text-gray-900 dark:text-white"><XCircle className="w-6 h-6"/></button>
-            <h2 className="text-xl font-black mb-6">تعديل بيانات المستخدم</h2>
-            <div className="space-y-4">
-              <div>
-                <label className="text-xs font-bold text-gray-500 block mb-1 dark:text-slate-300">اسم المستخدم</label>
-                <input type="text" className="w-full h-11 border border-gray-200 dark:border-white/10 dark:bg-black/20 rounded-lg px-3 outline-none focus:border-purple-500 text-sm font-medium" defaultValue={selectedUser.name} id="edit-user-name"/>
-              </div>
-              <div>
-                <label className="text-xs font-bold text-gray-500 block mb-1 dark:text-slate-300">البريد الإلكتروني</label>
-                <input type="email" className="w-full h-11 border border-gray-200 dark:border-white/10 dark:bg-black/20 rounded-lg px-3 outline-none focus:border-purple-500 text-sm dir-ltr text-left font-medium" defaultValue={selectedUser.email} id="edit-user-email"/>
-              </div>
-              <div>
-                <label className="text-xs font-bold text-gray-500 block mb-1 dark:text-slate-300">الصلاحية (الرتبة)</label>
-                <select className="w-full h-11 border border-gray-200 dark:border-white/10 dark:bg-black/20 rounded-lg px-3 outline-none focus:border-purple-500 text-sm font-medium" defaultValue={selectedUser.role} id="edit-user-role">
-                  <option value="user">مستخدم عادي</option>
-                  <option value="store_owner">صاحب متجر</option>
-                  <option value="admin">مدير نظام</option>
-                </select>
-              </div>
-              <div>
-                <label className="text-xs font-bold text-gray-500 block mb-1 dark:text-slate-300">رصيد المحفظة (ر.ي)</label>
-                <input type="number" className="w-full h-11 border border-gray-200 dark:border-white/10 dark:bg-black/20 rounded-lg px-3 outline-none focus:border-purple-500 text-sm font-bold" defaultValue={selectedUser.wallet_yer || 0} id="edit-user-wallet"/>
-              </div>
-              {selectedUser.role === 'store_owner' && (() => {
-                const userStore = storesList.find(s => s.user_id === selectedUser.id);
-                return (
-                  <div>
-                    <label className="text-xs font-bold text-gray-500 block mb-1 dark:text-slate-300">اسم المتجر</label>
-                    <input
-                      type="text"
-                      className="w-full h-11 border border-indigo-200 dark:border-indigo-500/30 dark:bg-black/20 rounded-lg px-3 outline-none focus:border-indigo-500 text-sm font-medium bg-indigo-50/30"
-                      defaultValue={userStore?.store_name || ''}
-                      id="edit-user-store-name"
-                      placeholder="لا يوجد متجر مرتبط"
-                    />
-                    {!userStore && (
-                      <p className="text-xs text-amber-500 mt-1 font-bold">⚠ لا يوجد متجر مرتبط بهذا المستخدم بعد</p>
-                    )}
-                  </div>
-                );
-              })()}
-            </div>
-            <button onClick={async () => {
-              const name = (document.getElementById('edit-user-name') as HTMLInputElement).value;
-              const email = (document.getElementById('edit-user-email') as HTMLInputElement).value;
-              const role = (document.getElementById('edit-user-role') as HTMLSelectElement).value;
-              const wallet_yer = parseInt((document.getElementById('edit-user-wallet') as HTMLInputElement).value) || 0;
-              
-              const { error } = await supabase.from('users').update({ name, email, role, wallet_yer }).eq('id', selectedUser.id);
-              if (error) { toast.error('وقع خطأ أثناء تحديث المستخدم: ' + error.message); return; }
-
-              // Update store name if the user is a store_owner
-              const storeNameInput = document.getElementById('edit-user-store-name') as HTMLInputElement | null;
-              if (storeNameInput && role === 'store_owner') {
-                const store_name = storeNameInput.value.trim();
-                if (store_name) {
-                  const userStore = storesList.find(s => s.user_id === selectedUser.id);
-                  if (userStore) {
-                    const { error: storeError } = await supabase.from('stores').update({ store_name }).eq('id', userStore.id);
-                    if (storeError) { toast.error('تم تحديث المستخدم لكن وقع خطأ في تحديث المتجر: ' + storeError.message); fetchUsers(); fetchStores(); setIsUserEditOpen(false); return; }
-                  }
-                }
-              }
-
-              toast.success('تم تحديث البيانات بنجاح!');
-              fetchUsers();
-              fetchStores();
-              setIsUserEditOpen(false);
-            }} className="w-full mt-6 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-black transition-colors shadow-lg shadow-purple-600/20">حفظ التعديلات الشاملة</button>
-          </div>
-        </div>
-      )}
 
       {isMarketerViewOpen && selectedMarketer && (
         <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 p-4">
